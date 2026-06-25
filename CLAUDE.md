@@ -366,6 +366,17 @@ The SFBU ECE Program Explorer will become the primary interactive interface for 
 
 
 # Startup
+## Session Workflow
+
+When beginning a new coding session:
+
+- Read `start.md`.
+
+When ending a coding session:
+
+- Follow `end.md`.
+
+These files define the session workflow and may evolve over time.
 
 Always read in this order:
 
