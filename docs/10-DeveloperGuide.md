@@ -111,11 +111,11 @@ docs/
 5. Project Management
 
 management/
-CLAUDE.md
 PROJECT_ROADMAP.md
 TASKS.md
 CHANGELOG.md
 DEVELOPMENT_WORKFLOW.md
+CLAUDE.md (project root)
 
 ⸻
 
@@ -451,7 +451,7 @@ Before committing
 * docs/07-TestingStrategy.md
 * docs/08-DeploymentGuide.md
 * docs/09-CatalogDataModel.md
-* management/CLAUDE.md
+* CLAUDE.md
 * management/PROJECT_ROADMAP.md
 * management/TASKS.md
 * management/CHANGELOG.md

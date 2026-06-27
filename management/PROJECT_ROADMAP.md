@@ -67,7 +67,7 @@ Deliverables
 * Architecture.md
 * Initial CI configuration
 
-Status: ☐ Not Started
+Status: 🟡 In Progress
 
 ⸻
 

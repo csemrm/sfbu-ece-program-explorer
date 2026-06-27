@@ -420,6 +420,6 @@ References
 * docs/03-Database.md
 * docs/04-API.md
 * docs/05-UIUX.md
-* management/CLAUDE.md
+* CLAUDE.md
 * management/PROJECT_ROADMAP.md
 * epics/001-foundation.md

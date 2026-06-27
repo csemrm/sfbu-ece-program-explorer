@@ -291,7 +291,7 @@ backend/
 - **[Database Spec]**: [03-Database.md](./03-Database.md)
 - **[API Spec]**: [04-API.md](./04-API.md)
 - **[UI/UX Guidelines]**: [05-UIUX.md](./05-UIUX.md)
-- **[Epics/Stories]**: [06-Epics.md](./06-Epics.md)
+- **[Epics]**: [epics/](../epics/)
 
 ---
 

@@ -1,4 +1,4 @@
-TASKS.md
+# TASKS.md
 
 SFBU ECE Program Explorer
 
@@ -6,203 +6,222 @@ Development Task Tracker
 
 Current Version: 1.0
 
-⸻
+---
 
-Current Sprint
+## Current Sprint
 
 Sprint 1 – Project Foundation
 
 Status: 🟡 In Progress
 
-⸻
+---
 
-High Priority
+## High Priority
 
-Project Setup
+### Project Setup
 
-* Initialize Git repository
-* Create Next.js frontend
-* Create NestJS backend
-* Configure PostgreSQL
-* Configure Docker Compose
-* Configure ESLint and Prettier
-* Configure Husky pre-commit hooks
+- [x] Initialize Git repository
+- [x] Create Next.js frontend
+- [x] Create NestJS backend
+- [ ] Configure PostgreSQL migrations
+- [x] Configure Docker Compose
+- [x] Configure ESLint and Prettier
+- [x] Configure Husky pre-commit hooks
 
-⸻
+---
 
-Documentation
+### Documentation
 
-* Software Requirements Specification (SRS)
-* Architecture document
-* CLAUDE.md
-* PROJECT_ROADMAP.md
-* Database design document
-* API specification
-* UI style guide
+- [x] Software Requirements Specification (SRS)
+- [x] Architecture document
+- [x] CLAUDE.md
+- [x] PROJECT_ROADMAP.md
+- [x] Database design document
+- [x] API specification
+- [x] UI style guide
 
-⸻
+---
 
-Database
+### Database
 
-* Design ER diagram
-* Create database schema
-* Create migrations
-* Create seed data
-* Import initial catalog
+- [ ] Design ER diagram (→ Epic 002)
+- [ ] Create database schema (→ Epic 002)
+- [ ] Create migrations (→ Epic 002)
+- [ ] Create seed data (→ Epic 002)
+- [ ] Import initial catalog (→ Epic 002)
 
-⸻
+---
 
-Backend
+### Backend
 
-Programs Module
+#### Programs Module
 
-* Program entity
-* Program repository
-* Program service
-* Program controller
-* CRUD API
+- [ ] Program entity
+- [ ] Program repository
+- [ ] Program service
+- [ ] Program controller
+- [ ] CRUD API
 
-⸻
+---
 
-Courses Module
+#### Courses Module
 
-* Course entity
-* Course repository
-* Course service
-* Course controller
+- [ ] Course entity
+- [ ] Course repository
+- [ ] Course service
+- [ ] Course controller
 
-⸻
+---
 
-Knowledge Areas
+#### Knowledge Areas
 
-* Entity
-* Service
-* API
+- [ ] Entity
+- [ ] Service
+- [ ] API
 
-⸻
+---
 
-Requirement Groups
+#### Requirement Groups
 
-* Entity
-* Service
-* API
+- [ ] Entity
+- [ ] Service
+- [ ] API
 
-⸻
+---
 
-Search
+#### Search
 
-* Search API
-* Full-text search
-* Filtering
+- [ ] Search API
+- [ ] Full-text search
+- [ ] Filtering
 
-⸻
+---
 
-Frontend
+### Frontend
 
-Layout
+#### Layout
 
-* Navigation bar
-* Footer
-* Theme
-* Responsive layout
+- [ ] Navigation bar
+- [ ] Footer
+- [ ] Theme
+- [ ] Responsive layout
 
-⸻
+---
 
-Home Page
+#### Home Page
 
-* Hero section
-* Program cards
-* Search box
-* Featured visualizations
+- [ ] Hero section
+- [ ] Program cards
+- [ ] Search box
+- [ ] Featured visualizations
 
-⸻
+---
 
-Program Explorer
+#### Program Explorer
 
-* Program list
-* Program detail page
-* Requirement summary
-* Learning outcomes
+- [ ] Program list
+- [ ] Program detail page
+- [ ] Requirement summary
+- [ ] Learning outcomes
 
-⸻
+---
 
-Course Explorer
+#### Course Explorer
 
-* Search
-* Filters
-* Course detail page
-* Related courses
+- [ ] Search
+- [ ] Filters
+- [ ] Course detail page
+- [ ] Related courses
 
-⸻
+---
 
-Curriculum Roadmap
+#### Curriculum Roadmap
 
-* Timeline view
-* Semester cards
-* Zoom
-* Pan
+- [ ] Timeline view
+- [ ] Semester cards
+- [ ] Zoom
+- [ ] Pan
 
-⸻
+---
 
-Prerequisite Graph
+#### Prerequisite Graph
 
-* React Flow integration
-* Node rendering
-* Edge rendering
-* Highlight prerequisite paths
+- [ ] React Flow integration
+- [ ] Node rendering
+- [ ] Edge rendering
+- [ ] Highlight prerequisite paths
 
-⸻
+---
 
-Program Comparison
+#### Program Comparison
 
-* Comparison page
-* Credit comparison
-* Knowledge area comparison
-* Requirement comparison
+- [ ] Comparison page
+- [ ] Credit comparison
+- [ ] Knowledge area comparison
+- [ ] Requirement comparison
 
-⸻
+---
 
-Admin
+#### Admin
 
-* Login
-* Dashboard
-* Course editor
-* Program editor
-* Catalog import
+- [ ] Login
+- [ ] Dashboard
+- [ ] Course editor
+- [ ] Program editor
+- [ ] Catalog import
 
-⸻
+---
 
-Testing
+### Testing
 
-* Unit tests
-* Integration tests
-* API tests
-* UI tests
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] API tests
+- [ ] UI tests
 
-⸻
+---
 
-Deployment
+### Deployment
 
-* Docker configuration
-* Environment variables
-* Production build
-* Deployment documentation
+- [x] Docker configuration
+- [x] Environment variables
+- [ ] Production build validation
+- [ ] Deployment documentation
 
-⸻
+---
 
-Completed
+## Completed
 
-(Move completed tasks here for historical tracking.)
+- [x] Initialize Git repository
+- [x] Create project documentation (SRS, Architecture, DB, API, UI/UX, Coding Standards, Testing Strategy, Deployment Guide, Catalog Data Model, Developer Guide)
+- [x] Create all 9 epics (001–009)
+- [x] Create PROJECT_ROADMAP.md (14 milestones)
+- [x] Create CLAUDE.md
+- [x] Scaffold Next.js frontend (Next.js 16, TypeScript, Tailwind CSS, App Router)
+- [x] Scaffold NestJS backend (NestJS 11, TypeScript)
+- [x] Add health endpoint (`GET /api/v1/health`)
+- [x] Install TypeORM, PostgreSQL, config, validation packages
+- [x] Create docker-compose.yml
+- [x] Create backend/Dockerfile and frontend/Dockerfile
+- [x] Create docker/nginx.conf
+- [x] Create .env.example
+- [x] Create .gitignore
+- [x] Configure Prettier (.prettierrc)
+- [x] Configure Husky pre-commit hook
+- [x] Set up GitHub Actions CI (.github/workflows/ci.yml)
+- [x] Populate README.md
+- [x] Fix doc inconsistencies (ORM, CLAUDE.md path, broken refs)
 
-⸻
+---
 
-Blocked
+## Blocked
 
-(List tasks waiting on external decisions or dependencies.)
+(None)
 
-⸻
+---
 
-Notes
+## Notes
 
-* Version 1 does not include student accounts, transcripts, GPA, or advising workflows.
-* The application is a public-facing curriculum visualization platform built from the university catalog.
+- Version 1 does not include student accounts, transcripts, GPA, or advising workflows.
+- The application is a public-facing curriculum visualization platform built from the university catalog.
+- Next unfinished milestone task: PostgreSQL migrations and seed data (Epic 002).
