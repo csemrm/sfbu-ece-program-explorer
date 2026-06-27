@@ -101,28 +101,28 @@ Status: 🟡 In Progress
 
 #### Layout
 
-- [ ] Navigation bar
-- [ ] Footer
-- [ ] Theme
-- [ ] Responsive layout
+- [x] Navigation bar
+- [x] Footer
+- [x] Theme
+- [x] Responsive layout
 
 ---
 
 #### Home Page
 
-- [ ] Hero section
-- [ ] Program cards
-- [ ] Search box
-- [ ] Featured visualizations
+- [x] Hero section
+- [x] Program cards
+- [ ] Search box (Epic 005)
+- [ ] Featured visualizations (Epic 006/007)
 
 ---
 
 #### Program Explorer
 
-- [ ] Program list
-- [ ] Program detail page
-- [ ] Requirement summary
-- [ ] Learning outcomes
+- [x] Program list
+- [x] Program detail page
+- [x] Requirement summary
+- [ ] Learning outcomes (future)
 
 ---
 
@@ -216,6 +216,13 @@ Status: 🟡 In Progress
 - [x] Create AppDataSource for TypeORM CLI migrations
 - [x] Create InitialSchema migration (all 10 tables, FK constraints, indexes, enums)
 - [x] Create seed data from 2025-2026 SFBU catalog (3 programs, 70+ courses, prerequisites, corequisites, requirement groups)
+- [x] Build typed API client (frontend/lib/api.ts) with server/client URL switching (SSR + browser)
+- [x] Build Nav, Breadcrumb shared UI components
+- [x] Build ProgramCard, ProgramHero, RequirementSummary, ProgramNavigation components
+- [x] Build Programs list page (/programs) — server component with live API data
+- [x] Build Program detail page (/programs/[id]) — requirements table, catalog years
+- [x] Rewrite home page with hero section, live program grid, features section
+- [x] Configure docker-compose.yml with API_BASE_URL for SSR internal routing
 
 ---
 
@@ -229,4 +236,4 @@ Status: 🟡 In Progress
 
 - Version 1 does not include student accounts, transcripts, GPA, or advising workflows.
 - The application is a public-facing curriculum visualization platform built from the university catalog.
-- Next unfinished milestone task: PostgreSQL migrations and seed data (Epic 002).
+- Next milestone: Epic 005 — Course Explorer (search, filters, course detail page).

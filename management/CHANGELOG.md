@@ -4,6 +4,31 @@
 
 ---
 
+## [0.4.0] — 2026-06-27
+
+### Epic 004 — Program Explorer (Frontend)
+
+#### Added
+
+- `frontend/lib/api.ts` — Typed API client with server/client URL switching (`API_BASE_URL` for SSR, `NEXT_PUBLIC_API_URL` for browser)
+- `frontend/components/ui/Nav.tsx` — Sticky navigation header with SFBU branding and Programs/Courses links
+- `frontend/components/ui/Breadcrumb.tsx` — Accessible breadcrumb navigation with aria-current
+- `frontend/components/programs/ProgramCard.tsx` — Program card with color accent per abbreviation (BSCS=blue, MSCS=purple, MSEE=emerald)
+- `frontend/components/programs/ProgramHero.tsx` — Gradient hero section per program
+- `frontend/components/programs/RequirementSummary.tsx` — Requirement groups table with min credits and total row
+- `frontend/components/programs/ProgramNavigation.tsx` — Placeholder navigation cards for upcoming Epics 006/007
+- `frontend/app/programs/page.tsx` — Programs list page (async server component, live API data)
+- `frontend/app/programs/[id]/page.tsx` — Program detail page with requirements table, catalog year selector, breadcrumb
+- `frontend/app/page.tsx` — Rewritten home page: gradient hero with live program badges, program grid, features section
+
+#### Changed
+
+- `frontend/app/layout.tsx` — Added Nav, footer with © year, metadata title template
+- `docker-compose.yml` — Added `API_BASE_URL: http://backend:3001/api/v1` to frontend service
+- `.env.example` — Added `API_BASE_URL` variable
+
+---
+
 ## [0.3.0] — 2026-06-27
 
 ### Epic 003 — Backend API
