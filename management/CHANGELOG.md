@@ -4,6 +4,29 @@
 
 ---
 
+## [0.3.0] — 2026-06-27
+
+### Epic 003 — Backend API
+
+#### Added
+
+- `@nestjs/swagger` + `swagger-ui-express` — Swagger UI at `/api/docs`
+- `common/filters/http-exception.filter.ts` — Global exception filter with consistent `{ statusCode, timestamp, path, message }` shape
+- `common/dto/pagination.dto.ts` — `PaginationDto` (page/limit), `PaginatedResult<T>`, `paginate()` helper
+- `modules/programs/` — `GET /programs`, `GET /programs/:id`, `GET /programs/:id/requirements`
+- `modules/courses/` — `GET /courses`, `GET /courses/:id`, `GET /courses/:id/prerequisites`
+- `modules/requirement-groups/` — `GET /requirement-groups`, `GET /requirement-groups/:id`
+- `modules/knowledge-areas/` — `GET /knowledge-areas`, `GET /knowledge-areas/:id`
+- `modules/catalog-years/` — `GET /catalog-years`, `GET /catalog-years/:id`
+- `modules/search/` — `GET /search?q=&type=&level=` (ILIKE across programs and courses)
+
+#### Changed
+
+- `main.ts` — Added global exception filter, Swagger setup
+- `app.module.ts` — Imports all 6 feature modules
+
+---
+
 ## [0.2.0] — 2026-06-27
 
 ### Epic 002 — Database Design

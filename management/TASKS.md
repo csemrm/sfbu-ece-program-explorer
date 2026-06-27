@@ -56,44 +56,44 @@ Status: 🟡 In Progress
 
 #### Programs Module
 
-- [ ] Program entity
-- [ ] Program repository
-- [ ] Program service
-- [ ] Program controller
-- [ ] CRUD API
+- [x] Program entity
+- [x] Program repository
+- [x] Program service
+- [x] Program controller
+- [x] CRUD API
 
 ---
 
 #### Courses Module
 
-- [ ] Course entity
-- [ ] Course repository
-- [ ] Course service
-- [ ] Course controller
+- [x] Course entity
+- [x] Course repository
+- [x] Course service
+- [x] Course controller
 
 ---
 
 #### Knowledge Areas
 
-- [ ] Entity
-- [ ] Service
-- [ ] API
+- [x] Entity
+- [x] Service
+- [x] API
 
 ---
 
 #### Requirement Groups
 
-- [ ] Entity
-- [ ] Service
-- [ ] API
+- [x] Entity
+- [x] Service
+- [x] API
 
 ---
 
 #### Search
 
-- [ ] Search API
-- [ ] Full-text search
-- [ ] Filtering
+- [x] Search API
+- [x] Full-text search
+- [x] Filtering
 
 ---
 
