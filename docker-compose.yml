@@ -21,6 +21,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      target: development
     container_name: sfbu_backend
     restart: unless-stopped
     environment:
@@ -35,25 +36,25 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./backend:/app
-      - /app/node_modules
+      - ./backend/src:/app/src
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: development
     container_name: sfbu_frontend
     restart: unless-stopped
     environment:
       NEXT_PUBLIC_API_URL: http://localhost/api/v1
+      NEXT_TELEMETRY_DISABLED: 1
     ports:
       - "3000:3000"
     depends_on:
       - backend
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
+      - ./frontend/app:/app/app
+      - ./frontend/public:/app/public
 
   nginx:
     image: nginx:alpine

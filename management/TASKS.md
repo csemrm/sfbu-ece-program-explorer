@@ -23,7 +23,7 @@ Status: 🟡 In Progress
 - [x] Initialize Git repository
 - [x] Create Next.js frontend
 - [x] Create NestJS backend
-- [ ] Configure PostgreSQL migrations
+- [x] Configure PostgreSQL migrations
 - [x] Configure Docker Compose
 - [x] Configure ESLint and Prettier
 - [x] Configure Husky pre-commit hooks
@@ -44,11 +44,11 @@ Status: 🟡 In Progress
 
 ### Database
 
-- [ ] Design ER diagram (→ Epic 002)
-- [ ] Create database schema (→ Epic 002)
-- [ ] Create migrations (→ Epic 002)
-- [ ] Create seed data (→ Epic 002)
-- [ ] Import initial catalog (→ Epic 002)
+- [x] Design ER diagram (→ Epic 002)
+- [x] Create database schema (→ Epic 002)
+- [x] Create migrations (→ Epic 002)
+- [x] Create seed data (→ Epic 002)
+- [x] Import initial catalog (→ Epic 002)
 
 ---
 
@@ -211,6 +211,11 @@ Status: 🟡 In Progress
 - [x] Set up GitHub Actions CI (.github/workflows/ci.yml)
 - [x] Populate README.md
 - [x] Fix doc inconsistencies (ORM, CLAUDE.md path, broken refs)
+- [x] Create 10 TypeORM entities (Program, CatalogYear, RequirementGroup, Course, KnowledgeArea, CourseKnowledgeArea, ProgramRequirement, Prerequisite, Corequisite, CatalogImport)
+- [x] Configure DatabaseModule with TypeORM (database.config.ts, database.module.ts)
+- [x] Create AppDataSource for TypeORM CLI migrations
+- [x] Create InitialSchema migration (all 10 tables, FK constraints, indexes, enums)
+- [x] Create seed data from 2025-2026 SFBU catalog (3 programs, 70+ courses, prerequisites, corequisites, requirement groups)
 
 ---
 

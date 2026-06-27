@@ -4,6 +4,38 @@
 
 ---
 
+## [0.2.0] — 2026-06-27
+
+### Epic 002 — Database Design
+
+#### Added
+
+- `backend/src/database/entities/` — 10 TypeORM entities:
+  - `program.entity.ts` — Program (BSCS, MSCS, MSEE)
+  - `catalog-year.entity.ts` — CatalogYear with unique constraint on (program_id, academic_year)
+  - `requirement-group.entity.ts` — RequirementGroup with minCredits and sortOrder
+  - `course.entity.ts` — Course with CourseLevel enum (undergraduate/graduate)
+  - `knowledge-area.entity.ts` — KnowledgeArea
+  - `course-knowledge-area.entity.ts` — Junction with unique composite index
+  - `program-requirement.entity.ts` — ProgramRequirement linking groups to courses
+  - `prerequisite.entity.ts` — Prerequisite with unique constraint per course pair
+  - `corequisite.entity.ts` — Corequisite with unique constraint per course pair
+  - `catalog-import.entity.ts` — CatalogImport with ImportStatus enum
+- `backend/src/database/entities/index.ts` — Barrel export for all entities
+- `backend/src/database/database.config.ts` — TypeORM config factory from DATABASE_URL
+- `backend/src/database/database.module.ts` — NestJS DatabaseModule (TypeOrmModule.forRootAsync)
+- `backend/src/database/data-source.ts` — AppDataSource for TypeORM CLI
+- `backend/src/database/migrations/1719446400000-InitialSchema.ts` — Full schema migration (all tables, FK constraints, composite indexes, enums)
+- `backend/src/database/seeds/catalog-data.ts` — Typed seed data from 2025-2026 SFBU catalog (3 programs, 70+ courses, prerequisites, corequisites, requirement groups)
+- `backend/src/database/seeds/seed.ts` — Idempotent seed runner script
+
+#### Changed
+
+- `backend/src/app.module.ts` — Imports DatabaseModule
+- `backend/package.json` — Added migration scripts: `migration:run`, `migration:revert`, `migration:generate`, `migration:create`, `seed`
+
+---
+
 ## [0.1.0] — 2026-06-27
 
 ### Epic 001 — Project Foundation
