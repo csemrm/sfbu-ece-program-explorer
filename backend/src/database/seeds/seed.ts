@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import * as dotenv from 'dotenv';
+import * as bcrypt from 'bcryptjs';
 import { DataSource } from 'typeorm';
 import { AppDataSource } from '../data-source';
 import {
@@ -17,6 +18,7 @@ import { Prerequisite } from '../entities/prerequisite.entity';
 import { Program } from '../entities/program.entity';
 import { ProgramRequirement } from '../entities/program-requirement.entity';
 import { RequirementGroup } from '../entities/requirement-group.entity';
+import { AdminUser, AdminRole } from '../entities/admin-user.entity';
 
 dotenv.config();
 
@@ -178,6 +180,30 @@ async function seed(dataSource: DataSource): Promise<void> {
         }),
       );
     }
+  }
+
+  // ── Admin user ─────────────────────────────────────────────
+  const adminEmail = process.env.ADMIN_SEED_EMAIL ?? 'admin@sfbu.edu';
+  const adminPassword = process.env.ADMIN_SEED_PASSWORD ?? 'SfbuAdmin2025!';
+  const adminRepo = dataSource.getRepository(AdminUser);
+  const existingAdmin = await adminRepo.findOne({
+    where: { email: adminEmail },
+  });
+  if (!existingAdmin) {
+    const passwordHash = await bcrypt.hash(adminPassword, 12);
+    await adminRepo.save(
+      adminRepo.create({
+        email: adminEmail,
+        passwordHash,
+        role: AdminRole.SYSTEM_ADMIN,
+        isActive: true,
+      }),
+    );
+    console.log(
+      `  Admin user created: ${adminEmail} (change password after first login)`,
+    );
+  } else {
+    console.log(`  Admin user already exists: ${adminEmail}`);
   }
 
   console.log('Seed complete.');

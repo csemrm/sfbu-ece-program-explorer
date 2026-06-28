@@ -12,6 +12,8 @@ import {
   Program,
   ProgramRequirement,
   RequirementGroup,
+  AdminUser,
+  AuditLog,
 } from './entities';
 
 dotenv.config();
@@ -30,6 +32,8 @@ export const AppDataSource = new DataSource({
     Prerequisite,
     Corequisite,
     CatalogImport,
+    AdminUser,
+    AuditLog,
   ],
   migrations: [__dirname + '/migrations/*{.ts,.js}'],
   synchronize: false,

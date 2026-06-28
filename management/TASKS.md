@@ -150,10 +150,15 @@ Status: 🟡 In Progress
 
 #### Prerequisite Graph
 
-- [ ] React Flow integration
-- [ ] Node rendering
-- [ ] Edge rendering
-- [ ] Highlight prerequisite paths
+- [x] React Flow integration (@xyflow/react ^12.11.1)
+- [x] CourseNode: custom node with level-colored border, code/title/credits
+- [x] Edge rendering: solid=prerequisite, dashed=corequisite
+- [x] Node click highlights connected edges blue
+- [x] DetailsPanel: course details + link to course detail page
+- [x] MiniMap, zoom/pan Controls, Background
+- [x] Topological-sort layout utility (graphLayout.ts)
+- [x] GET /programs/:id/graph backend endpoint
+- [x] /programs/:id/graph frontend page
 
 ---
 
@@ -240,4 +245,4 @@ Status: 🟡 In Progress
 
 - Version 1 does not include student accounts, transcripts, GPA, or advising workflows.
 - The application is a public-facing curriculum visualization platform built from the university catalog.
-- Next milestone: Epic 007 — Prerequisite Graph (React Flow interactive graph).
+- Next milestone: Epic 008 — Administration Dashboard.

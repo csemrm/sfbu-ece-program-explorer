@@ -8,3 +8,5 @@ export * from './program-requirement.entity';
 export * from './prerequisite.entity';
 export * from './corequisite.entity';
 export * from './catalog-import.entity';
+export * from './admin-user.entity';
+export * from './audit-log.entity';

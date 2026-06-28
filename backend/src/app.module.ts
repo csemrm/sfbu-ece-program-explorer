@@ -8,6 +8,8 @@ import { RequirementGroupsModule } from './modules/requirement-groups/requiremen
 import { KnowledgeAreasModule } from './modules/knowledge-areas/knowledge-areas.module';
 import { CatalogYearsModule } from './modules/catalog-years/catalog-years.module';
 import { SearchModule } from './modules/search/search.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { SearchModule } from './modules/search/search.module';
     KnowledgeAreasModule,
     CatalogYearsModule,
     SearchModule,
+    AuthModule,
+    AdminModule,
   ],
   controllers: [AppController],
 })

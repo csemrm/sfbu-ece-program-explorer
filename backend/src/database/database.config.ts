@@ -10,6 +10,8 @@ import {
   Program,
   ProgramRequirement,
   RequirementGroup,
+  AdminUser,
+  AuditLog,
 } from './entities';
 
 export function getDatabaseConfig(): TypeOrmModuleOptions {
@@ -32,6 +34,8 @@ export function getDatabaseConfig(): TypeOrmModuleOptions {
       Prerequisite,
       Corequisite,
       CatalogImport,
+      AdminUser,
+      AuditLog,
     ],
     migrations: [__dirname + '/migrations/*{.ts,.js}'],
     synchronize: false,
