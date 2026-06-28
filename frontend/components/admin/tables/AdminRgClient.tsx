@@ -54,6 +54,7 @@ export function AdminRgClient({ rows }: { rows: AdminRequirementGroup[] }) {
       <DataTable
         columns={columns}
         rows={rows}
+        editHref={(row) => `/admin/requirement-groups/${row.id}/edit`}
         onDelete={(id) => setConfirmId(id)}
         deleting={deleting}
       />

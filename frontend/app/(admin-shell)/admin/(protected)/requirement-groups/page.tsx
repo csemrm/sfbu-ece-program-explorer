@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import Link from 'next/link';
 import { adminApi } from '../../../../../lib/admin-api';
 import { AdminRgClient } from '../../../../../components/admin/tables/AdminRgClient';
 
@@ -26,7 +27,15 @@ export default async function RequirementGroupsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Requirement Groups</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Requirement Groups</h1>
+        <Link
+          href="/admin/requirement-groups/new"
+          className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors"
+        >
+          + New Requirement Group
+        </Link>
+      </div>
       <div className="bg-white rounded-xl border border-gray-200">
         <AdminRgClient rows={result.data} />
       </div>

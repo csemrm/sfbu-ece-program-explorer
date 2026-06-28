@@ -48,6 +48,7 @@ export function AdminKaClient({ rows }: { rows: AdminKnowledgeArea[] }) {
       <DataTable
         columns={columns}
         rows={rows}
+        editHref={(row) => `/admin/knowledge-areas/${row.id}/edit`}
         onDelete={(id) => setConfirmId(id)}
         deleting={deleting}
       />
