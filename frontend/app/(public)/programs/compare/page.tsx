@@ -242,7 +242,7 @@ export default async function ComparePage() {
     statsList = roadmaps
       .map(computeStats)
       .filter((s) => s.abbreviation === 'MSCS' || s.abbreviation === 'MSEE')
-      .sort((a, b) => (a.abbreviation === 'MSCS' ? -1 : 1));
+      .sort((a) => (a.abbreviation === 'MSCS' ? -1 : 1));
   } catch {
     fetchError = true;
   }
@@ -342,18 +342,15 @@ export default async function ComparePage() {
                   <th className="text-left px-6 py-3.5 text-white/80 font-medium text-xs uppercase tracking-wider">
                     Metric
                   </th>
-                  {statsList.map((s) => {
-                    const meta = DEGREE_META[s.abbreviation];
-                    return (
-                      <th
-                        key={s.id}
-                        className="px-6 py-3.5 text-center text-white font-bold text-xs uppercase tracking-wider"
-                        style={{ color: 'white' }}
-                      >
-                        {s.abbreviation}
-                      </th>
-                    );
-                  })}
+                  {statsList.map((s) => (
+                    <th
+                      key={s.id}
+                      className="px-6 py-3.5 text-center text-white font-bold text-xs uppercase tracking-wider"
+                      style={{ color: 'white' }}
+                    >
+                      {s.abbreviation}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -379,8 +376,8 @@ export default async function ComparePage() {
         <section>
           <h2 className="text-xl font-bold text-gray-900 mb-1">Requirement Phases</h2>
           <p className="text-sm text-gray-500 mb-5">
-            Each program's curriculum is organized into requirement phases with associated credit
-            totals.
+            Each program&apos;s curriculum is organized into requirement phases with associated
+            credit totals.
           </p>
           <div className="grid gap-6 sm:grid-cols-2 sm:grid-cols-2">
             {statsList.map((s) => {
