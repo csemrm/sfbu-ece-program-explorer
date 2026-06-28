@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { api } from '../../../../lib/api';
 import { PrerequisiteList } from '../../../../components/courses/PrerequisiteList';
 import { Breadcrumb } from '../../../../components/ui/Breadcrumb';
@@ -117,30 +118,40 @@ export default async function CourseDetailPage({ params }: Props) {
             />
           </section>
 
-          {/* Future links */}
+          {/* Explore further */}
           <section>
             <h2 className="text-lg font-bold text-gray-900 mb-3">Explore Further</h2>
             <div className="grid sm:grid-cols-2 gap-4">
-              <div className="rounded-xl border border-gray-200 bg-white p-5">
+              <Link
+                href="/programs"
+                className="group rounded-xl border border-gray-200 bg-white p-5 hover:border-blue-300 hover:shadow-sm transition-all block"
+              >
                 <div className="text-2xl mb-2">🔗</div>
-                <h3 className="font-semibold text-gray-900 mb-1">Prerequisite Graph</h3>
+                <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-blue-700 transition-colors">
+                  Prerequisite Graph
+                </h3>
                 <p className="text-sm text-gray-500 mb-3">
                   View {course.courseCode} in the full dependency graph.
                 </p>
-                <span className="inline-block text-xs text-gray-400 bg-gray-100 rounded px-2 py-1">
-                  Coming in Epic 007
+                <span className="inline-block text-xs text-blue-600 font-medium">
+                  Select a program →
                 </span>
-              </div>
-              <div className="rounded-xl border border-gray-200 bg-white p-5">
+              </Link>
+              <Link
+                href="/programs"
+                className="group rounded-xl border border-gray-200 bg-white p-5 hover:border-blue-300 hover:shadow-sm transition-all block"
+              >
                 <div className="text-2xl mb-2">🗺️</div>
-                <h3 className="font-semibold text-gray-900 mb-1">Curriculum Roadmap</h3>
+                <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-blue-700 transition-colors">
+                  Curriculum Roadmap
+                </h3>
                 <p className="text-sm text-gray-500 mb-3">
                   See where {course.courseCode} fits in the semester plan.
                 </p>
-                <span className="inline-block text-xs text-gray-400 bg-gray-100 rounded px-2 py-1">
-                  Coming in Epic 006
+                <span className="inline-block text-xs text-blue-600 font-medium">
+                  Select a program →
                 </span>
-              </div>
+              </Link>
             </div>
           </section>
         </div>
