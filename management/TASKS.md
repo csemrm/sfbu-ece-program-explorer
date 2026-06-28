@@ -139,10 +139,12 @@ Status: 🟡 In Progress
 
 #### Curriculum Roadmap
 
-- [ ] Timeline view
-- [ ] Semester cards
-- [ ] Zoom
-- [ ] Pan
+- [x] Phase-by-phase timeline (requirement-group columns)
+- [x] Course cards with level badge, credits, link to detail
+- [x] Zoom (CSS zoom 50–150% via range slider)
+- [x] Collapse/expand per column
+- [x] Credit totals per phase
+- [x] GET /programs/:id/roadmap backend endpoint
 
 ---
 
@@ -238,4 +240,4 @@ Status: 🟡 In Progress
 
 - Version 1 does not include student accounts, transcripts, GPA, or advising workflows.
 - The application is a public-facing curriculum visualization platform built from the university catalog.
-- Next milestone: Epic 006 — Curriculum Roadmap (semester-by-semester visualization).
+- Next milestone: Epic 007 — Prerequisite Graph (React Flow interactive graph).

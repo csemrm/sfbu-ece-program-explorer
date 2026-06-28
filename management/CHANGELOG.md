@@ -4,6 +4,28 @@
 
 ---
 
+## [0.6.0] — 2026-06-27
+
+### Epic 006 — Curriculum Roadmap
+
+#### Added
+
+**Backend:**
+- `programs.module.ts` — Added `RequirementGroup` and `ProgramRequirement` to TypeOrmModule
+- `programs.service.ts` — `findRoadmap()`: fetches requirement groups with linked courses for latest catalog year
+- `programs.controller.ts` — `GET /programs/:id/roadmap` endpoint
+- `programs/dto/program.dto.ts` — `RoadmapCourseDto`, `RoadmapPhaseDto`, `ProgramRoadmapDto`
+
+**Frontend:**
+- `lib/api.ts` — `RoadmapCourse`, `RoadmapPhase`, `ProgramRoadmap` types; `programs.roadmap(id)` call
+- `components/roadmap/RoadmapCourseCard.tsx` — Compact course card with level-colored left border and link
+- `components/roadmap/PhaseColumn.tsx` — Collapsible column with courses list and credit total badge
+- `components/roadmap/RoadmapCanvas.tsx` — Client component: CSS zoom slider (50–150%), level legend, scrollable canvas
+- `app/programs/[id]/roadmap/page.tsx` — Roadmap page: hero, breadcrumb, canvas
+- `components/programs/ProgramNavigation.tsx` — Replaced placeholder with live link to roadmap page
+
+---
+
 ## [0.5.0] — 2026-06-27
 
 ### Epic 005 — Course Explorer (Frontend)
