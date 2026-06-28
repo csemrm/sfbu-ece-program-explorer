@@ -6,7 +6,7 @@ import type { ProgramRoadmap } from '../../../../lib/api';
 
 export const metadata: Metadata = {
   title: 'Compare Programs',
-  description: 'Side-by-side comparison of BSCS, MSCS, and MSEE programs at SFBU.',
+  description: 'Side-by-side comparison of MSCS and MSEE graduate programs at SFBU.',
 };
 
 // ── Program-level constants ────────────────────────────────────────────────
@@ -59,7 +59,7 @@ function computeStats(roadmap: ProgramRoadmap): ProgramStats {
     id: roadmap.programId,
     name: roadmap.programName,
     abbreviation: roadmap.programAbbreviation,
-    totalCredits: allCourses.reduce((sum, c) => sum + c.creditHours, 0),
+    totalCredits: allCourses.reduce((sum, c) => sum + Number(c.creditHours), 0),
     totalCourses: allCourses.length,
     ugCourses: allCourses.filter((c) => c.level === 'undergraduate').length,
     gradCourses: allCourses.filter((c) => c.level === 'graduate').length,
@@ -135,7 +135,7 @@ function PhaseList({ stats }: { stats: ProgramStats }) {
   return (
     <div className="space-y-2">
       {stats.phases.map((phase) => {
-        const credits = phase.courses.reduce((sum, c) => sum + c.creditHours, 0);
+        const credits = phase.courses.reduce((sum, c) => sum + Number(c.creditHours), 0);
         return (
           <div
             key={phase.id}
@@ -149,7 +149,7 @@ function PhaseList({ stats }: { stats: ProgramStats }) {
               <p className="text-sm font-semibold text-gray-800 truncate">{phase.name}</p>
               <p className="text-xs text-gray-500 mt-0.5">
                 {phase.courses.length} course{phase.courses.length !== 1 ? 's' : ''}
-                {phase.minCredits ? ` · min ${phase.minCredits} cr` : ''}
+                {phase.minCredits ? ` · min ${Math.round(Number(phase.minCredits))} cr` : ''}
               </p>
             </div>
             <span
@@ -174,14 +174,10 @@ export default async function ComparePage() {
   try {
     const { data: programs } = await api.programs.list({ limit: 100 });
     const roadmaps = await Promise.all(programs.map((p) => api.programs.roadmap(p.id)));
-    statsList = roadmaps.map(computeStats);
-    // Sort BSCS → MSCS → MSEE
-    const ORDER = ['BSCS', 'MSCS', 'MSEE'];
-    statsList.sort((a, b) => {
-      const ai = ORDER.indexOf(a.abbreviation);
-      const bi = ORDER.indexOf(b.abbreviation);
-      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
-    });
+    statsList = roadmaps
+      .map(computeStats)
+      .filter((s) => s.abbreviation === 'MSCS' || s.abbreviation === 'MSEE')
+      .sort((a, b) => (a.abbreviation === 'MSCS' ? -1 : 1));
   } catch {
     fetchError = true;
   }
@@ -204,13 +200,9 @@ export default async function ComparePage() {
   const STAT_ROWS: { label: string; getValue: (s: ProgramStats) => string }[] = [
     { label: 'Total Credits', getValue: (s) => `${s.totalCredits}` },
     { label: 'Total Courses', getValue: (s) => `${s.totalCourses}` },
-    { label: 'Undergraduate Courses', getValue: (s) => (s.ugCourses > 0 ? `${s.ugCourses}` : '—') },
     { label: 'Graduate Courses', getValue: (s) => (s.gradCourses > 0 ? `${s.gradCourses}` : '—') },
     { label: 'Requirement Phases', getValue: (s) => `${s.phaseCount}` },
-    {
-      label: 'Degree Level',
-      getValue: (s) => DEGREE_META[s.abbreviation]?.type.split(' ')[0] ?? '—',
-    },
+    { label: 'Degree Level', getValue: (s) => DEGREE_META[s.abbreviation]?.type ?? '—' },
     { label: 'Typical Duration', getValue: (s) => DEGREE_META[s.abbreviation]?.duration ?? '—' },
     { label: 'Catalog Year', getValue: (s) => s.academicYear ?? '—' },
   ];
@@ -237,7 +229,7 @@ export default async function ComparePage() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Compare Programs</h1>
               <p className="text-gray-500 mt-1.5 text-base">
-                Side-by-side comparison of BSCS, MSCS, and MSEE degree requirements.
+                Side-by-side comparison of graduate programs — MSCS and MSEE.
               </p>
             </div>
             <Link
@@ -253,7 +245,7 @@ export default async function ComparePage() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 space-y-12">
         {/* Program header cards */}
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2">
           {statsList.map((s) => (
             <ProgramHeaderCard key={s.id} stats={s} />
           ))}
@@ -276,7 +268,7 @@ export default async function ComparePage() {
         <section>
           <h2 className="text-xl font-bold text-gray-900 mb-1">Program Overview</h2>
           <p className="text-sm text-gray-500 mb-5">
-            Key metrics compared across all three programs.
+            Key metrics compared across both graduate programs.
           </p>
           <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
             <table className="w-full text-sm">
@@ -291,7 +283,7 @@ export default async function ComparePage() {
                       <th
                         key={s.id}
                         className="px-6 py-3.5 text-center text-white font-bold text-xs uppercase tracking-wider"
-                        style={{ color: meta?.bg ?? 'white' }}
+                        style={{ color: 'white' }}
                       >
                         {s.abbreviation}
                       </th>
@@ -325,7 +317,7 @@ export default async function ComparePage() {
             Each program's curriculum is organized into requirement phases with associated credit
             totals.
           </p>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 sm:grid-cols-2">
             {statsList.map((s) => {
               const meta = DEGREE_META[s.abbreviation];
               return (
@@ -348,7 +340,7 @@ export default async function ComparePage() {
         {/* Explore CTAs */}
         <section>
           <h2 className="text-xl font-bold text-gray-900 mb-5">Explore Each Program</h2>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 sm:grid-cols-2">
             {statsList.map((s) => {
               const meta = DEGREE_META[s.abbreviation];
               return (
