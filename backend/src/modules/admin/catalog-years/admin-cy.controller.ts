@@ -2,10 +2,12 @@ import {
   Body,
   ConflictException,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -25,6 +27,11 @@ import { AdminAuditService } from '../admin-audit.service';
 
 class CreateCyDto {
   @IsUUID() programId: string;
+  @IsString() academicYear: string;
+  @IsOptional() @IsString() effectiveDate?: string;
+}
+
+class UpdateCyDto {
   @IsString() academicYear: string;
   @IsOptional() @IsString() effectiveDate?: string;
 }
@@ -76,5 +83,41 @@ export class AdminCyController {
       academicYear: cy.academicYear,
     });
     return cy;
+  }
+
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateCyDto,
+    @Req() req: { user: { id: string; email: string } },
+  ) {
+    const cy = await this.repo.findOne({ where: { id } });
+    if (!cy) throw new NotFoundException(`CatalogYear ${id} not found`);
+    cy.academicYear = dto.academicYear;
+    cy.effectiveDate = dto.effectiveDate ?? null;
+    try {
+      await this.repo.save(cy);
+    } catch (err) {
+      throwIfDuplicate(
+        err,
+        `Catalog year "${dto.academicYear}" already exists for this program.`,
+      );
+    }
+    await this.audit.log(req.user, 'update', 'catalog_year', id, {
+      academicYear: dto.academicYear,
+    });
+    return cy;
+  }
+
+  @Delete(':id')
+  async remove(
+    @Param('id') id: string,
+    @Req() req: { user: { id: string; email: string } },
+  ) {
+    const cy = await this.repo.findOne({ where: { id } });
+    if (!cy) throw new NotFoundException(`CatalogYear ${id} not found`);
+    await this.repo.remove(cy);
+    await this.audit.log(req.user, 'delete', 'catalog_year', id);
+    return { success: true };
   }
 }

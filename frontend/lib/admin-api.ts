@@ -205,6 +205,13 @@ export const adminApi = {
         method: 'POST',
         body: JSON.stringify(body),
       }),
+    update: (token: string, id: string, body: Partial<AdminCatalogYear>) =>
+      adminFetch<AdminCatalogYear>(`catalog-years/${id}`, token, {
+        method: 'PUT',
+        body: JSON.stringify(body),
+      }),
+    delete: (token: string, id: string) =>
+      adminFetch<{ success: boolean }>(`catalog-years/${id}`, token, { method: 'DELETE' }),
   },
   auditLog: {
     list: (token: string, page = 1) =>

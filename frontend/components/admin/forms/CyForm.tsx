@@ -12,15 +12,17 @@ interface CyData {
 
 interface Props {
   programs: AdminProgram[];
+  initial?: Partial<CyData & { programId: string }>;
   onSubmit: (data: CyData) => Promise<void>;
   submitLabel: string;
+  lockProgram?: boolean;
 }
 
-export function CyForm({ programs, onSubmit, submitLabel }: Props) {
+export function CyForm({ programs, initial, onSubmit, submitLabel, lockProgram }: Props) {
   const router = useRouter();
-  const [programId, setProgramId] = useState('');
-  const [academicYear, setAcademicYear] = useState('');
-  const [effectiveDate, setEffectiveDate] = useState('');
+  const [programId, setProgramId] = useState(initial?.programId ?? '');
+  const [academicYear, setAcademicYear] = useState(initial?.academicYear ?? '');
+  const [effectiveDate, setEffectiveDate] = useState(initial?.effectiveDate ?? '');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -47,19 +49,26 @@ export function CyForm({ programs, onSubmit, submitLabel }: Props) {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Program</label>
-        <select
-          required
-          value={programId}
-          onChange={(e) => setProgramId(e.target.value)}
-          className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 bg-white"
-        >
-          <option value="">Select program…</option>
-          {programs.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.abbreviation} — {p.name}
-            </option>
-          ))}
-        </select>
+        {lockProgram ? (
+          <div className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-600">
+            {programs.find((p) => p.id === programId)?.abbreviation ?? programId}
+            <span className="text-gray-400 text-xs ml-1">(cannot change)</span>
+          </div>
+        ) : (
+          <select
+            required
+            value={programId}
+            onChange={(e) => setProgramId(e.target.value)}
+            className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 bg-white"
+          >
+            <option value="">Select program…</option>
+            {programs.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.abbreviation} — {p.name}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <div>
