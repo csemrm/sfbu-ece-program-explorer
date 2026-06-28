@@ -243,12 +243,20 @@ Status: 🟡 In Progress
 
 ---
 
-### Deployment
+### Deployment — Epic 009 (v0.9.0)
 
-- [x] Docker configuration
-- [x] Environment variables
-- [ ] Production build validation
-- [ ] Deployment documentation
+- [x] Docker configuration (dev compose + Dockerfiles)
+- [x] Environment variables (.env.example)
+- [x] Production Docker Compose (docker-compose.prod.yml — target:production, health checks, internal network)
+- [x] Production Nginx (docker/nginx.prod.conf — HTTPS, security headers, rate limiting)
+- [x] Deploy script (scripts/deploy.sh — pull → build → migrate → start → smoke test)
+- [x] Backup script (scripts/backup.sh — timestamped pg_dump, 30-file retention)
+- [x] Restore script (scripts/restore.sh — drop + restore from .sql.gz)
+- [x] Health check / smoke test (scripts/healthcheck.sh)
+- [x] Self-signed cert generator (scripts/gen-self-signed-cert.sh — staging only)
+- [x] CI Docker build validation (docker job in ci.yml — builds prod images)
+- [x] .gitignore: docker/ssl/, backups/, .env.prod excluded
+- [x] Deployment documentation (docs/08-DeploymentGuide.md — full rewrite with real commands)
 
 ---
 

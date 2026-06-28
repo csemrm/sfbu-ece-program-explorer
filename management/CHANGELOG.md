@@ -4,6 +4,28 @@
 
 ---
 
+## [0.9.0] — 2026-06-27
+
+### Epic 009 — Production Deployment Infrastructure
+
+#### Added
+
+- `docker-compose.prod.yml` — Production Docker Compose: `target: production` builds, no source mounts, no pgAdmin, health checks on all services, internal bridge network isolating PostgreSQL
+- `docker/nginx.prod.conf` — Production Nginx: HTTP→HTTPS redirect, TLS 1.2/1.3, HSTS, security headers (X-Frame-Options, CSP, Referrer-Policy, Permissions-Policy, X-Content-Type-Options), rate limiting on `/api` (30 req/min, burst 20), immutable cache on `/_next/static`
+- `scripts/deploy.sh` — Full deploy: pull → build prod images → wait for DB → run migrations → start services → smoke test
+- `scripts/backup.sh` — Timestamped `pg_dump` to `backups/`, auto-retains last 30 files
+- `scripts/restore.sh` — Drop + recreate DB + restore from `.sql.gz`, with confirmation prompt
+- `scripts/healthcheck.sh` — Smoke tests all public endpoints (frontend, programs, courses, API, admin)
+- `scripts/gen-self-signed-cert.sh` — Self-signed SSL cert generator for staging/testing
+
+#### Changed
+
+- `.github/workflows/ci.yml` — Added `docker` job: builds production images for both frontend and backend after lint/test/build pass, catching Dockerfile regressions in CI
+- `.gitignore` — Added `docker/ssl/`, `backups/`, `.env.prod` to prevent committing secrets/certs/backup files
+- `docs/08-DeploymentGuide.md` — Full rewrite: quick-start, production deploy steps, env var reference table, backup/restore commands, CI/CD description, nginx config notes, rollback procedure, security checklist, system requirements
+
+---
+
 ## [0.8.4] — 2026-06-27
 
 ### Public UI — Professional Polish + Blue Purge
