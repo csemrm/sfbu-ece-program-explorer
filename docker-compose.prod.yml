@@ -53,6 +53,8 @@ services:
     restart: always
     environment:
       NODE_ENV: production
+      HOSTNAME: "0.0.0.0"
+      PORT: 3000
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
       NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-SFBU ECE Program Explorer}
       API_BASE_URL: http://backend:3001/api/v1
