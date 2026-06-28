@@ -87,6 +87,33 @@ export interface CoursePrerequisites {
   corequisites: CoursePrerequisiteItem[];
 }
 
+export interface RoadmapCourse {
+  id: string;
+  courseCode: string;
+  title: string;
+  creditHours: number;
+  level: 'undergraduate' | 'graduate';
+  description: string | null;
+}
+
+export interface RoadmapPhase {
+  id: string;
+  name: string;
+  description: string | null;
+  minCredits: number | null;
+  sortOrder: number;
+  courses: RoadmapCourse[];
+}
+
+export interface ProgramRoadmap {
+  programId: string;
+  programName: string;
+  programAbbreviation: string;
+  catalogYearId: string | null;
+  academicYear: string | null;
+  phases: RoadmapPhase[];
+}
+
 export interface SearchResult {
   type: 'program' | 'course';
   id: string;
@@ -105,6 +132,7 @@ export const api = {
       get<PaginatedResult<Program>>('/programs', params as Record<string, string | number>),
     get: (id: string) => get<Program>(`/programs/${id}`),
     requirements: (id: string) => get<ProgramRequirements>(`/programs/${id}/requirements`),
+    roadmap: (id: string) => get<ProgramRoadmap>(`/programs/${id}/roadmap`),
   },
   catalogYears: {
     list: () => get<PaginatedResult<CatalogYear>>('/catalog-years', { limit: 100 }),

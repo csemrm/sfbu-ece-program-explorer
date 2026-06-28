@@ -4,6 +4,7 @@ import { ProgramsService } from './programs.service';
 import {
   ProgramDto,
   ProgramRequirementsDto,
+  ProgramRoadmapDto,
   QueryProgramsDto,
 } from './dto/program.dto';
 
@@ -33,5 +34,14 @@ export class ProgramsController {
   @ApiOkResponse({ type: ProgramRequirementsDto })
   findRequirements(@Param('id', ParseUUIDPipe) id: string) {
     return this.programsService.findRequirements(id);
+  }
+
+  @Get(':id/roadmap')
+  @ApiOperation({
+    summary: 'Get curriculum roadmap for a program (latest catalog year)',
+  })
+  @ApiOkResponse({ type: ProgramRoadmapDto })
+  findRoadmap(@Param('id', ParseUUIDPipe) id: string) {
+    return this.programsService.findRoadmap(id);
   }
 }

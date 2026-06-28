@@ -40,3 +40,30 @@ export class ProgramRequirementsDto {
   @ApiProperty({ type: [CatalogYearWithGroupsDto] })
   catalogYears: CatalogYearWithGroupsDto[];
 }
+
+export class RoadmapCourseDto {
+  @ApiProperty() id: string;
+  @ApiProperty() courseCode: string;
+  @ApiProperty() title: string;
+  @ApiProperty() creditHours: number;
+  @ApiProperty() level: string;
+  @ApiPropertyOptional({ nullable: true }) description: string | null;
+}
+
+export class RoadmapPhaseDto {
+  @ApiProperty() id: string;
+  @ApiProperty() name: string;
+  @ApiPropertyOptional({ nullable: true }) description: string | null;
+  @ApiPropertyOptional({ nullable: true }) minCredits: number | null;
+  @ApiProperty() sortOrder: number;
+  @ApiProperty({ type: [RoadmapCourseDto] }) courses: RoadmapCourseDto[];
+}
+
+export class ProgramRoadmapDto {
+  @ApiProperty() programId: string;
+  @ApiProperty() programName: string;
+  @ApiProperty() programAbbreviation: string;
+  @ApiProperty() catalogYearId: string;
+  @ApiProperty() academicYear: string;
+  @ApiProperty({ type: [RoadmapPhaseDto] }) phases: RoadmapPhaseDto[];
+}
