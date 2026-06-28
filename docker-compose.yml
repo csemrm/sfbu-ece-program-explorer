@@ -55,6 +55,9 @@ services:
       - backend
     volumes:
       - ./frontend/app:/app/app
+      - ./frontend/components:/app/components
+      - ./frontend/lib:/app/lib
+      - ./frontend/middleware.ts:/app/middleware.ts
       - ./frontend/public:/app/public
 
   nginx:
