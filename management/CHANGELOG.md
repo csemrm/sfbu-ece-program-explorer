@@ -4,6 +4,31 @@
 
 ---
 
+## [0.7.0] — 2026-06-27
+
+### Epic 007 — Prerequisite Graph
+
+#### Added
+
+**Backend:**
+- `programs.module.ts` — Added `Course`, `Prerequisite`, `Corequisite` to TypeOrmModule
+- `programs.service.ts` — `findGraph()`: fetches program courses via requirement groups, collects all prereq/coreq edges, returns nodes+edges
+- `programs.controller.ts` — `GET /programs/:id/graph` endpoint
+- `program.dto.ts` — `GraphNodeDto`, `GraphEdgeDto`, `ProgramGraphDto`
+
+**Frontend:**
+- `package.json` — Added `@xyflow/react ^12.11.1`
+- `lib/api.ts` — `GraphNode`, `GraphEdge`, `ProgramGraph` types; `programs.graph(id)` call
+- `lib/graphLayout.ts` — Topological-sort layout: longest-path level assignment → x/y positions
+- `components/graph/CourseNode.tsx` — Custom React Flow node: level-colored border (blue=UG, purple=grad), code/title/credits, target+source handles
+- `components/graph/DetailsPanel.tsx` — Absolute-positioned panel: course details, external badge, link to course detail
+- `components/graph/GraphCanvas.tsx` — React Flow canvas: Background, Controls, MiniMap; node click highlights edges; pane click resets
+- `components/graph/GraphPageClient.tsx` — `'use client'` wrapper for `dynamic(ssr:false)` (required by Next.js 16 App Router)
+- `app/programs/[id]/graph/page.tsx` — Server component: fetch graph data, render hero + breadcrumb + canvas
+- `components/programs/ProgramNavigation.tsx` — Replaced "Coming in Epic 007" with live link to graph page
+
+---
+
 ## [0.6.0] — 2026-06-27
 
 ### Epic 006 — Curriculum Roadmap
