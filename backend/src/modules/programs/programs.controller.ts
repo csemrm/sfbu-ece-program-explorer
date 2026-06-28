@@ -3,6 +3,7 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ProgramsService } from './programs.service';
 import {
   ProgramDto,
+  ProgramGraphDto,
   ProgramRequirementsDto,
   ProgramRoadmapDto,
   QueryProgramsDto,
@@ -43,5 +44,14 @@ export class ProgramsController {
   @ApiOkResponse({ type: ProgramRoadmapDto })
   findRoadmap(@Param('id', ParseUUIDPipe) id: string) {
     return this.programsService.findRoadmap(id);
+  }
+
+  @Get(':id/graph')
+  @ApiOperation({
+    summary: 'Get prerequisite graph nodes and edges for a program',
+  })
+  @ApiOkResponse({ type: ProgramGraphDto })
+  findGraph(@Param('id', ParseUUIDPipe) id: string) {
+    return this.programsService.findGraph(id);
   }
 }

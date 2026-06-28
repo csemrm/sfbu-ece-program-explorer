@@ -67,3 +67,29 @@ export class ProgramRoadmapDto {
   @ApiProperty() academicYear: string;
   @ApiProperty({ type: [RoadmapPhaseDto] }) phases: RoadmapPhaseDto[];
 }
+
+export class GraphNodeDto {
+  @ApiProperty() id: string;
+  @ApiProperty() courseCode: string;
+  @ApiProperty() title: string;
+  @ApiProperty() creditHours: number;
+  @ApiProperty() level: string;
+  @ApiPropertyOptional({ nullable: true }) description: string | null;
+  @ApiProperty() inProgram: boolean;
+}
+
+export class GraphEdgeDto {
+  @ApiProperty() id: string;
+  @ApiProperty() sourceId: string;
+  @ApiProperty() targetId: string;
+  @ApiProperty({ enum: ['prerequisite', 'corequisite'] }) type: string;
+}
+
+export class ProgramGraphDto {
+  @ApiProperty() programId: string;
+  @ApiProperty() programName: string;
+  @ApiProperty() programAbbreviation: string;
+  @ApiPropertyOptional({ nullable: true }) academicYear: string | null;
+  @ApiProperty({ type: [GraphNodeDto] }) nodes: GraphNodeDto[];
+  @ApiProperty({ type: [GraphEdgeDto] }) edges: GraphEdgeDto[];
+}

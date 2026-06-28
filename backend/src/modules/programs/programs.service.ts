@@ -1,10 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Program } from '../../database/entities/program.entity';
 import { CatalogYear } from '../../database/entities/catalog-year.entity';
 import { RequirementGroup } from '../../database/entities/requirement-group.entity';
 import { ProgramRequirement } from '../../database/entities/program-requirement.entity';
+import { Course } from '../../database/entities/course.entity';
+import { Prerequisite } from '../../database/entities/prerequisite.entity';
+import { Corequisite } from '../../database/entities/corequisite.entity';
 import { paginate, PaginatedResult } from '../../common/dto/pagination.dto';
 import { QueryProgramsDto } from './dto/program.dto';
 
@@ -19,6 +22,12 @@ export class ProgramsService {
     private readonly rgRepo: Repository<RequirementGroup>,
     @InjectRepository(ProgramRequirement)
     private readonly prRepo: Repository<ProgramRequirement>,
+    @InjectRepository(Course)
+    private readonly courseRepo: Repository<Course>,
+    @InjectRepository(Prerequisite)
+    private readonly prereqRepo: Repository<Prerequisite>,
+    @InjectRepository(Corequisite)
+    private readonly coreqRepo: Repository<Corequisite>,
   ) {}
 
   async findAll(query: QueryProgramsDto): Promise<PaginatedResult<Program>> {
@@ -37,6 +46,113 @@ export class ProgramsService {
     const program = await this.programRepo.findOne({ where: { id } });
     if (!program) throw new NotFoundException(`Program ${id} not found`);
     return program;
+  }
+
+  async findGraph(programId: string) {
+    const program = await this.findOne(programId);
+
+    const years = await this.cyRepo.find({
+      where: { programId },
+      order: { academicYear: 'DESC' },
+    });
+    if (!years.length) {
+      return {
+        programId: program.id,
+        programName: program.name,
+        programAbbreviation: program.abbreviation,
+        academicYear: null,
+        nodes: [],
+        edges: [],
+      };
+    }
+    const cy = years[0];
+
+    const groups = await this.rgRepo.find({ where: { catalogYearId: cy.id } });
+    const groupIds = groups.map((g) => g.id);
+
+    const pReqs = await this.prRepo.find({
+      where: { requirementGroupId: In(groupIds) },
+    });
+    const programCourseIds = [
+      ...new Set(
+        pReqs.filter((r) => r.courseId != null).map((r) => r.courseId!),
+      ),
+    ];
+
+    if (programCourseIds.length === 0) {
+      return {
+        programId: program.id,
+        programName: program.name,
+        programAbbreviation: program.abbreviation,
+        academicYear: cy.academicYear,
+        nodes: [],
+        edges: [],
+      };
+    }
+
+    const [prereqs, coreqs] = await Promise.all([
+      this.prereqRepo.find({
+        where: [
+          { courseId: In(programCourseIds) },
+          { prerequisiteCourseId: In(programCourseIds) },
+        ],
+      }),
+      this.coreqRepo.find({
+        where: [
+          { courseId: In(programCourseIds) },
+          { corequisiteCourseId: In(programCourseIds) },
+        ],
+      }),
+    ]);
+
+    const allIds = new Set<string>(programCourseIds);
+    prereqs.forEach((p) => {
+      allIds.add(p.courseId);
+      allIds.add(p.prerequisiteCourseId);
+    });
+    coreqs.forEach((c) => {
+      allIds.add(c.courseId);
+      allIds.add(c.corequisiteCourseId);
+    });
+
+    const courses = await this.courseRepo.find({
+      where: { id: In([...allIds]) },
+    });
+    const programSet = new Set(programCourseIds);
+
+    const nodes = courses.map((c) => ({
+      id: c.id,
+      courseCode: c.courseCode,
+      title: c.title,
+      creditHours: c.creditHours,
+      level: c.level,
+      description: c.description,
+      inProgram: programSet.has(c.id),
+    }));
+
+    const edges = [
+      ...prereqs.map((p) => ({
+        id: `prereq-${p.id}`,
+        sourceId: p.prerequisiteCourseId,
+        targetId: p.courseId,
+        type: 'prerequisite' as const,
+      })),
+      ...coreqs.map((c) => ({
+        id: `coreq-${c.id}`,
+        sourceId: c.corequisiteCourseId,
+        targetId: c.courseId,
+        type: 'corequisite' as const,
+      })),
+    ];
+
+    return {
+      programId: program.id,
+      programName: program.name,
+      programAbbreviation: program.abbreviation,
+      academicYear: cy.academicYear,
+      nodes,
+      edges,
+    };
   }
 
   async findRoadmap(programId: string) {

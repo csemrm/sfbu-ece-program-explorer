@@ -24,16 +24,18 @@ export function ProgramNavigation({ programId, abbreviation }: Props) {
             Visual phase-by-phase course progression for {abbreviation}.
           </p>
         </Link>
-        <div className="rounded-xl border border-gray-200 bg-white p-5">
+        <Link
+          href={`/programs/${programId}/graph`}
+          className="group rounded-xl border border-gray-200 bg-white p-5 hover:border-blue-300 hover:shadow-md transition-all"
+        >
           <div className="text-2xl mb-2">🔗</div>
-          <h3 className="font-semibold text-gray-900 mb-1">Prerequisite Graph</h3>
-          <p className="text-sm text-gray-500 mb-3">
+          <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-blue-700 transition-colors">
+            Prerequisite Graph
+          </h3>
+          <p className="text-sm text-gray-500">
             Interactive dependency graph for all {abbreviation} courses.
           </p>
-          <span className="inline-block text-xs text-gray-400 bg-gray-100 rounded px-2 py-1">
-            Coming in Epic 007
-          </span>
-        </div>
+        </Link>
       </div>
     </section>
   );

@@ -87,6 +87,32 @@ export interface CoursePrerequisites {
   corequisites: CoursePrerequisiteItem[];
 }
 
+export interface GraphNode {
+  id: string;
+  courseCode: string;
+  title: string;
+  creditHours: number;
+  level: 'undergraduate' | 'graduate';
+  description: string | null;
+  inProgram: boolean;
+}
+
+export interface GraphEdge {
+  id: string;
+  sourceId: string;
+  targetId: string;
+  type: 'prerequisite' | 'corequisite';
+}
+
+export interface ProgramGraph {
+  programId: string;
+  programName: string;
+  programAbbreviation: string;
+  academicYear: string | null;
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+}
+
 export interface RoadmapCourse {
   id: string;
   courseCode: string;
@@ -133,6 +159,7 @@ export const api = {
     get: (id: string) => get<Program>(`/programs/${id}`),
     requirements: (id: string) => get<ProgramRequirements>(`/programs/${id}/requirements`),
     roadmap: (id: string) => get<ProgramRoadmap>(`/programs/${id}/roadmap`),
+    graph: (id: string) => get<ProgramGraph>(`/programs/${id}/graph`),
   },
   catalogYears: {
     list: () => get<PaginatedResult<CatalogYear>>('/catalog-years', { limit: 100 }),
