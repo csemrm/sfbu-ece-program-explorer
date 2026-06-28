@@ -53,16 +53,60 @@ interface ProgramStats {
   phases: ProgramRoadmap['phases'];
 }
 
+function isSpecialization(phaseName: string): boolean {
+  return phaseName.toLowerCase().includes('specialization');
+}
+
+// Sum minCredits across phases, counting only one specialization track.
+// Students choose ONE specialization — including all would overcount.
+function computeRequiredCredits(phases: ProgramRoadmap['phases']): number {
+  let total = 0;
+  let specCounted = false;
+  for (const phase of phases) {
+    const mc = Number(phase.minCredits);
+    if (!mc) continue;
+    if (isSpecialization(phase.name)) {
+      if (!specCounted) {
+        total += mc;
+        specCounted = true;
+      }
+    } else {
+      total += mc;
+    }
+  }
+  return total;
+}
+
+// Count courses from required phases only (one specialization track).
+function computeRequiredCourses(phases: ProgramRoadmap['phases']) {
+  let specIncluded = false;
+  const required = phases.filter((p) => {
+    if (isSpecialization(p.name)) {
+      if (!specIncluded) {
+        specIncluded = true;
+        return true;
+      }
+      return false;
+    }
+    return true;
+  });
+  const courses = required.flatMap((p) => p.courses);
+  return {
+    total: courses.length,
+    grad: courses.filter((c) => c.level === 'graduate').length,
+  };
+}
+
 function computeStats(roadmap: ProgramRoadmap): ProgramStats {
-  const allCourses = roadmap.phases.flatMap((p) => p.courses);
+  const { total: totalCourses, grad: gradCourses } = computeRequiredCourses(roadmap.phases);
   return {
     id: roadmap.programId,
     name: roadmap.programName,
     abbreviation: roadmap.programAbbreviation,
-    totalCredits: allCourses.reduce((sum, c) => sum + Number(c.creditHours), 0),
-    totalCourses: allCourses.length,
-    ugCourses: allCourses.filter((c) => c.level === 'undergraduate').length,
-    gradCourses: allCourses.filter((c) => c.level === 'graduate').length,
+    totalCredits: computeRequiredCredits(roadmap.phases),
+    totalCourses,
+    ugCourses: 0,
+    gradCourses,
     phaseCount: roadmap.phases.length,
     academicYear: roadmap.academicYear,
     phases: roadmap.phases,
@@ -132,10 +176,12 @@ function PhaseList({ stats }: { stats: ProgramStats }) {
   if (stats.phases.length === 0) {
     return <p className="text-sm text-gray-400 italic">No phase data available.</p>;
   }
+  const specPhases = stats.phases.filter((p) => isSpecialization(p.name));
+  const otherPhases = stats.phases.filter((p) => !isSpecialization(p.name));
   return (
     <div className="space-y-2">
-      {stats.phases.map((phase) => {
-        const credits = phase.courses.reduce((sum, c) => sum + Number(c.creditHours), 0);
+      {otherPhases.map((phase) => {
+        const mc = phase.minCredits ? Math.round(Number(phase.minCredits)) : null;
         return (
           <div
             key={phase.id}
@@ -145,22 +191,41 @@ function PhaseList({ stats }: { stats: ProgramStats }) {
               backgroundColor: meta?.bg ?? '#f9fafb',
             }}
           >
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-gray-800 truncate">{phase.name}</p>
-              <p className="text-xs text-gray-500 mt-0.5">
-                {phase.courses.length} course{phase.courses.length !== 1 ? 's' : ''}
-                {phase.minCredits ? ` · min ${Math.round(Number(phase.minCredits))} cr` : ''}
-              </p>
-            </div>
+            <p className="text-sm font-semibold text-gray-800 truncate">{phase.name}</p>
             <span
               className="ml-3 shrink-0 text-sm font-bold"
               style={{ color: meta?.color ?? '#374151' }}
             >
-              {credits} cr
+              {mc ? `${mc} cr` : '—'}
             </span>
           </div>
         );
       })}
+      {specPhases.length > 0 && (
+        <div
+          className="rounded-lg border-2 border-dashed px-3 py-2.5"
+          style={{ borderColor: meta?.border ?? '#e5e7eb' }}
+        >
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+            Choose one specialization
+          </p>
+          {specPhases.map((phase) => {
+            const mc = phase.minCredits ? Math.round(Number(phase.minCredits)) : null;
+            const label = phase.name.replace(/^Specialization\s*[—–-]\s*/i, '');
+            return (
+              <div key={phase.id} className="flex items-center justify-between py-1">
+                <p className="text-sm text-gray-700">{label}</p>
+                <span
+                  className="text-sm font-semibold ml-3"
+                  style={{ color: meta?.color ?? '#374151' }}
+                >
+                  {mc ? `${mc} cr` : '—'}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
