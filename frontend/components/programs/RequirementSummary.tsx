@@ -20,12 +20,15 @@ export function RequirementSummary({ groups, academicYear }: Props) {
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="text-left px-5 py-3 font-semibold text-gray-700">Requirement Group</th>
-              <th className="text-left px-5 py-3 font-semibold text-gray-700 hidden sm:table-cell">
+            <tr
+              className="border-b border-gray-200"
+              style={{ backgroundColor: 'var(--sfbu-navy)' }}
+            >
+              <th className="text-left px-5 py-3 font-semibold text-white">Requirement Group</th>
+              <th className="text-left px-5 py-3 font-semibold text-white hidden sm:table-cell">
                 Description
               </th>
-              <th className="text-right px-5 py-3 font-semibold text-gray-700">Min Credits</th>
+              <th className="text-right px-5 py-3 font-semibold text-white">Min Credits</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -47,7 +50,10 @@ export function RequirementSummary({ groups, academicYear }: Props) {
                 <td className="px-5 py-3 font-bold text-gray-900" colSpan={2}>
                   Total Minimum Credits
                 </td>
-                <td className="px-5 py-3 text-right font-bold text-blue-700 text-base">
+                <td
+                  className="px-5 py-3 text-right font-bold text-base"
+                  style={{ color: 'var(--sfbu-navy)' }}
+                >
                   {totalMin}
                 </td>
               </tr>

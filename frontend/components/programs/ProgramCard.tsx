@@ -14,13 +14,13 @@ const CREDIT_TOTALS: Record<string, number> = {
 };
 
 const ACCENT: Record<string, string> = {
-  BSCS: 'bg-blue-50 border-blue-200 hover:border-blue-400',
-  MSCS: 'bg-purple-50 border-purple-200 hover:border-purple-400',
-  MSEE: 'bg-emerald-50 border-emerald-200 hover:border-emerald-400',
+  BSCS: 'bg-[#f0f4fa] border-[#c5d3e8] hover:border-sfbu-navy',
+  MSCS: 'bg-purple-50 border-purple-200 hover:border-purple-500',
+  MSEE: 'bg-emerald-50 border-emerald-200 hover:border-emerald-500',
 };
 
 const BADGE: Record<string, string> = {
-  BSCS: 'bg-blue-100 text-blue-800',
+  BSCS: 'bg-[#1c3766] text-white',
   MSCS: 'bg-purple-100 text-purple-800',
   MSEE: 'bg-emerald-100 text-emerald-800',
 };
@@ -30,7 +30,7 @@ export function ProgramCard({ program }: { program: Program }) {
   return (
     <Link
       href={`/programs/${program.id}`}
-      className={`block rounded-xl border-2 p-6 transition-all duration-200 ${ACCENT[abbr] ?? 'bg-gray-50 border-gray-200 hover:border-gray-400'}`}
+      className={`block rounded-xl border-2 p-6 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${ACCENT[abbr] ?? 'bg-gray-50 border-gray-200 hover:border-gray-400'}`}
     >
       <div className="flex items-start justify-between gap-4 mb-3">
         <span
@@ -49,7 +49,7 @@ export function ProgramCard({ program }: { program: Program }) {
       {program.description && (
         <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">{program.description}</p>
       )}
-      <div className="mt-4 flex items-center gap-1 text-sm font-medium text-blue-700">
+      <div className="mt-4 flex items-center gap-1 text-sm font-medium text-sfbu-navy">
         Explore program
         <svg
           className="w-4 h-4"

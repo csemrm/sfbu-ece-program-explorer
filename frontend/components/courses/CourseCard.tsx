@@ -6,7 +6,7 @@ interface Props {
 }
 
 const levelColors = {
-  undergraduate: 'bg-blue-50 text-blue-700 border-blue-200',
+  undergraduate: 'bg-[#eef2f8] text-sfbu-navy border-[#c5d3e8]',
   graduate: 'bg-purple-50 text-purple-700 border-purple-200',
 };
 
@@ -14,7 +14,7 @@ export function CourseCard({ course }: Props) {
   return (
     <Link
       href={`/courses/${course.id}`}
-      className="group block rounded-xl border border-gray-200 bg-white p-5 hover:border-blue-300 hover:shadow-md transition-all"
+      className="group block rounded-xl border border-gray-200 bg-white p-5 hover:border-sfbu-navy/40 hover:shadow-md transition-all"
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <span className="font-mono font-bold text-gray-900 text-sm bg-gray-100 rounded px-2 py-1">
@@ -22,7 +22,7 @@ export function CourseCard({ course }: Props) {
         </span>
         <div className="flex items-center gap-2 flex-shrink-0">
           <span
-            className={`text-xs font-medium border rounded-full px-2 py-0.5 ${levelColors[course.level]}`}
+            className={`text-xs font-medium border rounded-full px-2 py-0.5 ${levelColors[course.level] ?? 'bg-gray-100 text-gray-700 border-gray-200'}`}
           >
             {course.level === 'undergraduate' ? 'UG' : 'Grad'}
           </span>
@@ -30,7 +30,7 @@ export function CourseCard({ course }: Props) {
         </div>
       </div>
 
-      <h3 className="font-semibold text-gray-900 text-sm leading-snug mb-2 group-hover:text-blue-700 transition-colors">
+      <h3 className="font-semibold text-gray-900 text-sm leading-snug mb-2 group-hover:text-sfbu-navy transition-colors">
         {course.title}
       </h3>
 

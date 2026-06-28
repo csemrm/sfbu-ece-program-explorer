@@ -4,6 +4,25 @@
 
 ---
 
+## [0.8.3] — 2026-06-27
+
+### Public UI Branding — SFBU Navy + Gold Theme
+
+#### Changed
+
+**Frontend — Public UI:**
+- `components/ui/Nav.tsx` — Navy background, gold accent bar, gold SF badge, white links with active-state highlight; now `'use client'` to support active path detection via `usePathname`
+- `app/(public)/layout.tsx` — Footer: SFBU navy background, white text hierarchy
+- `app/(public)/page.tsx` — Hero: SFBU navy gradient, dot pattern, gold "Browse Programs" CTA; "View all →" link uses navy; Features section: SVG icons with navy/gold/green icon badges, subtitle added
+- `components/programs/ProgramCard.tsx` — BSCS card: navy-tinted background/border; BSCS badge: navy bg white text; "Explore program →" link: `text-sfbu-navy`; hover lift animation added
+- `components/programs/ProgramHero.tsx` — BSCS: SFBU navy gradient; MSCS: purple; MSEE: emerald; dot pattern overlay; gold accent bar on BSCS hero
+- `components/programs/RequirementSummary.tsx` — Table header row: SFBU navy background, white text; total credits: navy color
+- `components/programs/ProgramNavigation.tsx` — Navy/gold icon badges instead of emoji; `group-hover:text-sfbu-navy` on headings
+- `components/ui/Breadcrumb.tsx` — Link hover: `hover:text-sfbu-navy` instead of blue
+- `components/courses/CourseCard.tsx` — Hover border: navy-tinted; UG badge: navy-tinted; title hover: `text-sfbu-navy`
+
+---
+
 ## [0.8.2] — 2026-06-27
 
 ### Admin UI Dark Mode Fix + Full Dark Mode Coverage
