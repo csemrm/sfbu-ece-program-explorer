@@ -72,6 +72,31 @@ export interface Course {
   level: 'undergraduate' | 'graduate';
 }
 
+export interface CoursePrerequisiteItem {
+  id: string;
+  courseCode: string;
+  title: string;
+  creditHours: number;
+  level: 'undergraduate' | 'graduate';
+}
+
+export interface CoursePrerequisites {
+  courseId: string;
+  courseCode: string;
+  prerequisites: CoursePrerequisiteItem[];
+  corequisites: CoursePrerequisiteItem[];
+}
+
+export interface SearchResult {
+  type: 'program' | 'course';
+  id: string;
+  code?: string;
+  title: string;
+  description: string | null;
+  creditHours?: number;
+  level?: string;
+}
+
 // ── API calls ──────────────────────────────────────────────────
 
 export const api = {
@@ -87,9 +112,14 @@ export const api = {
   courses: {
     list: (params?: { q?: string; level?: string; page?: number; limit?: number }) =>
       get<PaginatedResult<Course>>('/courses', params as Record<string, string | number>),
+    get: (id: string) => get<Course>(`/courses/${id}`),
+    prerequisites: (id: string) => get<CoursePrerequisites>(`/courses/${id}/prerequisites`),
   },
   search: {
     query: (q: string, params?: { type?: string; level?: string }) =>
-      get('/search', { q, ...params } as Record<string, string | number>),
+      get<PaginatedResult<SearchResult>>('/search', { q, ...params } as Record<
+        string,
+        string | number
+      >),
   },
 };
