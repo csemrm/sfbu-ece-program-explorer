@@ -2,9 +2,10 @@ SFBU ECE Program Explorer
 
 Project Roadmap
 
-Version: 1.0
+Version: 2.0
+Last Updated: 2026-06-27
 
-Status: Planning
+Status: 🟡 In Progress
 
 ⸻
 
@@ -12,7 +13,7 @@ Project Vision
 
 Develop an interactive web application that transforms the SFBU Electrical and Computer Engineering catalog into an engaging visual learning platform.
 
-The application will support:
+The application supports:
 
 * Bachelor of Science in Computer Science (BSCS)
 * Master of Science in Computer Science (MSCS)
@@ -34,7 +35,7 @@ Project Goals
 
 Development Strategy
 
-The project will be developed incrementally.
+The project is developed incrementally.
 
 Each milestone must:
 
@@ -67,7 +68,7 @@ Deliverables
 * Architecture.md
 * Initial CI configuration
 
-Status: 🟡 In Progress
+Status: ✅ Complete (Epic 001 — v0.1.0)
 
 ⸻
 
@@ -91,9 +92,9 @@ Deliverables
 
 * ER diagram
 * SQL schema
-* Seed data
+* Seed data (3 programs, 70+ courses)
 
-Status: ☐ Not Started
+Status: ✅ Complete (Epic 002 — v0.2.0)
 
 ⸻
 
@@ -117,7 +118,7 @@ Deliverables
 * Validation
 * API documentation
 
-Status: ☐ Not Started
+Status: ✅ Complete (Epic 003 — v0.3.0)
 
 ⸻
 
@@ -142,7 +143,7 @@ Deliverables
 * Navigation
 * Theme
 
-Status: ☐ Not Started
+Status: ✅ Complete (Epic 004 — v0.4.0)
 
 ⸻
 
@@ -157,9 +158,9 @@ Features
 * Program cards
 * Program overview
 * Requirement summary
-* Learning outcomes
+* Curriculum roadmap link
 
-Status: ☐ Not Started
+Status: ✅ Complete (Epic 004 — v0.5.0)
 
 ⸻
 
@@ -171,12 +172,13 @@ Develop the Course Explorer.
 
 Features
 
-* Search
-* Filtering
-* Course detail
-* Related courses
+* Search (keyword, code, title)
+* Filtering (level)
+* Course list page with grid/list toggle
+* Course detail (hero, info table, prerequisites)
+* Prerequisite and corequisite display
 
-Status: ☐ Not Started
+Status: ✅ Complete (Epic 005 — v0.6.0, enhanced v0.8.4)
 
 ⸻
 
@@ -188,12 +190,12 @@ Visualize curriculum progression.
 
 Features
 
-* Semester roadmap
-* Zoom
-* Pan
-* Expand course details
+* Phase-by-phase timeline
+* Course cards with level badge and credits
+* Zoom (50–150%) and collapse/expand per phase
+* Credit totals per phase
 
-Status: ☐ Not Started
+Status: ✅ Complete (Epic 006 — v0.6.0)
 
 ⸻
 
@@ -205,12 +207,14 @@ Build the interactive prerequisite network.
 
 Features
 
-* Graph visualization
-* Search
-* Highlight dependency paths
-* Interactive nodes
+* React Flow graph visualization
+* Custom course nodes (level-colored borders)
+* Solid/dashed edges (prerequisite/corequisite)
+* Node click highlights connected edges
+* Details panel with link to course detail
+* MiniMap, zoom/pan controls
 
-Status: ☐ Not Started
+Status: ✅ Complete (Epic 007 — v0.7.0)
 
 ⸻
 
@@ -228,7 +232,7 @@ Examples
 * Embedded Systems
 * Digital Design
 
-Status: ☐ Not Started
+Status: 🟡 Partial — Admin CRUD complete; public browsing page not yet built.
 
 ⸻
 
@@ -246,7 +250,7 @@ Compare
 * Knowledge areas
 * Capstone requirements
 
-Status: ☐ Not Started
+Status: ⬜ Not Started — next milestone.
 
 ⸻
 
@@ -258,12 +262,12 @@ Create an admin interface.
 
 Functions
 
-* Manage programs
-* Manage courses
-* Manage prerequisites
-* Import catalog updates
+* Manage programs, courses, prerequisites, requirement groups, knowledge areas, catalog years
+* Audit log
+* Role-based access (system_admin, curriculum_admin, content_editor)
+* Dark mode UI
 
-Status: ☐ Not Started
+Status: ✅ Complete (Epic 008 — v0.8.0, improved v0.8.1–v0.8.3)
 
 ⸻
 
@@ -275,13 +279,14 @@ Improve quality.
 
 Tasks
 
+* SFBU brand theme (navy #1C3766, gold #C5972B)
 * Accessibility
 * Performance optimization
 * Responsive testing
 * UI refinement
 * Error handling
 
-Status: ☐ Not Started
+Status: 🟡 In Progress — Brand theme, dark mode, error boundaries, and UI polish complete (v0.8.x). Formal accessibility audit and responsive QA pending.
 
 ⸻
 
@@ -298,7 +303,7 @@ Types
 * API tests
 * UI tests
 
-Status: ☐ Not Started
+Status: ⬜ Not Started
 
 ⸻
 
@@ -310,18 +315,45 @@ Prepare production deployment.
 
 Deliverables
 
-* Docker Compose
-* Environment configuration
+* Docker Compose (dev + production)
+* Production Nginx (HTTPS, security headers, rate limiting)
+* Deployment scripts (deploy, backup, restore, healthcheck)
+* CI Docker build validation
 * Deployment guide
-* Monitoring setup
 
-Status: ☐ Not Started
+Status: ✅ Complete (Epic 009 — v0.9.0)
 
 ⸻
 
-Future Enhancements
+Current Milestone
 
-These items are intentionally excluded from Version 1.0.
+Milestone 10 — Program Comparison
+
+Next development task should target Program Comparison unless priorities change.
+
+⸻
+
+Completed Versions
+
+| Version | Milestone | Epic |
+| ------- | --------- | ---- |
+| v0.1.0  | Foundation       | 001 |
+| v0.2.0  | Database         | 002 |
+| v0.3.0  | Backend API      | 003 |
+| v0.4.0  | Frontend Shell   | 004 |
+| v0.5.0  | Program Explorer | 004 |
+| v0.6.0  | Course Explorer + Roadmap | 005, 006 |
+| v0.7.0  | Prerequisite Graph | 007 |
+| v0.8.0  | Administration   | 008 |
+| v0.8.1  | Post-Admin fixes + forms | — |
+| v0.8.2  | Dark mode fix + admin brand | — |
+| v0.8.3  | Public UI brand theme | — |
+| v0.8.4  | Public UI polish + grid/list toggle | — |
+| v0.9.0  | Deployment infrastructure | 009 |
+
+⸻
+
+Future Enhancements (Post v1.0)
 
 * Student login
 * Degree planning
@@ -330,7 +362,11 @@ These items are intentionally excluded from Version 1.0.
 * Transcript import
 * Degree audit
 * Career pathway recommendations
-* Integration with the Student Information System (SIS)
+* SIS integration
+* Kubernetes / container orchestration
+* CDN integration
+* Redis cache
+* Multi-region deployment
 
 ⸻
 
@@ -343,11 +379,3 @@ A milestone is complete only when:
 * Tests pass.
 * The application builds successfully.
 * No known critical issues remain.
-
-⸻
-
-Current Milestone
-
-Milestone 1 – Project Foundation
-
-The next development task should always come from the current milestone unless priorities are explicitly changed.
