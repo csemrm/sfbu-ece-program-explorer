@@ -234,12 +234,16 @@ Status: 🟡 In Progress
 
 ---
 
-### Testing
+### Testing — Milestone 13 (v0.9.1)
 
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] API tests
-- [ ] UI tests
+- [x] Backend unit tests: pagination utility, ProgramsService, CoursesService, AuthService (29 tests)
+- [x] Frontend test setup: Jest + next/jest + @testing-library/react + jest.setup.ts
+- [x] Frontend unit tests: URL building logic, search param construction (8 tests)
+- [x] CI: frontend unit test step added before build
+- [ ] Integration tests (backend ↔ database — requires test DB)
+- [ ] API tests (Supertest e2e against running app)
+- [ ] Frontend component tests (React Testing Library — CourseCard, ProgramCard, etc.)
+- [ ] Accessibility tests (axe, Lighthouse)
 
 ---
 

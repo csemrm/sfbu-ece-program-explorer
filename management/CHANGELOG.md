@@ -4,6 +4,28 @@
 
 ---
 
+## [0.9.1] — 2026-06-27
+
+### Milestone 13 — Unit Tests
+
+#### Added
+
+**Backend (29 tests, 5 suites — all passing):**
+- `src/common/dto/pagination.spec.ts` — `paginate()` result shape, `totalPages` ceil math, data passthrough
+- `src/modules/programs/programs.service.spec.ts` — `findAll()` with/without abbreviation filter; `findOne()` happy path + `NotFoundException`; `findRequirements()` with catalog years + requirement groups + empty + not-found
+- `src/modules/courses/courses.service.spec.ts` — `findAll()` no filters / `q` ILIKE / `level` / both; `findOne()` happy path + `NotFoundException`; `findPrerequisites()` with prereqs, coreqs, empty, not-found
+- `src/modules/auth/auth.service.spec.ts` — `validateCredentials()` user-not-found / wrong-password / valid-credentials / query shape; `signToken()` return type + payload; `findById()` found + null
+
+**Frontend (8 tests, 2 suites — all passing):**
+- `jest.config.js` + `jest.setup.ts` — Jest setup with `next/jest` transformer, `jsdom`, `@testing-library/jest-dom`
+- `__tests__/pagination.test.ts` — `pageHref()` URL building, param preservation, page overwrite
+- `__tests__/api-url.test.ts` — server vs client base URL selection, search param building
+
+**CI:**
+- `.github/workflows/ci.yml` — added frontend unit test step before build in the frontend job
+
+---
+
 ## [0.9.0] — 2026-06-27
 
 ### Epic 009 — Production Deployment Infrastructure
