@@ -36,5 +36,14 @@ Thumbs.db
 # Docker
 postgres_data/
 
+# SSL certificates — never commit private keys
+docker/ssl/
+
+# Database backups
+backups/
+
+# Production env
+.env.prod
+
 # Coverage
 coverage/

@@ -1,542 +1,344 @@
-SFBU ECE Program Explorer
+# SFBU ECE Program Explorer — Deployment Guide
 
-Deployment Guide
+Version: 2.0
+Updated: 2026-06-27
 
-Version: 1.0
-Status: Draft
+---
 
-⸻
+## Architecture
 
-Revision History
+```
+Internet → Nginx (80/443) → Next.js frontend (3000)
+                          → NestJS backend (3001) → PostgreSQL (5432)
+```
 
-Version	Date	Author	Description
-1.0	2026-06-24	Project Team	Initial Deployment Guide
+All services run in Docker containers orchestrated by Docker Compose.
 
-⸻
+---
 
-Table of Contents
+## Quick Start (Local Development)
 
-1. Purpose
-2. Deployment Objectives
-3. Supported Environments
-4. System Requirements
-5. Deployment Architecture
-6. Infrastructure
-7. Docker Deployment
-8. Environment Configuration
-9. Database Deployment
-10. Nginx Configuration
-11. CI/CD Pipeline
-12. Security Configuration
-13. Monitoring & Logging
-14. Backup & Disaster Recovery
-15. Rollback Strategy
-16. Deployment Checklist
-17. Troubleshooting
-18. Future Improvements
-19. References
+```bash
+# 1. Copy environment file
+cp .env.example .env
 
-⸻
-
-1. Purpose
-
-This document describes the deployment process for the SFBU ECE Program Explorer.
-
-It provides guidance for developers, DevOps engineers, and system administrators to deploy, maintain, and operate the application.
-
-⸻
-
-2. Deployment Objectives
-
-The deployment strategy should:
-
-* Be reproducible
-* Be automated
-* Support multiple environments
-* Minimize downtime
-* Support rollback
-* Protect data
-* Be secure
-
-⸻
-
-3. Supported Environments
-
-Environment	Purpose
-Local	Development
-Development	Team Integration
-Testing	QA
-Staging	Pre-production
-Production	Public Release
-
-⸻
-
-4. System Requirements
-
-Frontend
-
-* Node.js 20+
-* Next.js
-
-⸻
-
-Backend
-
-* Node.js 20+
-* NestJS
-
-⸻
-
-Database
-
-* PostgreSQL 16+
-
-⸻
-
-Reverse Proxy
-
-* Nginx
-
-⸻
-
-Container Runtime
-
-* Docker
-* Docker Compose
-
-⸻
-
-Recommended OS
-
-* Ubuntu Server LTS
-
-⸻
-
-5. Deployment Architecture
-
-                Internet
-                    │
-                    ▼
-             Nginx Reverse Proxy
-          ┌─────────┴─────────┐
-          ▼                   ▼
-   Next.js Frontend      NestJS Backend
-                                │
-                                ▼
-                          PostgreSQL
-
-Optional
-
-                Prometheus
-                     │
-                     ▼
-                 Grafana
-
-⸻
-
-6. Infrastructure
-
-Recommended
-
-Production
-
-* 2 vCPU
-* 8 GB RAM
-* 100 GB SSD
-
-For large deployments
-
-* Kubernetes
-* Managed PostgreSQL
-* CDN
-
-⸻
-
-7. Docker Deployment
-
-Containers
-
-frontend
-backend
-postgres
-nginx
-
-Example
-
+# 2. Start all services
 docker compose up -d
 
-Verify
+# 3. Run migrations
+docker compose exec backend npm run migration:run
 
-docker compose ps
+# 4. Seed catalog data
+docker compose exec backend npm run seed
 
-⸻
+# 5. Verify
+curl http://localhost/api/v1/health
+# → {"status":"ok"}
+```
 
-8. Environment Variables
+Access points:
+- Frontend: http://localhost
+- Admin: http://localhost/admin
+- API: http://localhost/api/v1
+- pgAdmin: http://localhost:8080
 
-Frontend
+---
 
-NEXT_PUBLIC_API_URL
-NEXT_PUBLIC_APP_NAME
+## Production Deployment
 
-⸻
+### Prerequisites
 
-Backend
+- Linux server with Docker + Docker Compose v2
+- Domain name pointing to server IP
+- SSL certificate (`docker/ssl/cert.pem` + `docker/ssl/key.pem`)
 
-DATABASE_URL
-JWT_SECRET
-PORT
-NODE_ENV
-CORS_ORIGIN
+### 1. Clone the repository
 
-⸻
+```bash
+git clone https://github.com/csemrm/sfbu-ece-program-explorer.git
+cd sfbu-ece-program-explorer
+```
 
-Database
+### 2. Configure environment
 
-POSTGRES_USER
-POSTGRES_PASSWORD
-POSTGRES_DB
+```bash
+cp .env.example .env.prod
+```
 
-⸻
+Edit `.env.prod` and set all values — especially:
 
-Never commit
+| Variable | Required value |
+|---|---|
+| `POSTGRES_PASSWORD` | Strong random password |
+| `JWT_SECRET` | 64+ character random string |
+| `CORS_ORIGIN` | Your domain, e.g. `https://ece.sfbu.edu` |
+| `NEXT_PUBLIC_API_URL` | `https://ece.sfbu.edu/api/v1` |
 
-* passwords
-* secrets
-* API keys
+Generate a secret:
+```bash
+openssl rand -base64 48
+```
 
-⸻
+### 3. Obtain SSL certificates
 
-9. Database Deployment
+**Let's Encrypt (recommended):**
+```bash
+# Install certbot, then:
+certbot certonly --standalone -d ece.sfbu.edu
+mkdir -p docker/ssl
+cp /etc/letsencrypt/live/ece.sfbu.edu/fullchain.pem docker/ssl/cert.pem
+cp /etc/letsencrypt/live/ece.sfbu.edu/privkey.pem   docker/ssl/key.pem
+```
 
-Steps
+**Self-signed (staging/testing only):**
+```bash
+./scripts/gen-self-signed-cert.sh
+```
 
-1. Start PostgreSQL
-2. Create database
-3. Run migrations
-4. Seed catalog data
-5. Verify tables
+### 4. Deploy
 
-Example
+```bash
+./scripts/deploy.sh --env-file .env.prod
+```
 
-Programs
-Courses
-RequirementGroups
-KnowledgeAreas
-CatalogYears
+The deploy script:
+1. Pulls latest code
+2. Builds production Docker images
+3. Starts PostgreSQL and waits for it to be healthy
+4. Runs database migrations
+5. Starts all services
+6. Runs smoke tests
 
-⸻
+### 5. Seed initial data (first deploy only)
 
-10. Nginx Configuration
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.prod \
+  exec backend npm run seed
+```
 
-Responsibilities
+---
 
-* HTTPS
-* Reverse Proxy
-* Static Assets
-* Compression
-* Security Headers
+## Environment Variables
 
-Routes
+### Frontend
 
-/
-↓
-Frontend
-/api
-↓
-Backend
+| Variable | Description | Example |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | Public API URL (browser) | `https://ece.sfbu.edu/api/v1` |
+| `NEXT_PUBLIC_APP_NAME` | App name | `SFBU ECE Program Explorer` |
+| `API_BASE_URL` | Internal SSR API URL (set in compose) | `http://backend:3001/api/v1` |
 
-⸻
+### Backend
 
-11. CI/CD Pipeline
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `JWT_SECRET` | Secret for JWT signing (min 32 chars) |
+| `PORT` | Backend port (default: 3001) |
+| `NODE_ENV` | `production` |
+| `CORS_ORIGIN` | Allowed CORS origin |
 
-GitHub Actions
+### Database
 
-Commit
-↓
-Lint
-↓
-Format Check
-↓
-Unit Tests
-↓
-Integration Tests
-↓
-Build
-↓
-Docker Image
-↓
-Deploy Staging
-↓
-Manual Approval
-↓
-Deploy Production
+| Variable | Description |
+|---|---|
+| `POSTGRES_USER` | Database username |
+| `POSTGRES_PASSWORD` | Database password |
+| `POSTGRES_DB` | Database name |
 
-⸻
+### Admin seed (first run only)
 
-12. Security Configuration
+| Variable | Description |
+|---|---|
+| `ADMIN_SEED_EMAIL` | Initial admin email |
+| `ADMIN_SEED_PASSWORD` | Initial admin password — **change after first login** |
 
-Production Requirements
+---
 
-* HTTPS
-* TLS 1.3
-* Strong Ciphers
-* HTTP Security Headers
-* RBAC
-* Input Validation
-* Dependency Scanning
+## Docker Compose Files
 
-Never expose
+| File | Purpose |
+|---|---|
+| `docker-compose.yml` | Local development (hot reload, pgAdmin, HTTP only) |
+| `docker-compose.prod.yml` | Production (production builds, HTTPS, no pgAdmin) |
 
-* PostgreSQL
-* Admin API
-* Internal logs
+---
 
-⸻
+## Database Operations
 
-13. Monitoring
+### Run migrations
 
-Recommended
+```bash
+# Development
+docker compose exec backend npm run migration:run
 
-Application
+# Production
+docker compose -f docker-compose.prod.yml --env-file .env.prod \
+  run --rm backend npm run migration:run
+```
 
-* Health endpoint
+### Revert last migration
 
-Infrastructure
+```bash
+docker compose exec backend npm run migration:revert
+```
 
-* CPU
-* Memory
-* Disk
+### Seed catalog data
 
-API
+```bash
+docker compose exec backend npm run seed
+```
 
-* Response Time
-* Error Rate
+---
 
-Database
+## Backup & Restore
 
-* Connections
-* Slow Queries
+### Create a backup
 
-⸻
+```bash
+./scripts/backup.sh --env-file .env.prod
+# Output: backups/sfbu_ece_YYYYMMDD_HHMMSS.sql.gz
+```
 
-Logging
+Retains the last 30 backups automatically.
 
-Frontend
+### Schedule daily backups (cron)
 
-Browser errors
+```cron
+0 2 * * * /path/to/project/scripts/backup.sh --env-file /path/to/.env.prod >> /var/log/sfbu-backup.log 2>&1
+```
 
-Backend
+### Restore from backup
 
-Application logs
+```bash
+./scripts/restore.sh backups/sfbu_ece_20260627_120000.sql.gz --env-file .env.prod
+```
 
-Nginx
+---
 
-Access logs
+## Health Check & Smoke Tests
 
-PostgreSQL
+```bash
+# Against production
+./scripts/healthcheck.sh https://ece.sfbu.edu
 
-Database logs
+# Against localhost
+./scripts/healthcheck.sh http://localhost
+```
 
-Recommended
+Checks: frontend, programs page, courses page, API health, API programs, API courses, admin login.
 
-* Grafana
-* Loki
-* Prometheus
+---
 
-⸻
+## CI/CD Pipeline
 
-14. Backup Strategy
+GitHub Actions runs on push to `main` and `develop`:
 
-Database
+| Job | What it does |
+|---|---|
+| `backend` | Install → lint → build → unit tests (with real Postgres) |
+| `frontend` | Install → lint → type check → Next.js build |
+| `docker` | Build production Docker images for both services |
 
-Daily
+The `docker` job runs only after `backend` and `frontend` pass, catching Dockerfile regressions.
 
-Incremental
+---
 
-Every hour
+## Nginx Configuration
 
-Retention
+| File | Purpose |
+|---|---|
+| `docker/nginx.conf` | Development — HTTP only |
+| `docker/nginx.prod.conf` | Production — HTTPS, security headers, rate limiting |
 
-30 Days
+Production nginx:
+- HTTP → HTTPS redirect
+- TLS 1.2 + 1.3 only
+- Security headers: HSTS, X-Frame-Options, CSP, Referrer-Policy
+- Rate limiting on `/api` (30 req/min per IP, burst 20)
+- Static asset caching (`/_next/static` → 1-year immutable)
 
-Storage
+---
 
-* Local
-* Cloud
+## Rollback
 
-Verify restoration monthly.
+```bash
+# Stop current deployment
+docker compose -f docker-compose.prod.yml --env-file .env.prod down
 
-⸻
+# Checkout previous version
+git checkout <previous-tag-or-commit>
 
-15. Disaster Recovery
+# Redeploy
+./scripts/deploy.sh --env-file .env.prod
 
-Recovery Targets
+# If database schema changed, restore from backup
+./scripts/restore.sh backups/<latest-good-backup>.sql.gz --env-file .env.prod
+```
 
-Metric	Target
-RPO	1 hour
-RTO	4 hours
+---
 
-⸻
+## Troubleshooting
 
-Recovery Process
+### Services not starting
 
-Restore
+```bash
+docker compose -f docker-compose.prod.yml logs --tail=100
+docker compose -f docker-compose.prod.yml ps
+```
 
-↓
+### Database connection refused
 
-Run Migrations
+```bash
+docker compose -f docker-compose.prod.yml logs postgres
+# Check POSTGRES_USER / POSTGRES_PASSWORD / DATABASE_URL match
+```
 
-↓
+### Frontend shows blank / API errors
 
-Verify
+```bash
+# Check NEXT_PUBLIC_API_URL is the public URL (not internal)
+# Check CORS_ORIGIN matches the frontend domain
+docker compose -f docker-compose.prod.yml logs frontend
+docker compose -f docker-compose.prod.yml logs backend
+```
 
-↓
+### Nginx 502 Bad Gateway
 
-Restart Services
+```bash
+docker compose -f docker-compose.prod.yml ps
+# frontend or backend container may not be healthy yet — wait or restart
+docker compose -f docker-compose.prod.yml restart nginx
+```
 
-↓
+### API health endpoint
 
-Smoke Test
+```bash
+curl https://ece.sfbu.edu/api/v1/health
+# Expected: {"status":"ok"}
+```
 
-⸻
+---
 
-16. Rollback Strategy
+## Security Checklist
 
-Rollback if
+- [ ] All secrets in `.env.prod`, never committed to git
+- [ ] `JWT_SECRET` is at least 48 random characters
+- [ ] `POSTGRES_PASSWORD` is strong and unique
+- [ ] HTTPS enabled with valid certificate
+- [ ] Admin password changed after first login
+- [ ] Postgres port (5432) not exposed to internet (compose `internal` network only)
+- [ ] pgAdmin not running in production
+- [ ] `docker/ssl/` added to `.gitignore`
 
-* Build fails
-* Critical bug
-* Database issue
-* Deployment failure
+---
 
-Method
+## System Requirements
 
-Stop
-↓
-Previous Docker Image
-↓
-Restore Database
-↓
-Restart
-
-⸻
-
-17. Deployment Checklist
-
-Infrastructure
-
-* Server Ready
-* Docker Installed
-* PostgreSQL Installed
-* Nginx Installed
-
-⸻
-
-Application
-
-* Build Successful
-* Migrations Complete
-* Seed Complete
-* Environment Variables Configured
-
-⸻
-
-Security
-
-* HTTPS Enabled
-* Firewall Configured
-* Secrets Configured
-
-⸻
-
-Validation
-
-* Frontend Accessible
-* Backend Healthy
-* Database Connected
-* Admin Dashboard Accessible
-
-⸻
-
-Monitoring
-
-* Logs Available
-* Metrics Available
-* Backup Scheduled
-
-⸻
-
-18. Troubleshooting
-
-Frontend won’t start
-
-Check
-
-npm install
-npm run build
-
-⸻
-
-Backend won’t connect
-
-Check
-
-DATABASE_URL
-
-⸻
-
-Database
-
-Verify
-
-docker compose logs postgres
-
-⸻
-
-Nginx
-
-Check
-
-systemctl status nginx
-
-⸻
-
-API
-
-Verify
-
-GET /api/v1/health
-
-Expected
-
-{
-  "status": "ok"
-}
-
-⸻
-
-19. Future Improvements
-
-* Kubernetes
-* Helm Charts
-* GitOps
-* Blue/Green Deployment
-* Canary Releases
-* CDN
-* Redis Cache
-* Auto Scaling
-* Multi-region Deployment
-
-⸻
-
-References
-
-* docs/SRS.md
-* docs/02-Architecture.md
-* docs/03-Database.md
-* docs/04-API.md
-* docs/05-UIUX.md
-* docs/07-TestingStrategy.md
-* epics/009-deployment.md
-* management/PROJECT_ROADMAP.md
-* management/TASKS.md
+| Component | Minimum | Recommended |
+|---|---|---|
+| CPU | 1 vCPU | 2 vCPU |
+| RAM | 2 GB | 4–8 GB |
+| Disk | 20 GB | 100 GB SSD |
+| OS | Ubuntu 22.04 LTS | Ubuntu 24.04 LTS |
+| Docker | 24+ | latest |

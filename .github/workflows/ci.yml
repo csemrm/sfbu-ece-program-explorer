@@ -88,3 +88,28 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
           NEXT_PUBLIC_APP_NAME: SFBU ECE Program Explorer
+
+  docker:
+    name: Docker Build (Production)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend production image
+        run: |
+          docker build \
+            --target production \
+            --tag sfbu-backend:ci \
+            ./backend
+
+      - name: Build frontend production image
+        run: |
+          docker build \
+            --target production \
+            --tag sfbu-frontend:ci \
+            ./frontend
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost/api/v1
+          NEXT_PUBLIC_APP_NAME: SFBU ECE Program Explorer
