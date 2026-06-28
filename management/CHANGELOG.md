@@ -4,6 +4,25 @@
 
 ---
 
+## [0.5.0] — 2026-06-27
+
+### Epic 005 — Course Explorer (Frontend)
+
+#### Added
+
+- `frontend/components/courses/CourseCard.tsx` — Course card with code badge, level badge (UG/Grad), credits, truncated description
+- `frontend/components/courses/CourseFilters.tsx` — Client component: keyword search + level filter, updates URL params via `router.push`
+- `frontend/components/courses/PrerequisiteList.tsx` — Linked chips for prerequisites and corequisites
+- `frontend/components/courses/CoursePagination.tsx` — Prev/Next pagination with URL search param preservation
+- `frontend/app/courses/page.tsx` — Course list page: reads `searchParams`, server-fetches filtered data, 18/page
+- `frontend/app/courses/[id]/page.tsx` — Course detail: hero with code/level/credits, description, info table, prerequisites section, explore-further cards
+
+#### Changed
+
+- `frontend/lib/api.ts` — Added `CoursePrerequisites`, `SearchResult` types; added `courses.get()`, `courses.prerequisites()` calls
+
+---
+
 ## [0.4.0] — 2026-06-27
 
 ### Epic 004 — Program Explorer (Frontend)

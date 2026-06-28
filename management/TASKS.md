@@ -128,10 +128,12 @@ Status: 🟡 In Progress
 
 #### Course Explorer
 
-- [ ] Search
-- [ ] Filters
-- [ ] Course detail page
-- [ ] Related courses
+- [x] Search (keyword, by code/title via URL params)
+- [x] Filters (level: undergraduate/graduate)
+- [x] Course list page with pagination (18/page)
+- [x] Course detail page (hero, info table, prereqs/coreqs)
+- [x] PrerequisiteList with linked course chips
+- [ ] Related courses (future)
 
 ---
 
@@ -236,4 +238,4 @@ Status: 🟡 In Progress
 
 - Version 1 does not include student accounts, transcripts, GPA, or advising workflows.
 - The application is a public-facing curriculum visualization platform built from the university catalog.
-- Next milestone: Epic 005 — Course Explorer (search, filters, course detail page).
+- Next milestone: Epic 006 — Curriculum Roadmap (semester-by-semester visualization).
