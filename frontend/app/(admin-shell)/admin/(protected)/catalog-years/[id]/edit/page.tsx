@@ -4,14 +4,15 @@ import Link from 'next/link';
 import { adminApi } from '../../../../../../../lib/admin-api';
 import { EditCyClient } from '../../../../../../../components/admin/forms/EditCyClient';
 
-export default async function EditCatalogYearPage({ params }: { params: { id: string } }) {
+export default async function EditCatalogYearPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const token = (await cookies()).get('admin_token')?.value ?? '';
 
   let cy;
   let programs;
   try {
     [cy, programs] = await Promise.all([
-      adminApi.catalogYears.get(token, params.id),
+      adminApi.catalogYears.get(token, id),
       adminApi.programs.list(token, 1).then((r) => r.data),
     ]);
   } catch {
