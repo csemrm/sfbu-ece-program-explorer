@@ -34,7 +34,7 @@ function computeRequiredCredits(phases: RoadmapPhase[]): number {
   for (const p of phases) {
     const mc = Number(p.minCredits ?? 0);
     const courseCr = p.courses.reduce((s, c) => s + parseFloat(String(c.creditHours)), 0);
-    const credits = courseCr > 0 ? courseCr : mc;
+    const credits = mc > 0 ? mc : courseCr; // minCredits is authoritative
     if (!credits) continue;
     if (isSpecialization(p.name)) {
       if (!specCounted) {
