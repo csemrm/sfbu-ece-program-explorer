@@ -1,5 +1,50 @@
 # CHANGELOG
 
+# 1.0.0 (2026-06-28)
+
+
+### Bug Fixes
+
+* add comprehensive error handling across all pages ([ed26be6](https://github.com/csemrm/sfbu-ece-program-explorer/commit/ed26be61ae0cc92fe00e20469c4aa729e1e65153))
+* await params in catalog-years edit page (Next.js 16) ([6614d8a](https://github.com/csemrm/sfbu-ece-program-explorer/commit/6614d8a6c60e8eec6940e901d7a19d909819a434))
+* **ci:** Node 24 for release job ([6c90a6d](https://github.com/csemrm/sfbu-ece-program-explorer/commit/6c90a6d02d9729fd969499ff78783aa1c2ac34c7))
+* **ci:** use Node 24 for release job — semantic-release v25 requires >=22.14 ([4a49bc0](https://github.com/csemrm/sfbu-ece-program-explorer/commit/4a49bc056d1cfa685919d30652515f588e87fe78))
+* **compare:** correct credit totals by counting one specialization track only ([d6a973a](https://github.com/csemrm/sfbu-ece-program-explorer/commit/d6a973adf78fa8cc0fa4a7ae58500dc9254e6d04))
+* **compare:** show MSCS vs MSEE only; fix creditHours string coercion ([e9720fb](https://github.com/csemrm/sfbu-ece-program-explorer/commit/e9720fbaa7310ee921d934ab8e88f682da4e08d0))
+* dark mode toggle + full admin page dark mode coverage (v0.8.2) ([58c86a8](https://github.com/csemrm/sfbu-ece-program-explorer/commit/58c86a8a7d515ff2b9becdb7179a07cc7d22f77d))
+* enforce uniqueness and show relationships in admin tables ([59a6df2](https://github.com/csemrm/sfbu-ece-program-explorer/commit/59a6df227f7bd0754b419f9fd2a6173d94b156f1))
+* **lint:** resolve all ESLint errors in backend ([f1cbd43](https://github.com/csemrm/sfbu-ece-program-explorer/commit/f1cbd43e2b8771dc7ff00ce927a3c1cc3b4c5ba5))
+* **lint:** resolve all ESLint errors in frontend ([8791a9f](https://github.com/csemrm/sfbu-ece-program-explorer/commit/8791a9f2da312e2f4c2014e188418027bc20c7be))
+* mount components/, lib/, middleware.ts as dev volumes in docker-compose ([fffdb36](https://github.com/csemrm/sfbu-ece-program-explorer/commit/fffdb367152e385469bd759d344ce7ebba5611c0))
+* move catalog-years render functions to AdminCyClient ('use client') ([f976cca](https://github.com/csemrm/sfbu-ece-program-explorer/commit/f976ccae0712cdde13bf6ba3668e106f2d0a444b))
+* **prod:** set HOSTNAME=0.0.0.0 so Next.js standalone binds to all interfaces ([cdefa6d](https://github.com/csemrm/sfbu-ece-program-explorer/commit/cdefa6da0829c46e5b11b9b0e81eb6588ad6c305))
+* replace Coming in Epic placeholders with live links on course detail page ([4b286b4](https://github.com/csemrm/sfbu-ece-program-explorer/commit/4b286b4654acaf89e5f979656dd45f9d418eb9e5))
+* **roadmap:** correct required credits total for programs with specialization tracks ([a61697c](https://github.com/csemrm/sfbu-ece-program-explorer/commit/a61697c4374934a7cea5c632939e14c8b62b4167))
+* suppress hydration warning from browser extensions; fix roadmap required credits ([6d0d97d](https://github.com/csemrm/sfbu-ece-program-explorer/commit/6d0d97db18d760c9a32213a2941d6f271592ad9e))
+
+
+### Features
+
+* add create/edit UI for Knowledge Areas, Requirement Groups, Catalog Years ([706d447](https://github.com/csemrm/sfbu-ece-program-explorer/commit/706d4478e53097282f8016e2dab617478514975d))
+* add edit and delete for catalog years ([19ca137](https://github.com/csemrm/sfbu-ece-program-explorer/commit/19ca137ed867824deb990d2eb6fb6eae3df7ad7d))
+* admin UI modernization — SFBU brand colors, dark mode, input fix ([621b2df](https://github.com/csemrm/sfbu-ece-program-explorer/commit/621b2dfc46c10be6998d5c94f1a7ae6bf756e340)), closes [#1C3766](https://github.com/csemrm/sfbu-ece-program-explorer/issues/1C3766) [#C5972B](https://github.com/csemrm/sfbu-ece-program-explorer/issues/C5972B)
+* **ci:** add semantic-release for automatic versioning on main ([6e6680e](https://github.com/csemrm/sfbu-ece-program-explorer/commit/6e6680ea92aa63bdfe0b835e632af9c99ed9044e))
+* collapsible sidebar toggle with icon-only mode ([d19a99d](https://github.com/csemrm/sfbu-ece-program-explorer/commit/d19a99d961d34e80f14c8a4bb686f65f1da0c7cc))
+* **courses:** grid/list view toggle on course catalog page ([ad0ccec](https://github.com/csemrm/sfbu-ece-program-explorer/commit/ad0ccec4789c91873402df0a935b85bfa2949bb9))
+* **epic-009:** production deployment infrastructure ([6022d38](https://github.com/csemrm/sfbu-ece-program-explorer/commit/6022d3819b3066bad0c92a17c35a9cdb07f75d73))
+* implement Epic 001 – Project Foundation ([08b4351](https://github.com/csemrm/sfbu-ece-program-explorer/commit/08b4351d2bb858eb1f701fa27b2777b4cb7ba8ba))
+* implement Epic 002 – Database Design ([8bb7e4b](https://github.com/csemrm/sfbu-ece-program-explorer/commit/8bb7e4b0e637cfea2f5b3b5f0af4d89fb35ac3d3))
+* implement Epic 003 – Backend API ([9566236](https://github.com/csemrm/sfbu-ece-program-explorer/commit/95662362573b8fef663523f376b4f0e205de198b))
+* implement Epic 004 – Program Explorer frontend ([7406cad](https://github.com/csemrm/sfbu-ece-program-explorer/commit/7406cadda562acf762e78353efdadaca06c245e5))
+* implement Epic 005 – Course Explorer ([c7c8e8e](https://github.com/csemrm/sfbu-ece-program-explorer/commit/c7c8e8eb59de722f94c4ace2491ee99e9ff09568))
+* implement Epic 006 – Curriculum Roadmap ([e1a2c3d](https://github.com/csemrm/sfbu-ece-program-explorer/commit/e1a2c3deaf4275e16b188c44bb3bde6afff382ca))
+* implement Epic 007 – Prerequisite Graph ([7d88f7d](https://github.com/csemrm/sfbu-ece-program-explorer/commit/7d88f7d07f09b2c1d73cba77d142da070699d198))
+* implement Epic 008 – Administration Dashboard ([1ac38bb](https://github.com/csemrm/sfbu-ece-program-explorer/commit/1ac38bb75ac7a221b90a94311b81b8be737a7789))
+* **m10:** add Program Comparison page — BSCS vs MSCS vs MSEE (v1.0.0) ([8afb122](https://github.com/csemrm/sfbu-ece-program-explorer/commit/8afb1227a5c7fe168d774fc212ff22766209212a))
+* public UI SFBU branding — navy/gold theme throughout (v0.8.3) ([50f572a](https://github.com/csemrm/sfbu-ece-program-explorer/commit/50f572a2e9bba5c5b02cda829c644f70753c88a0))
+* **public-ui:** SFBU brand theme + professional UI polish ([4dfbff5](https://github.com/csemrm/sfbu-ece-program-explorer/commit/4dfbff5a693eba2185c7b2536f5f24b0438535da))
+* **testing:** milestone 13 — unit tests for backend services and frontend utilities ([92dd71a](https://github.com/csemrm/sfbu-ece-program-explorer/commit/92dd71a95c22a7656ea4242c31de17dc38aabf38))
+
 ## [Unreleased]
 
 ---
