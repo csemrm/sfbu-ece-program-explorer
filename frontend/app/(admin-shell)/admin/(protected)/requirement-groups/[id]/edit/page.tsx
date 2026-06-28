@@ -18,7 +18,9 @@ export default async function EditRgPage({ params }: Props) {
     ]);
     return (
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Requirement Group</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+          Edit Requirement Group
+        </h1>
         <EditRgClient rg={rg} catalogYears={catalogYears} />
       </div>
     );

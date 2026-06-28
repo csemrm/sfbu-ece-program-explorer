@@ -203,6 +203,22 @@ Status: 🟡 In Progress
 - [x] Fix server→client function serialization error: extract AdminCyClient as 'use client' component
 - [x] Fix Docker volume mounts: add frontend/components, frontend/lib, frontend/middleware.ts
 
+#### Admin UI Modernization + Dark Mode Fix (v0.8.2)
+
+- [x] Fix dark mode toggle: `@custom-variant dark` → `@variant dark` in globals.css (overrides built-in media-query variant)
+- [x] SFBU brand colors in CSS vars (--sfbu-navy #1C3766, --sfbu-gold #C5972B)
+- [x] ThemeProvider (localStorage persistence) + ThemeToggle (sun/moon button) in admin header
+- [x] Fix invisible input text: explicit `text-gray-900 bg-white dark:text-gray-100 dark:bg-gray-800` on all form inputs/selects
+- [x] AdminSidebar: SFBU navy background, gold accent bar, brand badge, SVG icons
+- [x] Admin login page: SFBU navy background, gold avatar, branded card
+- [x] Dashboard: stat cards with navy/gold/green icon badges, dark mode throughout
+- [x] DataTable: full dark mode (thead, tbody, rows, text, actions)
+- [x] All 5 forms: dark mode labels, inputs, errors, cancel button
+- [x] All list pages: heading dark mode + card dark mode + action button uses var(--sfbu-navy)
+- [x] All new/edit pages: heading dark:text-white
+- [x] Audit log page: full dark mode (heading, card, table, pagination)
+- [x] Catalog years edit page: breadcrumb dark mode
+
 ---
 
 ### Testing

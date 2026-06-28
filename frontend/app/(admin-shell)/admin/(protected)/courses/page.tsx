@@ -34,16 +34,17 @@ export default async function AdminCoursesPage({ searchParams }: Props) {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Courses</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Courses</h1>
         <Link
           href="/admin/courses/new"
-          className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors"
+          className="px-4 py-2 text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+          style={{ backgroundColor: 'var(--sfbu-navy)' }}
         >
           + New Course
         </Link>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
         <AdminCoursesTable
           rows={result.data}
           total={result.total}

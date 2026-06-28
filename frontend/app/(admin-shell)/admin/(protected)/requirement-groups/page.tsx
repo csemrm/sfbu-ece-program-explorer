@@ -32,15 +32,16 @@ export default async function RequirementGroupsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Requirement Groups</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Requirement Groups</h1>
         <Link
           href="/admin/requirement-groups/new"
-          className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors"
+          className="px-4 py-2 text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+          style={{ backgroundColor: 'var(--sfbu-navy)' }}
         >
           + New Requirement Group
         </Link>
       </div>
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
         <AdminRgClient rows={result.data} catalogYears={catalogYears} />
       </div>
     </div>

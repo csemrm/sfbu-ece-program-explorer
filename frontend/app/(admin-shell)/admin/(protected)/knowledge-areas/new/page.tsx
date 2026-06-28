@@ -16,7 +16,7 @@ export default function NewKaPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">New Knowledge Area</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">New Knowledge Area</h1>
       <KaForm onSubmit={handleCreate} submitLabel="Create Knowledge Area" />
     </div>
   );

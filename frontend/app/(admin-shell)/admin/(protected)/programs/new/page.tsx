@@ -16,7 +16,7 @@ export default function NewProgramPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">New Program</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">New Program</h1>
       <ProgramForm onSubmit={handleCreate} submitLabel="Create Program" />
     </div>
   );

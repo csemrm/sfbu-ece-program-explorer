@@ -15,7 +15,7 @@ export default async function NewCyPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">New Catalog Year</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">New Catalog Year</h1>
       <NewCyClient programs={programs} />
     </div>
   );

@@ -4,6 +4,29 @@
 
 ---
 
+## [0.8.2] — 2026-06-27
+
+### Admin UI Dark Mode Fix + Full Dark Mode Coverage
+
+#### Fixed
+
+**Frontend:**
+- `app/globals.css` — `@custom-variant dark` → `@variant dark`; `@custom-variant` creates new variants, `@variant` overrides the built-in media-query dark variant enabling class-based toggle
+- `app/(admin-shell)/admin/(protected)/programs/page.tsx` — Headings + card + button dark mode
+- `app/(admin-shell)/admin/(protected)/courses/page.tsx` — Headings + card + button dark mode
+- `app/(admin-shell)/admin/(protected)/knowledge-areas/page.tsx` — Headings + card + button dark mode
+- `app/(admin-shell)/admin/(protected)/requirement-groups/page.tsx` — Headings + card + button dark mode
+- `app/(admin-shell)/admin/(protected)/catalog-years/page.tsx` — Headings + card + button dark mode
+- `app/(admin-shell)/admin/(protected)/audit-log/page.tsx` — Full dark mode: heading, card, table (thead/tbody/rows/cells), pagination
+- All `new/page.tsx` and `[id]/edit/page.tsx` pages — Added `dark:text-white` to headings; catalog-years edit breadcrumb gets dark variants
+
+#### Changed
+
+**Frontend:**
+- "New X" action buttons across all list pages: replaced `bg-slate-900 hover:bg-slate-800` with `style={{ backgroundColor: 'var(--sfbu-navy)' }} hover:opacity-90` for brand consistency
+
+---
+
 ## [0.8.1] — 2026-06-27
 
 ### Post-Epic 008 Fixes & Improvements
