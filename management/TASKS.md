@@ -171,13 +171,21 @@ Status: 🟡 In Progress
 
 ---
 
-#### Admin
+#### Admin (Epic 008 — Complete)
 
-- [ ] Login
-- [ ] Dashboard
-- [ ] Course editor
-- [ ] Program editor
-- [ ] Catalog import
+- [x] JWT auth: login, logout, me (httpOnly cookie)
+- [x] AdminUser + AuditLog entities + migration
+- [x] RolesGuard + RBAC (system_admin, curriculum_admin, content_editor)
+- [x] Admin seed (ADMIN_SEED_EMAIL / ADMIN_SEED_PASSWORD env vars)
+- [x] Dashboard stats endpoint + recent activity
+- [x] Admin CRUD: programs, courses (incl. prereq/coreq), requirement groups, knowledge areas, catalog years
+- [x] Audit log endpoint with pagination
+- [x] Next.js route groups: (public) + (admin-shell) dual root layouts
+- [x] Next.js middleware: protects /admin/* routes
+- [x] Admin login page (dark theme, cookie auth)
+- [x] Admin protected layout: sidebar + header with role badge
+- [x] Admin pages: dashboard, programs, courses, requirement groups, knowledge areas, catalog years, audit log
+- [x] Reusable: DataTable, ConfirmDialog, ProgramForm, CourseForm components
 
 ---
 
@@ -245,4 +253,4 @@ Status: 🟡 In Progress
 
 - Version 1 does not include student accounts, transcripts, GPA, or advising workflows.
 - The application is a public-facing curriculum visualization platform built from the university catalog.
-- Next milestone: Epic 008 — Administration Dashboard.
+- Next milestone: Epic 009 — Deployment.

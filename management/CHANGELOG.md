@@ -4,6 +4,66 @@
 
 ---
 
+## [0.8.0] — 2026-06-27
+
+### Epic 008 — Administration Dashboard
+
+#### Added
+
+**Backend:**
+- `entities/admin-user.entity.ts` — AdminUser entity (email, passwordHash, AdminRole enum, isActive)
+- `entities/audit-log.entity.ts` — AuditLog entity (adminUserId, action, entityType, entityId, payload JSON)
+- `migrations/1719446401000-AdminTables.ts` — Creates admin_users + audit_logs tables with indexes
+- `modules/auth/` — JWT auth module: login/logout/me controller, AuthService (bcryptjs), JwtStrategy (cookie + Bearer), JwtAuthGuard, RolesGuard, @Roles() decorator, LoginDto
+- `modules/admin/admin-audit.service.ts` — Shared service for writing audit log entries
+- `modules/admin/dashboard/` — `GET /admin/dashboard` (stats: programs/courses/catalogYears counts + recent activity)
+- `modules/admin/programs/` — CRUD `GET|POST /admin/programs`, `GET|PUT|DELETE /admin/programs/:id`
+- `modules/admin/courses/` — CRUD + prereq/coreq management endpoints
+- `modules/admin/requirement-groups/` — CRUD endpoints
+- `modules/admin/knowledge-areas/` — CRUD endpoints
+- `modules/admin/catalog-years/` — `GET|POST /admin/catalog-years`
+- `modules/admin/audit-log/` — `GET /admin/audit-log` with pagination
+
+**Changed (Backend):**
+- `package.json` — Added `@nestjs/jwt`, `@nestjs/passport`, `bcryptjs`, `cookie-parser`, `passport`, `passport-jwt` (and `@types/*` dev deps). Uses `bcryptjs` (pure JS) instead of native `bcrypt` to support Docker Linux containers
+- `main.ts` — Added `cookieParser()` middleware (default import required with `esModuleInterop`)
+- `app.module.ts` — Imported AuthModule + AdminModule
+- `database.config.ts` + `data-source.ts` — Added AdminUser + AuditLog to entities arrays
+- `seeds/seed.ts` — Seeds initial admin user from `ADMIN_SEED_EMAIL`/`ADMIN_SEED_PASSWORD` env vars with bcrypt hash
+
+**Frontend:**
+- `app/(public)/` — Moved all public pages into route group; relative imports updated (+1 `../` per level)
+- `app/(admin-shell)/layout.tsx` — Separate root layout for admin area (html+body only, no Nav/footer)
+- `app/(admin-shell)/admin/login/page.tsx` — Dark-themed login page with JWT cookie auth
+- `app/(admin-shell)/admin/(protected)/layout.tsx` — Auth-checking server layout: reads admin_token cookie, calls /me, redirects on failure; renders AdminSidebar + header with role badge
+- `app/(admin-shell)/admin/(protected)/dashboard/page.tsx` — Stats cards + recent activity table
+- `app/(admin-shell)/admin/(protected)/programs/` — List, create, edit pages
+- `app/(admin-shell)/admin/(protected)/courses/` — List, create, edit pages
+- `app/(admin-shell)/admin/(protected)/requirement-groups/page.tsx`
+- `app/(admin-shell)/admin/(protected)/knowledge-areas/page.tsx`
+- `app/(admin-shell)/admin/(protected)/catalog-years/page.tsx`
+- `app/(admin-shell)/admin/(protected)/audit-log/page.tsx` — Paginated audit log
+- `middleware.ts` — Next.js middleware: redirects unauthenticated /admin/* to /admin/login
+- `lib/admin-api.ts` — `adminFetch` helper, all AdminUser/DashboardStats/AuditEntry/Paginated types; server-side `adminApi` object; client-side `loginAdmin`/`logoutAdmin`
+- `components/admin/AdminSidebar.tsx` — Collapsible sidebar with active-state links and sign-out
+- `components/admin/DataTable.tsx` — Generic reusable table with edit/delete actions
+- `components/admin/ConfirmDialog.tsx` — Modal confirm for destructive actions
+- `components/admin/forms/ProgramForm.tsx` + `EditProgramClient.tsx`
+- `components/admin/forms/CourseForm.tsx` + `EditCourseClient.tsx`
+- `components/admin/tables/AdminProgramsTable.tsx` + `AdminCoursesTable.tsx`
+- `components/admin/tables/AdminRgClient.tsx` + `AdminKaClient.tsx`
+- `.env.example` — Added `ADMIN_SEED_EMAIL` + `ADMIN_SEED_PASSWORD`
+
+#### Technical Notes
+
+- `bcryptjs` required over `bcrypt` — native addon compiled on macOS fails with `ERR_DLOPEN_FAILED` in Docker Linux containers
+- `cookieParser` must use default import (`import cookieParser from 'cookie-parser'`) when `esModuleInterop: true`; namespace import makes it non-callable (TS2349)
+- Express `Request`/`Response` types in `@Res()`/`@Req()` params cause TS1272 with `isolatedModules` + `emitDecoratorMetadata`; fixed by using `any`
+- Next.js route groups create real filesystem directories — all relative imports need one extra `../` per added group level
+- Client components extract JWT token from `document.cookie` via regex for API calls (Next.js `cookies()` API is server-only)
+
+---
+
 ## [0.7.0] — 2026-06-27
 
 ### Epic 007 — Prerequisite Graph
