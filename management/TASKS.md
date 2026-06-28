@@ -241,9 +241,9 @@ Status: 🟡 In Progress
 - [x] Frontend unit tests: URL building logic, search param construction (8 tests)
 - [x] CI: frontend unit test step added before build
 - [ ] Integration tests (backend ↔ database — requires test DB)
-- [ ] API tests (Supertest e2e against running app)
-- [ ] Frontend component tests (React Testing Library — CourseCard, ProgramCard, etc.)
-- [ ] Accessibility tests (axe, Lighthouse)
+- [x] API tests (Supertest e2e — isolated NestJS modules, no DB; 21 tests covering programs + courses + health)
+- [x] Frontend component tests (React Testing Library — CourseCard, ProgramCard, Breadcrumb, CoursePagination; 38 tests)
+- [x] Accessibility tests (jest-axe — CourseCard, ProgramCard, Breadcrumb all pass axe)
 
 ---
 

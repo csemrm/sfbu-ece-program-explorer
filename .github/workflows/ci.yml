@@ -56,6 +56,13 @@ jobs:
           JWT_SECRET: test_secret
           NODE_ENV: test
 
+      - name: E2E tests (isolated — no DB required)
+        working-directory: backend
+        run: npm run test:e2e
+        env:
+          JWT_SECRET: test_secret
+          NODE_ENV: test
+
   frontend:
     name: Frontend
     runs-on: ubuntu-latest

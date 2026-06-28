@@ -4,6 +4,28 @@
 
 ---
 
+## [0.9.2] — 2026-06-27
+
+### Milestone 13 — API E2E Tests + Frontend Component + Accessibility Tests
+
+#### Added
+
+**Backend E2E (21 tests, 3 suites — all passing, isolated modules, no DB required):**
+- `test/app.e2e-spec.ts` — `GET /api/v1/health` → 200, `status: ok`, timestamp string
+- `test/programs.e2e-spec.ts` — `GET /api/v1/programs` paginated; query param passthrough; invalid page → 400; `GET /api/v1/programs/:id` → 200; non-UUID → 400; NotFoundException → 404; `/requirements` + `/roadmap` + `/graph` endpoints
+- `test/courses.e2e-spec.ts` — `GET /api/v1/courses` paginated; `q` and `level` param passthrough; invalid page → 400; `GET /api/v1/courses/:id` → 200; non-UUID → 400; NotFoundException → 404; `GET /api/v1/courses/:id/prerequisites` → 200; non-UUID → 400; not-found → 404
+
+**Frontend component tests (38 tests, 4 suites — all passing, RTL + jest-axe):**
+- `__tests__/components/CourseCard.test.tsx` — code, title, UG/Grad badge, credits, description, null description, link href, axe pass
+- `__tests__/components/ProgramCard.test.tsx` — name, abbreviation badge, degree label (all 3 programs), credit totals (120/36/36), description, null description, link href, CTA text, axe pass
+- `__tests__/components/Breadcrumb.test.tsx` — single crumb, linked crumb, multi-crumb, aria-current on last crumb, no aria-current on linked crumbs, nav landmark, axe pass
+- `__tests__/components/CoursePagination.test.tsx` — returns null when totalPages ≤ 1, page info text, plural/singular label, disabled spans on first/last page, link hrefs with page numbers, search param preservation in both directions
+
+**CI:**
+- `.github/workflows/ci.yml` — added e2e test step after unit tests in backend job (`npm run test:e2e`; isolated — no DB required)
+
+---
+
 ## [0.9.1] — 2026-06-27
 
 ### Milestone 13 — Unit Tests
