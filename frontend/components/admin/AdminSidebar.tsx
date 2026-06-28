@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { logoutAdmin } from '../../lib/admin-api';
 
 const NAV = [
@@ -155,6 +156,18 @@ const NAV = [
 export function AdminSidebar({ email }: { email: string }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('admin-sidebar-collapsed');
+    if (stored === 'true') setCollapsed(true);
+  }, []);
+
+  function toggleCollapsed() {
+    const next = !collapsed;
+    setCollapsed(next);
+    localStorage.setItem('admin-sidebar-collapsed', String(next));
+  }
 
   async function handleLogout() {
     await logoutAdmin();
@@ -163,31 +176,35 @@ export function AdminSidebar({ email }: { email: string }) {
 
   return (
     <aside
-      className="w-64 min-h-screen flex flex-col text-white"
+      className={`${collapsed ? 'w-16' : 'w-64'} min-h-screen flex flex-col text-white flex-shrink-0 transition-all duration-200`}
       style={{ backgroundColor: 'var(--sfbu-navy)' }}
     >
       {/* Gold accent bar */}
       <div className="h-1 w-full flex-shrink-0" style={{ backgroundColor: 'var(--sfbu-gold)' }} />
 
       {/* Brand header */}
-      <div className="px-5 py-4 border-b border-white/10">
-        <div className="flex items-center gap-2.5 mb-1">
+      <div className={`border-b border-white/10 ${collapsed ? 'px-3 py-4' : 'px-5 py-4'}`}>
+        <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2.5 mb-1'}`}>
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
             style={{ backgroundColor: 'var(--sfbu-gold)' }}
           >
             SF
           </div>
-          <div>
-            <p className="text-white font-semibold text-sm leading-tight">SFBU ECE</p>
-            <p className="text-white/50 text-[10px] leading-tight">Program Explorer</p>
-          </div>
+          {!collapsed && (
+            <div>
+              <p className="text-white font-semibold text-sm leading-tight">SFBU ECE</p>
+              <p className="text-white/50 text-[10px] leading-tight">Program Explorer</p>
+            </div>
+          )}
         </div>
-        <p className="text-white/35 text-[10px] uppercase tracking-widest mt-2.5">Admin Portal</p>
+        {!collapsed && (
+          <p className="text-white/35 text-[10px] uppercase tracking-widest mt-2.5">Admin Portal</p>
+        )}
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
+      <nav className={`flex-1 ${collapsed ? 'px-2' : 'px-3'} py-4 space-y-0.5`}>
         {NAV.map((item) => {
           const active =
             pathname === item.href ||
@@ -196,7 +213,8 @@ export function AdminSidebar({ email }: { email: string }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+              title={collapsed ? item.label : undefined}
+              className={`flex items-center ${collapsed ? 'justify-center px-0 py-2.5' : 'gap-2.5 px-3 py-2'} rounded-lg text-sm font-medium transition-all ${
                 active
                   ? 'bg-white/15 text-white'
                   : 'text-white/55 hover:bg-white/8 hover:text-white/90'
@@ -205,8 +223,8 @@ export function AdminSidebar({ email }: { email: string }) {
               <span className={`flex-shrink-0 ${active ? 'text-white' : 'text-white/45'}`}>
                 {item.icon}
               </span>
-              <span className="flex-1">{item.label}</span>
-              {active && (
+              {!collapsed && <span className="flex-1">{item.label}</span>}
+              {!collapsed && active && (
                 <span
                   className="w-1 h-4 rounded-full flex-shrink-0"
                   style={{ backgroundColor: 'var(--sfbu-gold)' }}
@@ -218,28 +236,56 @@ export function AdminSidebar({ email }: { email: string }) {
       </nav>
 
       {/* Footer */}
-      <div className="px-4 py-4 border-t border-white/10">
-        <p className="text-white/35 text-xs truncate mb-2">{email}</p>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/80 transition-colors"
+      <div className={`border-t border-white/10 ${collapsed ? 'px-2 py-3' : 'px-4 py-4'}`}>
+        {!collapsed && <p className="text-white/35 text-xs truncate mb-2">{email}</p>}
+
+        <div
+          className={`flex ${collapsed ? 'flex-col items-center gap-2' : 'items-center justify-between'}`}
         >
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+          {/* Logout */}
+          <button
+            onClick={handleLogout}
+            title="Sign out"
+            className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/80 transition-colors"
           >
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-          Sign out
-        </button>
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            {!collapsed && <span>Sign out</span>}
+          </button>
+
+          {/* Collapse toggle */}
+          <button
+            onClick={toggleCollapsed}
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            className="flex items-center justify-center w-6 h-6 rounded text-white/30 hover:text-white/70 hover:bg-white/8 transition-colors"
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={`transition-transform duration-200 ${collapsed ? 'rotate-180' : ''}`}
+            >
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+        </div>
       </div>
     </aside>
   );
