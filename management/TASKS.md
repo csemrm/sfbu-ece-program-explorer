@@ -162,12 +162,13 @@ Status: 🟡 In Progress
 
 ---
 
-#### Program Comparison
+#### Program Comparison (Milestone 10 — v1.0.0)
 
-- [ ] Comparison page
-- [ ] Credit comparison
-- [ ] Knowledge area comparison
-- [ ] Requirement comparison
+- [x] Comparison page (/programs/compare)
+- [x] Credit comparison (total credits, credit bars, UG/grad breakdown)
+- [x] Requirement comparison (requirement phases per program side-by-side)
+- [x] Program CTAs (Requirements, Roadmap, Graph per program)
+- [ ] Knowledge area comparison (requires new backend endpoint)
 
 ---
 

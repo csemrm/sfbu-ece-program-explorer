@@ -10,6 +10,8 @@ const bscsProgram: Program = {
   name: 'Bachelor of Science in Computer Science',
   abbreviation: 'BSCS',
   description: 'An undergraduate CS degree.',
+  createdAt: '2025-01-01T00:00:00.000Z',
+  updatedAt: '2025-01-01T00:00:00.000Z',
 };
 
 const mscsProgram: Program = {
@@ -17,6 +19,8 @@ const mscsProgram: Program = {
   name: 'Master of Science in Computer Science',
   abbreviation: 'MSCS',
   description: null,
+  createdAt: '2025-01-01T00:00:00.000Z',
+  updatedAt: '2025-01-01T00:00:00.000Z',
 };
 
 const mseeProgram: Program = {
@@ -24,6 +28,8 @@ const mseeProgram: Program = {
   name: 'Master of Science in Electrical Engineering',
   abbreviation: 'MSEE',
   description: 'Graduate EE degree.',
+  createdAt: '2025-01-01T00:00:00.000Z',
+  updatedAt: '2025-01-01T00:00:00.000Z',
 };
 
 describe('ProgramCard', () => {

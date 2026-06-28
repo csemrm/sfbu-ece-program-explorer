@@ -4,6 +4,28 @@
 
 ---
 
+## [1.0.0] — 2026-06-27
+
+### Milestone 10 — Program Comparison
+
+#### Added
+
+- `app/(public)/programs/compare/page.tsx` — Server component; fetches all programs + roadmaps in parallel; side-by-side comparison of BSCS, MSCS, MSEE
+  - Program header cards: abbreviation badge, degree type, typical duration, total credits (large)
+  - Credit bar visualization: proportional horizontal bars per program
+  - Overview stats table: 8 metrics × 3 programs (total credits, courses, UG/grad breakdown, phases, degree level, duration, catalog year)
+  - Requirement phases breakdown: 3 columns, each listing phase name + course count + credit total + minCredits
+  - Explore CTAs per program: View Requirements, Curriculum Roadmap, Prerequisite Graph
+
+#### Changed
+
+- `app/(public)/programs/page.tsx` — Added "Compare programs →" link in page header
+- `app/(public)/page.tsx` — Added "Compare Programs" button to hero CTA row
+- `app/(admin-shell)/admin/login/page.tsx` — Fixed `useSearchParams()` Suspense boundary (pre-existing build error; `LoginForm` extracted as child component wrapped in `<Suspense>`)
+- `frontend/__tests__/components/ProgramCard.test.tsx` — Added `createdAt`/`updatedAt` to test fixtures (TypeScript strict)
+
+---
+
 ## [0.9.2] — 2026-06-27
 
 ### Milestone 13 — API E2E Tests + Frontend Component + Accessibility Tests

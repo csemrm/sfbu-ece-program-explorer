@@ -137,6 +137,12 @@ export default async function Home() {
             >
               Browse Courses
             </Link>
+            <Link
+              href="/programs/compare"
+              className="rounded-full border border-white/30 text-white font-semibold px-7 py-3 text-sm hover:bg-white/10 transition-colors"
+            >
+              Compare Programs
+            </Link>
           </div>
         </div>
       </section>

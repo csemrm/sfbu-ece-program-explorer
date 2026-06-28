@@ -44,16 +44,25 @@ export default async function ProgramsPage() {
           >
             ECE Department
           </p>
-          <div className="flex items-end justify-between">
+          <div className="flex items-end justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Academic Programs</h1>
               <p className="text-gray-500 mt-1.5 text-base">
                 Undergraduate and graduate programs in Computer Science and Electrical Engineering.
               </p>
             </div>
-            <span className="hidden sm:block text-sm text-gray-400 pb-1">
-              {programs.length} program{programs.length !== 1 ? 's' : ''}
-            </span>
+            <div className="hidden sm:flex flex-col items-end gap-1.5 pb-0.5 shrink-0">
+              <span className="text-sm text-gray-400">
+                {programs.length} program{programs.length !== 1 ? 's' : ''}
+              </span>
+              <Link
+                href="/programs/compare"
+                className="text-sm font-medium hover:underline"
+                style={{ color: 'var(--sfbu-navy)' }}
+              >
+                Compare programs →
+              </Link>
+            </div>
           </div>
         </div>
       </div>
