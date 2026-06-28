@@ -53,7 +53,7 @@ management/
 - Docker Compose file to orchestrate services
 - Linting and formatting (ESLint, Prettier) for both frontend and backend
 - Initial README.md with project overview and setup instructions
-- `management/CLAUDE.md`, `management/PROJECT_ROADMAP.md`, and `management/TASKS.md` created and populated
+- `CLAUDE.md` (project root), `management/PROJECT_ROADMAP.md`, and `management/TASKS.md` created and populated
 
 ## Functional Requirements
 - Project initializes and builds successfully (frontend, backend, database)
@@ -98,7 +98,7 @@ management/
 - All acceptance criteria are met
 
 ## AI Execution Instructions
-1. **Read** `management/CLAUDE.md`, `management/PROJECT_ROADMAP.md`, and `management/TASKS.md` before coding.
+1. **Read** `CLAUDE.md`, `management/PROJECT_ROADMAP.md`, and `management/TASKS.md` before coding.
 2. **Implement only this epic** (do not begin future features or epics).
 3. **Keep changes modular**—update one concern at a time, following the tasks checklist.
 4. **Update** `management/TASKS.md` and `CHANGELOG.md` after completing each major step.

@@ -1,4 +1,4 @@
-TASKS.md
+# TASKS.md
 
 SFBU ECE Program Explorer
 
@@ -6,203 +6,311 @@ Development Task Tracker
 
 Current Version: 1.0
 
-⸻
+---
 
-Current Sprint
+## Current Sprint
 
 Sprint 1 – Project Foundation
 
 Status: 🟡 In Progress
 
-⸻
+---
 
-High Priority
+## High Priority
 
-Project Setup
+### Project Setup
 
-* Initialize Git repository
-* Create Next.js frontend
-* Create NestJS backend
-* Configure PostgreSQL
-* Configure Docker Compose
-* Configure ESLint and Prettier
-* Configure Husky pre-commit hooks
+- [x] Initialize Git repository
+- [x] Create Next.js frontend
+- [x] Create NestJS backend
+- [x] Configure PostgreSQL migrations
+- [x] Configure Docker Compose
+- [x] Configure ESLint and Prettier
+- [x] Configure Husky pre-commit hooks
 
-⸻
+---
 
-Documentation
+### Documentation
 
-* Software Requirements Specification (SRS)
-* Architecture document
-* CLAUDE.md
-* PROJECT_ROADMAP.md
-* Database design document
-* API specification
-* UI style guide
+- [x] Software Requirements Specification (SRS)
+- [x] Architecture document
+- [x] CLAUDE.md
+- [x] PROJECT_ROADMAP.md
+- [x] Database design document
+- [x] API specification
+- [x] UI style guide
 
-⸻
+---
 
-Database
+### Database
 
-* Design ER diagram
-* Create database schema
-* Create migrations
-* Create seed data
-* Import initial catalog
+- [x] Design ER diagram (→ Epic 002)
+- [x] Create database schema (→ Epic 002)
+- [x] Create migrations (→ Epic 002)
+- [x] Create seed data (→ Epic 002)
+- [x] Import initial catalog (→ Epic 002)
 
-⸻
+---
 
-Backend
+### Backend
 
-Programs Module
+#### Programs Module
 
-* Program entity
-* Program repository
-* Program service
-* Program controller
-* CRUD API
+- [x] Program entity
+- [x] Program repository
+- [x] Program service
+- [x] Program controller
+- [x] CRUD API
 
-⸻
+---
 
-Courses Module
+#### Courses Module
 
-* Course entity
-* Course repository
-* Course service
-* Course controller
+- [x] Course entity
+- [x] Course repository
+- [x] Course service
+- [x] Course controller
 
-⸻
+---
 
-Knowledge Areas
+#### Knowledge Areas
 
-* Entity
-* Service
-* API
+- [x] Entity
+- [x] Service
+- [x] API
 
-⸻
+---
 
-Requirement Groups
+#### Requirement Groups
 
-* Entity
-* Service
-* API
+- [x] Entity
+- [x] Service
+- [x] API
 
-⸻
+---
 
-Search
+#### Search
 
-* Search API
-* Full-text search
-* Filtering
+- [x] Search API
+- [x] Full-text search
+- [x] Filtering
 
-⸻
+---
 
-Frontend
+### Frontend
 
-Layout
+#### Layout
 
-* Navigation bar
-* Footer
-* Theme
-* Responsive layout
+- [x] Navigation bar
+- [x] Footer
+- [x] Theme
+- [x] Responsive layout
 
-⸻
+---
 
-Home Page
+#### Home Page
 
-* Hero section
-* Program cards
-* Search box
-* Featured visualizations
+- [x] Hero section
+- [x] Program cards
+- [ ] Search box (Epic 005)
+- [ ] Featured visualizations (Epic 006/007)
 
-⸻
-
-Program Explorer
-
-* Program list
-* Program detail page
-* Requirement summary
-* Learning outcomes
-
-⸻
-
-Course Explorer
-
-* Search
-* Filters
-* Course detail page
-* Related courses
-
-⸻
-
-Curriculum Roadmap
-
-* Timeline view
-* Semester cards
-* Zoom
-* Pan
-
-⸻
-
-Prerequisite Graph
-
-* React Flow integration
-* Node rendering
-* Edge rendering
-* Highlight prerequisite paths
-
-⸻
-
-Program Comparison
-
-* Comparison page
-* Credit comparison
-* Knowledge area comparison
-* Requirement comparison
-
-⸻
-
-Admin
-
-* Login
-* Dashboard
-* Course editor
-* Program editor
-* Catalog import
-
-⸻
-
-Testing
-
-* Unit tests
-* Integration tests
-* API tests
-* UI tests
-
-⸻
-
-Deployment
-
-* Docker configuration
-* Environment variables
-* Production build
-* Deployment documentation
-
-⸻
-
-Completed
-
-(Move completed tasks here for historical tracking.)
-
-⸻
-
-Blocked
-
-(List tasks waiting on external decisions or dependencies.)
-
-⸻
-
-Notes
-
-* Version 1 does not include student accounts, transcripts, GPA, or advising workflows.
-* The application is a public-facing curriculum visualization platform built from the university catalog.
+---
+
+#### Program Explorer
+
+- [x] Program list
+- [x] Program detail page
+- [x] Requirement summary
+- [ ] Learning outcomes (future)
+
+---
+
+#### Course Explorer
+
+- [x] Search (keyword, by code/title via URL params)
+- [x] Filters (level: undergraduate/graduate)
+- [x] Course list page with pagination (18/page)
+- [x] Course detail page (hero, info table, prereqs/coreqs)
+- [x] PrerequisiteList with linked course chips
+- [ ] Related courses (future)
+
+---
+
+#### Curriculum Roadmap
+
+- [x] Phase-by-phase timeline (requirement-group columns)
+- [x] Course cards with level badge, credits, link to detail
+- [x] Zoom (CSS zoom 50–150% via range slider)
+- [x] Collapse/expand per column
+- [x] Credit totals per phase
+- [x] GET /programs/:id/roadmap backend endpoint
+- [x] Fix required credits total (specialization deduplication — count one track, not all 3)
+- [x] Visual distinction for specialization columns (amber header, ring, "choose one" label, info banner)
+
+---
+
+#### Prerequisite Graph
+
+- [x] React Flow integration (@xyflow/react ^12.11.1)
+- [x] CourseNode: custom node with level-colored border, code/title/credits
+- [x] Edge rendering: solid=prerequisite, dashed=corequisite
+- [x] Node click highlights connected edges blue
+- [x] DetailsPanel: course details + link to course detail page
+- [x] MiniMap, zoom/pan Controls, Background
+- [x] Topological-sort layout utility (graphLayout.ts)
+- [x] GET /programs/:id/graph backend endpoint
+- [x] /programs/:id/graph frontend page
+
+---
+
+#### Program Comparison (Milestone 10 — v1.0.0)
+
+- [x] Comparison page (/programs/compare)
+- [x] Credit comparison (total credits, credit bars, UG/grad breakdown)
+- [x] Requirement comparison (requirement phases per program side-by-side)
+- [x] Program CTAs (Requirements, Roadmap, Graph per program)
+- [ ] Knowledge area comparison (requires new backend endpoint)
+
+---
+
+#### Admin (Epic 008 — Complete)
+
+- [x] JWT auth: login, logout, me (httpOnly cookie)
+- [x] AdminUser + AuditLog entities + migration
+- [x] RolesGuard + RBAC (system_admin, curriculum_admin, content_editor)
+- [x] Admin seed (ADMIN_SEED_EMAIL / ADMIN_SEED_PASSWORD env vars)
+- [x] Dashboard stats endpoint + recent activity
+- [x] Admin CRUD: programs, courses (incl. prereq/coreq), requirement groups, knowledge areas, catalog years
+- [x] Audit log endpoint with pagination
+- [x] Next.js route groups: (public) + (admin-shell) dual root layouts
+- [x] Next.js middleware: protects /admin/* routes
+- [x] Admin login page (dark theme, cookie auth)
+- [x] Admin protected layout: sidebar + header with role badge
+- [x] Admin pages: dashboard, programs, courses, requirement groups, knowledge areas, catalog years, audit log
+- [x] Reusable: DataTable, ConfirmDialog, ProgramForm, CourseForm components
+
+#### Post-Epic 008 Fixes (v0.8.1)
+
+- [x] Global 404 page (app/not-found.tsx) with html/body root
+- [x] Error boundaries: (public)/error.tsx + (admin-shell)/error.tsx
+- [x] Error handling on all list pages: try/catch around API calls, red banner on failure
+- [x] Fix "Coming in Epic 006/007" static badges → clickable links on course detail page
+- [x] Unique constraint migration: programs.abbreviation + requirement_groups.(catalog_year_id, name)
+- [x] ConflictException (409) on duplicate: all 5 admin controllers catch PG error 23505
+- [x] Create/edit UI for Knowledge Areas (KaForm, EditKaClient, new/edit pages)
+- [x] Create/edit UI for Requirement Groups (RgForm, NewRgClient, EditRgClient, new/edit pages)
+- [x] Create UI for Catalog Years (CyForm, NewCyClient, new page)
+- [x] Relationship display: Catalog Year table shows program abbreviation+name (AdminCyClient)
+- [x] Relationship display: Requirement Group table shows catalog year academicYear (AdminRgClient)
+- [x] Fix server→client function serialization error: extract AdminCyClient as 'use client' component
+- [x] Fix Docker volume mounts: add frontend/components, frontend/lib, frontend/middleware.ts
+
+#### Public UI Professional Polish (v0.8.4)
+
+- [x] Home page: stats/trust bar (programs, courses, catalog year, accreditation); gold eyebrow labels
+- [x] Programs list: white page-header band with gold eyebrow + breadcrumb; bottom CTA to courses
+- [x] Courses list: white page-header band with gold eyebrow + count; filtered-results indicator
+- [x] Course detail: navy gradient hero + dot pattern + gold bar (replaces gray-800); navy info table thead; gold section eyebrows; SVG icons in "Explore Further" (replaces emoji)
+- [x] CourseFilters: blue focus ring → sfbu-navy CSS var ring
+- [x] PrerequisiteList: blue chip hover → navy-tinted; empty state in card; uppercase tracking headers
+- [x] CoursePagination: "Next →" button navy bg; consistent disabled states
+- [x] AdminSidebar collapse toggle: chevron button + icon-only mode + localStorage persistence
+
+---
+
+#### Admin UI Modernization + Dark Mode Fix (v0.8.2)
+
+- [x] Fix dark mode toggle: `@custom-variant dark` → `@variant dark` in globals.css (overrides built-in media-query variant)
+- [x] SFBU brand colors in CSS vars (--sfbu-navy #1C3766, --sfbu-gold #C5972B)
+- [x] ThemeProvider (localStorage persistence) + ThemeToggle (sun/moon button) in admin header
+- [x] Fix invisible input text: explicit `text-gray-900 bg-white dark:text-gray-100 dark:bg-gray-800` on all form inputs/selects
+- [x] AdminSidebar: SFBU navy background, gold accent bar, brand badge, SVG icons
+- [x] Admin login page: SFBU navy background, gold avatar, branded card
+- [x] Dashboard: stat cards with navy/gold/green icon badges, dark mode throughout
+- [x] DataTable: full dark mode (thead, tbody, rows, text, actions)
+- [x] All 5 forms: dark mode labels, inputs, errors, cancel button
+- [x] All list pages: heading dark mode + card dark mode + action button uses var(--sfbu-navy)
+- [x] All new/edit pages: heading dark:text-white
+- [x] Audit log page: full dark mode (heading, card, table, pagination)
+- [x] Catalog years edit page: breadcrumb dark mode
+
+---
+
+### Testing — Milestone 13 (v0.9.1)
+
+- [x] Backend unit tests: pagination utility, ProgramsService, CoursesService, AuthService (29 tests)
+- [x] Frontend test setup: Jest + next/jest + @testing-library/react + jest.setup.ts
+- [x] Frontend unit tests: URL building logic, search param construction (8 tests)
+- [x] CI: frontend unit test step added before build
+- [ ] Integration tests (backend ↔ database — requires test DB)
+- [x] API tests (Supertest e2e — isolated NestJS modules, no DB; 21 tests covering programs + courses + health)
+- [x] Frontend component tests (React Testing Library — CourseCard, ProgramCard, Breadcrumb, CoursePagination; 38 tests)
+- [x] Accessibility tests (jest-axe — CourseCard, ProgramCard, Breadcrumb all pass axe)
+
+---
+
+### Deployment — Epic 009 (v0.9.0)
+
+- [x] Docker configuration (dev compose + Dockerfiles)
+- [x] Environment variables (.env.example)
+- [x] Production Docker Compose (docker-compose.prod.yml — target:production, health checks, internal network)
+- [x] Production Nginx (docker/nginx.prod.conf — HTTPS, security headers, rate limiting)
+- [x] Deploy script (scripts/deploy.sh — pull → build → migrate → start → smoke test)
+- [x] Backup script (scripts/backup.sh — timestamped pg_dump, 30-file retention)
+- [x] Restore script (scripts/restore.sh — drop + restore from .sql.gz)
+- [x] Health check / smoke test (scripts/healthcheck.sh)
+- [x] Self-signed cert generator (scripts/gen-self-signed-cert.sh — staging only)
+- [x] CI Docker build validation (docker job in ci.yml — builds prod images)
+- [x] .gitignore: docker/ssl/, backups/, .env.prod excluded
+- [x] Deployment documentation (docs/08-DeploymentGuide.md — full rewrite with real commands)
+
+---
+
+## Completed
+
+- [x] Initialize Git repository
+- [x] Create project documentation (SRS, Architecture, DB, API, UI/UX, Coding Standards, Testing Strategy, Deployment Guide, Catalog Data Model, Developer Guide)
+- [x] Create all 9 epics (001–009)
+- [x] Create PROJECT_ROADMAP.md (14 milestones)
+- [x] Create CLAUDE.md
+- [x] Scaffold Next.js frontend (Next.js 16, TypeScript, Tailwind CSS, App Router)
+- [x] Scaffold NestJS backend (NestJS 11, TypeScript)
+- [x] Add health endpoint (`GET /api/v1/health`)
+- [x] Install TypeORM, PostgreSQL, config, validation packages
+- [x] Create docker-compose.yml
+- [x] Create backend/Dockerfile and frontend/Dockerfile
+- [x] Create docker/nginx.conf
+- [x] Create .env.example
+- [x] Create .gitignore
+- [x] Configure Prettier (.prettierrc)
+- [x] Configure Husky pre-commit hook
+- [x] Set up GitHub Actions CI (.github/workflows/ci.yml)
+- [x] Populate README.md
+- [x] Fix doc inconsistencies (ORM, CLAUDE.md path, broken refs)
+- [x] Create 10 TypeORM entities (Program, CatalogYear, RequirementGroup, Course, KnowledgeArea, CourseKnowledgeArea, ProgramRequirement, Prerequisite, Corequisite, CatalogImport)
+- [x] Configure DatabaseModule with TypeORM (database.config.ts, database.module.ts)
+- [x] Create AppDataSource for TypeORM CLI migrations
+- [x] Create InitialSchema migration (all 10 tables, FK constraints, indexes, enums)
+- [x] Create seed data from 2025-2026 SFBU catalog (3 programs, 70+ courses, prerequisites, corequisites, requirement groups)
+- [x] Build typed API client (frontend/lib/api.ts) with server/client URL switching (SSR + browser)
+- [x] Build Nav, Breadcrumb shared UI components
+- [x] Build ProgramCard, ProgramHero, RequirementSummary, ProgramNavigation components
+- [x] Build Programs list page (/programs) — server component with live API data
+- [x] Build Program detail page (/programs/[id]) — requirements table, catalog years
+- [x] Rewrite home page with hero section, live program grid, features section
+- [x] Configure docker-compose.yml with API_BASE_URL for SSR internal routing
+
+---
+
+## Blocked
+
+(None)
+
+---
+
+## Notes
+
+- Version 1 does not include student accounts, transcripts, GPA, or advising workflows.
+- The application is a public-facing curriculum visualization platform built from the university catalog.
+- Next milestone: Epic 009 — Deployment.

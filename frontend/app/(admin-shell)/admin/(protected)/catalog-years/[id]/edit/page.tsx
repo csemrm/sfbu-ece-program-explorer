@@ -1,0 +1,35 @@
+import { cookies } from 'next/headers';
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import { adminApi } from '../../../../../../../lib/admin-api';
+import { EditCyClient } from '../../../../../../../components/admin/forms/EditCyClient';
+
+export default async function EditCatalogYearPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const token = (await cookies()).get('admin_token')?.value ?? '';
+
+  let cy;
+  let programs;
+  try {
+    [cy, programs] = await Promise.all([
+      adminApi.catalogYears.get(token, id),
+      adminApi.programs.list(token, 1).then((r) => r.data),
+    ]);
+  } catch {
+    notFound();
+  }
+
+  return (
+    <div className="max-w-2xl">
+      <nav className="mb-6 text-sm text-gray-500 dark:text-gray-400">
+        <Link href="/admin/catalog-years" className="hover:text-gray-800 dark:hover:text-gray-200">
+          Catalog Years
+        </Link>
+        <span className="mx-2">/</span>
+        <span className="text-gray-800 dark:text-gray-200">Edit {cy.academicYear}</span>
+      </nav>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Edit Catalog Year</h1>
+      <EditCyClient cy={cy} programs={programs} />
+    </div>
+  );
+}

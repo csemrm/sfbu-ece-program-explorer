@@ -471,10 +471,10 @@ A feature is complete only if:
 * docs/06-CodingStandards.md
 * epics/001-foundation.md
 * epics/002-database.md
-* epics/003-backend-api.md
+* epics/003-backend.md
 * epics/004-program-explorer.md
 * epics/005-course-explorer.md
-* epics/006-curriculum-roadmap.md
+* epics/006-roadmap.md
 * epics/007-prerequisite-graph.md
-* epics/008-admin-dashboard.md
+* epics/008-admin.md
 * epics/009-deployment.md

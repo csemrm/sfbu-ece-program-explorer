@@ -46,7 +46,7 @@ This document specifies the database design for the SFBU ECE Program Explorer ap
 ## 4. Database Technology
 
 - **Database Engine:** PostgreSQL (preferred for advanced relational features and extensibility).
-- **ORM Options:** Prisma or TypeORM (to be decided during implementation phase based on team familiarity and integration needs).
+- **ORM:** TypeORM (consistent with architecture specification; integrates natively with NestJS).
 
 ---
 
