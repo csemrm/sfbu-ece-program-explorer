@@ -145,6 +145,8 @@ Status: 🟡 In Progress
 - [x] Collapse/expand per column
 - [x] Credit totals per phase
 - [x] GET /programs/:id/roadmap backend endpoint
+- [x] Fix required credits total (specialization deduplication — count one track, not all 3)
+- [x] Visual distinction for specialization columns (amber header, ring, "choose one" label, info banner)
 
 ---
 

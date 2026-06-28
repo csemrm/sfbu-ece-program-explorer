@@ -7,17 +7,25 @@ import { RoadmapCourseCard } from './RoadmapCourseCard';
 interface Props {
   phase: RoadmapPhase;
   colorClass: string;
+  isSpecialization?: boolean;
 }
 
-export function PhaseColumn({ phase, colorClass }: Props) {
+export function PhaseColumn({ phase, colorClass, isSpecialization = false }: Props) {
   const [collapsed, setCollapsed] = useState(false);
 
   const creditTotal = phase.courses.reduce((sum, c) => sum + parseFloat(String(c.creditHours)), 0);
 
   return (
-    <div className="flex-shrink-0 w-56 flex flex-col">
+    <div
+      className={`flex-shrink-0 w-56 flex flex-col${isSpecialization ? ' ring-2 ring-amber-400 ring-offset-1 rounded-xl' : ''}`}
+    >
       {/* Header */}
       <div className={`rounded-t-xl px-3 py-3 ${colorClass}`}>
+        {isSpecialization && (
+          <div className="text-[10px] font-semibold text-amber-200 uppercase tracking-widest mb-1 opacity-90">
+            Choose one
+          </div>
+        )}
         <div className="flex items-start justify-between gap-1">
           <h3 className="text-xs font-bold text-white leading-snug">{phase.name}</h3>
           <button

@@ -4,6 +4,19 @@
 
 ---
 
+## [1.0.1] — 2026-06-27
+
+### Curriculum Roadmap — Required Credits Fix
+
+#### Fixed
+
+- `components/roadmap/RoadmapCanvas.tsx` — Toolbar "total credits" was summing ALL specialization tracks (e.g., MSCS showed ~53 instead of 36). Replaced broken reduce with `computeRequiredCredits()`: counts `minCredits` per phase, counts only the FIRST specialization track (students choose one). Label changed from "total credits" to "credits required" for accuracy.
+- `components/roadmap/RoadmapCanvas.tsx` — Added amber info banner (visible only when `specPhases.length > 1`) explaining "Choose one specialization track — all N options shown for comparison."
+- `components/roadmap/RoadmapCanvas.tsx` — Specialization phase columns now use amber header (`bg-amber-600`) and amber ring (`ring-2 ring-amber-400`) to visually distinguish them from required phases. Legend updated to show amber swatch.
+- `components/roadmap/PhaseColumn.tsx` — Added `isSpecialization` prop; renders "CHOOSE ONE" micro-label above phase name in specialization column headers.
+
+---
+
 ## [1.0.0] — 2026-06-27
 
 ### Milestone 10 — Program Comparison
