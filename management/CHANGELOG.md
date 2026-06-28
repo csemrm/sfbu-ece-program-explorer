@@ -4,6 +4,25 @@
 
 ---
 
+## [0.8.4] — 2026-06-27
+
+### Public UI — Professional Polish + Blue Purge
+
+#### Changed
+
+**Frontend — Public Pages:**
+- `app/(public)/page.tsx` — Stats/trust bar (3 programs, 70+ courses, 2026 catalog, WASC accredited); gold eyebrow labels; refined hero CTA buttons
+- `app/(public)/programs/page.tsx` — White `bg-white border-b` page header band with gold eyebrow "ECE Department"; breadcrumb inside band; bottom CTA card linking to course catalog
+- `app/(public)/courses/page.tsx` — Same white page header band pattern; gold eyebrow; filtered-results indicator; content area `py-8`
+- `app/(public)/courses/[id]/page.tsx` — Hero: navy gradient + dot pattern + gold accent bar (was `from-gray-800 to-gray-950`); level badge: navy-tinted for UG, purple for grad; course info table: SFBU navy thead; section eyebrows: gold; "Explore Further" cards: SVG icons in navy/gold badges, `group-hover:text-sfbu-navy`, no emoji
+
+**Frontend — Course Components:**
+- `components/courses/PrerequisiteList.tsx` — `hover:border-blue-300 hover:bg-blue-50` → navy-tinted; empty state wrapped in card; section headers use uppercase tracking style
+- `components/courses/CourseFilters.tsx` — `focus:ring-blue-500` → CSS var `--sfbu-navy` ring; search icon inline
+- `components/courses/CoursePagination.tsx` — "Next →" button: navy bg; prev/next styling consistent with brand
+
+---
+
 ## [0.8.3] — 2026-06-27
 
 ### Public UI Branding — SFBU Navy + Gold Theme

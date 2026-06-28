@@ -203,6 +203,19 @@ Status: 🟡 In Progress
 - [x] Fix server→client function serialization error: extract AdminCyClient as 'use client' component
 - [x] Fix Docker volume mounts: add frontend/components, frontend/lib, frontend/middleware.ts
 
+#### Public UI Professional Polish (v0.8.4)
+
+- [x] Home page: stats/trust bar (programs, courses, catalog year, accreditation); gold eyebrow labels
+- [x] Programs list: white page-header band with gold eyebrow + breadcrumb; bottom CTA to courses
+- [x] Courses list: white page-header band with gold eyebrow + count; filtered-results indicator
+- [x] Course detail: navy gradient hero + dot pattern + gold bar (replaces gray-800); navy info table thead; gold section eyebrows; SVG icons in "Explore Further" (replaces emoji)
+- [x] CourseFilters: blue focus ring → sfbu-navy CSS var ring
+- [x] PrerequisiteList: blue chip hover → navy-tinted; empty state in card; uppercase tracking headers
+- [x] CoursePagination: "Next →" button navy bg; consistent disabled states
+- [x] AdminSidebar collapse toggle: chevron button + icon-only mode + localStorage persistence
+
+---
+
 #### Admin UI Modernization + Dark Mode Fix (v0.8.2)
 
 - [x] Fix dark mode toggle: `@custom-variant dark` → `@variant dark` in globals.css (overrides built-in media-query variant)
