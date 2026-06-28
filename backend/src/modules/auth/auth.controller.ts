@@ -18,13 +18,20 @@ interface AuthReq {
   user: { id: string; email: string; role: string };
 }
 
+interface CookieRes {
+  cookie(name: string, value: string, options: Record<string, unknown>): void;
+  clearCookie(name: string): void;
+}
+
 @Controller('admin/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: any) {
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: CookieRes,
+  ) {
     const user = await this.authService.validateCredentials(
       dto.email,
       dto.password,
@@ -40,8 +47,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  logout(@Res({ passthrough: true }) res: any) {
+  logout(@Res({ passthrough: true }) res: CookieRes) {
     res.clearCookie(COOKIE_NAME);
     return { success: true };
   }

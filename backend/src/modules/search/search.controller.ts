@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SearchService } from './search.service';
-import { SearchQueryDto, SearchResultItemDto } from './dto/search.dto';
+import { SearchQueryDto } from './dto/search.dto';
 
 @ApiTags('search')
 @Controller('search')
