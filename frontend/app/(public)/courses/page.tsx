@@ -1,9 +1,8 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { api } from '../../../lib/api';
-import { CourseCard } from '../../../components/courses/CourseCard';
 import { CourseFilters } from '../../../components/courses/CourseFilters';
-import { CoursePagination } from '../../../components/courses/CoursePagination';
+import { CourseListView } from '../../../components/courses/CourseListView';
 import { Breadcrumb } from '../../../components/ui/Breadcrumb';
 
 export const metadata: Metadata = {
@@ -87,19 +86,13 @@ export default async function CoursesPage({ searchParams }: Props) {
             )}
           </div>
         ) : (
-          <>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {result.data.map((course) => (
-                <CourseCard key={course.id} course={course} />
-              ))}
-            </div>
-            <CoursePagination
-              page={result.page}
-              totalPages={result.totalPages}
-              total={result.total}
-              searchParams={rawParams}
-            />
-          </>
+          <CourseListView
+            courses={result.data}
+            page={result.page}
+            totalPages={result.totalPages}
+            total={result.total}
+            searchParams={rawParams}
+          />
         )}
       </div>
     </div>

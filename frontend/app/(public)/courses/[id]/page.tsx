@@ -77,7 +77,7 @@ export default async function CourseDetailPage({ params }: Props) {
               {levelLabel[course.level] ?? course.level}
             </span>
             <span className="text-sm text-white/50">
-              {course.creditHours} credit hour{course.creditHours !== 1 ? 's' : ''}
+              {course.creditHours} credit hour{course.creditHours !== '1' ? 's' : ''}
             </span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">
