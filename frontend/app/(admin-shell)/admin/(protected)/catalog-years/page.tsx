@@ -8,9 +8,13 @@ export const metadata = { title: 'Catalog Years' };
 export default async function CatalogYearsPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get('admin_token')?.value ?? '';
-  let years: Awaited<ReturnType<typeof adminApi.catalogYears.list>>;
+  let years: Awaited<ReturnType<typeof adminApi.catalogYears.list>> = [];
+  let programs: Awaited<ReturnType<typeof adminApi.programs.list>>['data'] = [];
   try {
-    years = await adminApi.catalogYears.list(token);
+    [years, { data: programs }] = await Promise.all([
+      adminApi.catalogYears.list(token),
+      adminApi.programs.list(token),
+    ]);
   } catch {
     return (
       <div>
@@ -39,7 +43,7 @@ export default async function CatalogYearsPage() {
         </Link>
       </div>
       <div className="bg-white rounded-xl border border-gray-200">
-        <AdminCyClient rows={years} />
+        <AdminCyClient rows={years} programs={programs} />
       </div>
     </div>
   );

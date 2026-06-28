@@ -1,5 +1,6 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
@@ -11,6 +12,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+
+function throwIfDuplicate(err: unknown, message: string): never {
+  if ((err as { code?: string }).code === '23505')
+    throw new ConflictException(message);
+  throw err as Error;
+}
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { IsOptional, IsString } from 'class-validator';
@@ -64,7 +71,14 @@ export class AdminProgramsController {
     @Req() req: { user: { id: string; email: string } },
   ) {
     const program = this.repo.create(dto);
-    await this.repo.save(program);
+    try {
+      await this.repo.save(program);
+    } catch (err) {
+      throwIfDuplicate(
+        err,
+        `A program with abbreviation "${dto.abbreviation}" already exists.`,
+      );
+    }
     await this.audit.log(req.user, 'create', 'program', program.id, {
       name: program.name,
     });
@@ -80,7 +94,14 @@ export class AdminProgramsController {
     const program = await this.repo.findOne({ where: { id } });
     if (!program) throw new NotFoundException(`Program ${id} not found`);
     Object.assign(program, dto);
-    await this.repo.save(program);
+    try {
+      await this.repo.save(program);
+    } catch (err) {
+      throwIfDuplicate(
+        err,
+        `A program with abbreviation "${dto.abbreviation}" already exists.`,
+      );
+    }
     await this.audit.log(req.user, 'update', 'program', id, { name: dto.name });
     return program;
   }

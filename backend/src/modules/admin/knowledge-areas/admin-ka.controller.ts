@@ -1,5 +1,6 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
@@ -10,6 +11,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+
+function throwIfDuplicate(err: unknown, message: string): never {
+  if ((err as { code?: string }).code === '23505')
+    throw new ConflictException(message);
+  throw err as Error;
+}
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IsOptional, IsString } from 'class-validator';
@@ -49,7 +56,14 @@ export class AdminKaController {
     @Req() req: { user: { id: string; email: string } },
   ) {
     const ka = this.repo.create(dto);
-    await this.repo.save(ka);
+    try {
+      await this.repo.save(ka);
+    } catch (err) {
+      throwIfDuplicate(
+        err,
+        `A knowledge area named "${dto.name}" already exists.`,
+      );
+    }
     await this.audit.log(req.user, 'create', 'knowledge_area', ka.id, {
       name: ka.name,
     });
@@ -65,7 +79,14 @@ export class AdminKaController {
     const ka = await this.repo.findOne({ where: { id } });
     if (!ka) throw new NotFoundException(`KnowledgeArea ${id} not found`);
     Object.assign(ka, dto);
-    await this.repo.save(ka);
+    try {
+      await this.repo.save(ka);
+    } catch (err) {
+      throwIfDuplicate(
+        err,
+        `A knowledge area named "${dto.name}" already exists.`,
+      );
+    }
     await this.audit.log(req.user, 'update', 'knowledge_area', id, {
       name: dto.name,
     });

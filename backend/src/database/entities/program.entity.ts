@@ -4,11 +4,13 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { CatalogYear } from './catalog-year.entity';
 
 @Entity('programs')
+@Unique(['abbreviation'])
 export class Program {
   @PrimaryGeneratedColumn('uuid')
   id: string;

@@ -1,5 +1,6 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
@@ -11,6 +12,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+
+function throwIfDuplicate(err: unknown, message: string): never {
+  if ((err as { code?: string }).code === '23505')
+    throw new ConflictException(message);
+  throw err as Error;
+}
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IsNumber, IsOptional, IsString, IsUUID, Min } from 'class-validator';
@@ -65,7 +72,14 @@ export class AdminRgController {
     @Req() req: { user: { id: string; email: string } },
   ) {
     const rg = this.repo.create(dto);
-    await this.repo.save(rg);
+    try {
+      await this.repo.save(rg);
+    } catch (err) {
+      throwIfDuplicate(
+        err,
+        `A requirement group named "${dto.name}" already exists in this catalog year.`,
+      );
+    }
     await this.audit.log(req.user, 'create', 'requirement_group', rg.id, {
       name: rg.name,
     });
@@ -81,7 +95,14 @@ export class AdminRgController {
     const rg = await this.repo.findOne({ where: { id } });
     if (!rg) throw new NotFoundException(`RequirementGroup ${id} not found`);
     Object.assign(rg, dto);
-    await this.repo.save(rg);
+    try {
+      await this.repo.save(rg);
+    } catch (err) {
+      throwIfDuplicate(
+        err,
+        `A requirement group named "${dto.name}" already exists in this catalog year.`,
+      );
+    }
     await this.audit.log(req.user, 'update', 'requirement_group', id, {
       name: dto.name,
     });

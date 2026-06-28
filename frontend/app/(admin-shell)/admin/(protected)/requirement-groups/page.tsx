@@ -9,8 +9,12 @@ export default async function RequirementGroupsPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get('admin_token')?.value ?? '';
   let result: Awaited<ReturnType<typeof adminApi.requirementGroups.list>>;
+  let catalogYears: Awaited<ReturnType<typeof adminApi.catalogYears.list>> = [];
   try {
-    result = await adminApi.requirementGroups.list(token);
+    [result, catalogYears] = await Promise.all([
+      adminApi.requirementGroups.list(token),
+      adminApi.catalogYears.list(token),
+    ]);
   } catch {
     return (
       <div>
@@ -37,7 +41,7 @@ export default async function RequirementGroupsPage() {
         </Link>
       </div>
       <div className="bg-white rounded-xl border border-gray-200">
-        <AdminRgClient rows={result.data} />
+        <AdminRgClient rows={result.data} catalogYears={catalogYears} />
       </div>
     </div>
   );

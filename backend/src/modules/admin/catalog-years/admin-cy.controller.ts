@@ -1,5 +1,6 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Get,
   NotFoundException,
@@ -9,6 +10,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+
+function throwIfDuplicate(err: unknown, message: string): never {
+  if ((err as { code?: string }).code === '23505')
+    throw new ConflictException(message);
+  throw err as Error;
+}
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IsOptional, IsString, IsUUID } from 'class-validator';
@@ -57,7 +64,14 @@ export class AdminCyController {
       academicYear: dto.academicYear,
       effectiveDate: dto.effectiveDate ?? null,
     });
-    await this.repo.save(cy);
+    try {
+      await this.repo.save(cy);
+    } catch (err) {
+      throwIfDuplicate(
+        err,
+        `Catalog year "${dto.academicYear}" already exists for this program.`,
+      );
+    }
     await this.audit.log(req.user, 'create', 'catalog_year', cy.id, {
       academicYear: cy.academicYear,
     });

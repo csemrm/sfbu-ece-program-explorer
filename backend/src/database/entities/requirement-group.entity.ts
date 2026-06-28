@@ -13,6 +13,7 @@ import { CatalogYear } from './catalog-year.entity';
 import { ProgramRequirement } from './program-requirement.entity';
 
 @Entity('requirement_groups')
+@Index(['catalogYearId', 'name'], { unique: true })
 export class RequirementGroup {
   @PrimaryGeneratedColumn('uuid')
   id: string;

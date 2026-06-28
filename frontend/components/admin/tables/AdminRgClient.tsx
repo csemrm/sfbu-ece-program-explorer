@@ -4,13 +4,20 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DataTable } from '../DataTable';
 import { ConfirmDialog } from '../ConfirmDialog';
-import type { AdminRequirementGroup } from '../../../lib/admin-api';
+import type { AdminRequirementGroup, AdminCatalogYear } from '../../../lib/admin-api';
 import { adminApi } from '../../../lib/admin-api';
 
-export function AdminRgClient({ rows }: { rows: AdminRequirementGroup[] }) {
+export function AdminRgClient({
+  rows,
+  catalogYears,
+}: {
+  rows: AdminRequirementGroup[];
+  catalogYears: AdminCatalogYear[];
+}) {
   const router = useRouter();
   const [deleting, setDeleting] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const cyMap = new Map(catalogYears.map((cy) => [cy.id, cy]));
 
   async function handleDelete(id: string) {
     setDeleting(id);
@@ -27,18 +34,23 @@ export function AdminRgClient({ rows }: { rows: AdminRequirementGroup[] }) {
   const columns = [
     { key: 'name', header: 'Name' },
     {
+      key: 'catalogYearId',
+      header: 'Catalog Year',
+      render: (row: AdminRequirementGroup) => {
+        const cy = cyMap.get(row.catalogYearId);
+        return cy ? (
+          <span className="text-gray-700">{cy.academicYear}</span>
+        ) : (
+          <span className="font-mono text-xs text-gray-400">{row.catalogYearId.slice(0, 8)}…</span>
+        );
+      },
+    },
+    {
       key: 'minCredits',
       header: 'Min Credits',
       render: (row: AdminRequirementGroup) => <span>{row.minCredits ?? '—'}</span>,
     },
-    { key: 'sortOrder', header: 'Sort Order' },
-    {
-      key: 'description',
-      header: 'Description',
-      render: (row: AdminRequirementGroup) => (
-        <span className="text-gray-500 line-clamp-1">{row.description ?? '—'}</span>
-      ),
-    },
+    { key: 'sortOrder', header: 'Sort' },
   ];
 
   return (
