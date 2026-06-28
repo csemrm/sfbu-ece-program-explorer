@@ -187,6 +187,22 @@ Status: 🟡 In Progress
 - [x] Admin pages: dashboard, programs, courses, requirement groups, knowledge areas, catalog years, audit log
 - [x] Reusable: DataTable, ConfirmDialog, ProgramForm, CourseForm components
 
+#### Post-Epic 008 Fixes (v0.8.1)
+
+- [x] Global 404 page (app/not-found.tsx) with html/body root
+- [x] Error boundaries: (public)/error.tsx + (admin-shell)/error.tsx
+- [x] Error handling on all list pages: try/catch around API calls, red banner on failure
+- [x] Fix "Coming in Epic 006/007" static badges → clickable links on course detail page
+- [x] Unique constraint migration: programs.abbreviation + requirement_groups.(catalog_year_id, name)
+- [x] ConflictException (409) on duplicate: all 5 admin controllers catch PG error 23505
+- [x] Create/edit UI for Knowledge Areas (KaForm, EditKaClient, new/edit pages)
+- [x] Create/edit UI for Requirement Groups (RgForm, NewRgClient, EditRgClient, new/edit pages)
+- [x] Create UI for Catalog Years (CyForm, NewCyClient, new page)
+- [x] Relationship display: Catalog Year table shows program abbreviation+name (AdminCyClient)
+- [x] Relationship display: Requirement Group table shows catalog year academicYear (AdminRgClient)
+- [x] Fix server→client function serialization error: extract AdminCyClient as 'use client' component
+- [x] Fix Docker volume mounts: add frontend/components, frontend/lib, frontend/middleware.ts
+
 ---
 
 ### Testing

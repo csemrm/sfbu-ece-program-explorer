@@ -4,6 +4,58 @@
 
 ---
 
+## [0.8.1] — 2026-06-27
+
+### Post-Epic 008 Fixes & Improvements
+
+#### Added
+
+**Frontend — Error Handling:**
+- `app/not-found.tsx` — Global 404 page (includes `<html>/<body>` — required when no root `app/layout.tsx` exists)
+- `app/(public)/error.tsx` — Client error boundary for public section (500, uncaught exceptions)
+- `app/(admin-shell)/error.tsx` — Client error boundary for admin section
+- All list pages (public + admin) — try/catch around API calls; red error banner on fetch failure instead of crash
+
+**Frontend — Admin CRUD (missing pages added):**
+- `components/admin/forms/KaForm.tsx` + `EditKaClient.tsx` — Knowledge area create/edit form
+- `app/(admin-shell)/admin/(protected)/knowledge-areas/new/page.tsx` — Create knowledge area
+- `app/(admin-shell)/admin/(protected)/knowledge-areas/[id]/edit/page.tsx` — Edit knowledge area
+- `components/admin/forms/RgForm.tsx` + `NewRgClient.tsx` + `EditRgClient.tsx` — Requirement group forms
+- `app/(admin-shell)/admin/(protected)/requirement-groups/new/page.tsx` — Create requirement group
+- `app/(admin-shell)/admin/(protected)/requirement-groups/[id]/edit/page.tsx` — Edit requirement group
+- `components/admin/forms/CyForm.tsx` + `NewCyClient.tsx` — Catalog year create form
+- `app/(admin-shell)/admin/(protected)/catalog-years/new/page.tsx` — Create catalog year
+- `components/admin/tables/AdminCyClient.tsx` — Client table for catalog years (extract from server page to fix function-serialization error)
+
+**Backend — Duplicate Prevention:**
+- `migrations/1719446402000-UniqueConstraints.ts` — Adds `UQ_programs_abbreviation` and `UQ_rg_catalog_year_name` constraints
+- `ConflictException` handling in all 5 admin controllers: programs, courses, knowledge areas, requirement groups, catalog years — catches PG error code `23505`, returns 409 with human-readable message
+
+#### Changed
+
+**Frontend:**
+- `app/(public)/courses/[id]/page.tsx` — Replaced static "Coming in Epic 006/007" badges with clickable `<Link>` to `/programs`
+- `components/admin/tables/AdminCyClient.tsx` — Accepts `programs` prop; shows program abbreviation + name instead of raw UUID
+- `components/admin/tables/AdminRgClient.tsx` — Accepts `catalogYears` prop; shows `academicYear` in new "Catalog Year" column instead of UUID
+- `app/(admin-shell)/admin/(protected)/catalog-years/page.tsx` — Fetches programs in parallel via `Promise.all`; passes to AdminCyClient
+- `app/(admin-shell)/admin/(protected)/requirement-groups/page.tsx` — Fetches catalogYears in parallel; passes to AdminRgClient; adds "+ New Requirement Group" button
+- `app/(admin-shell)/admin/(protected)/knowledge-areas/page.tsx` — Adds "+ New Knowledge Area" button
+- `components/admin/tables/AdminKaClient.tsx` — Added `editHref` for edit navigation
+- `components/admin/tables/AdminRgClient.tsx` — Added `editHref` for edit navigation
+- `docker-compose.yml` — Added missing volume mounts: `frontend/components`, `frontend/lib`, `frontend/middleware.ts` (fix for module-not-found on new component files)
+
+**Backend:**
+- `entities/program.entity.ts` — Added `@Unique(['abbreviation'])` decorator
+- `entities/requirement-group.entity.ts` — Added `@Index(['catalogYearId', 'name'], { unique: true })`
+
+#### Technical Notes
+
+- Next.js App Router: functions (render callbacks) cannot be passed from server components to `'use client'` components — extract column definitions into a client component (`AdminCyClient`)
+- Docker volume mount gap: new files in `frontend/components/` not found in container until `docker-compose.yml` added that mount and container rebuilt
+- Global `not-found.tsx` at `app/` level requires its own `<html>/<body>` when no `app/layout.tsx` exists (route groups each have their own root layout)
+
+---
+
 ## [0.8.0] — 2026-06-27
 
 ### Epic 008 — Administration Dashboard
