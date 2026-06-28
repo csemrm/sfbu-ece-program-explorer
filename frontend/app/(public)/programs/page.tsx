@@ -9,8 +9,27 @@ export const metadata: Metadata = {
 };
 
 export default async function ProgramsPage() {
-  const result = await api.programs.list({ limit: 100 });
-  const programs = result.data;
+  let programs: Awaited<ReturnType<typeof api.programs.list>>['data'] = [];
+  let fetchError = false;
+  try {
+    const result = await api.programs.list({ limit: 100 });
+    programs = result.data;
+  } catch {
+    fetchError = true;
+  }
+
+  if (fetchError) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-6 py-10 text-center">
+          <p className="text-red-700 font-medium mb-1">Unable to load programs</p>
+          <p className="text-red-500 text-sm">
+            The server may be temporarily unavailable. Please try again.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">

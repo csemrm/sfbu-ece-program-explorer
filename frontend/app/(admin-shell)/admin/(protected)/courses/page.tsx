@@ -13,8 +13,23 @@ export default async function AdminCoursesPage({ searchParams }: Props) {
   const { page: pageStr, q, level } = await searchParams;
   const page = Math.max(1, parseInt(pageStr ?? '1', 10));
   const cookieStore = await cookies();
-  const token = cookieStore.get('admin_token')!.value;
-  const result = await adminApi.courses.list(token, page, q, level);
+  const token = cookieStore.get('admin_token')?.value ?? '';
+  let result: Awaited<ReturnType<typeof adminApi.courses.list>>;
+  try {
+    result = await adminApi.courses.list(token, page, q, level);
+  } catch {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Courses</h1>
+        <div className="rounded-xl border border-red-200 bg-red-50 px-6 py-10 text-center">
+          <p className="text-red-700 font-medium mb-1">Unable to load courses</p>
+          <p className="text-red-500 text-sm">
+            The API may be temporarily unavailable. Please refresh.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

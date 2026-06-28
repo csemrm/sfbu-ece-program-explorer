@@ -12,8 +12,23 @@ export default async function AuditLogPage({ searchParams }: Props) {
   const { page: pageStr } = await searchParams;
   const page = Math.max(1, parseInt(pageStr ?? '1', 10));
   const cookieStore = await cookies();
-  const token = cookieStore.get('admin_token')!.value;
-  const result = await adminApi.auditLog.list(token, page);
+  const token = cookieStore.get('admin_token')?.value ?? '';
+  let result: Awaited<ReturnType<typeof adminApi.auditLog.list>>;
+  try {
+    result = await adminApi.auditLog.list(token, page);
+  } catch {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Audit Log</h1>
+        <div className="rounded-xl border border-red-200 bg-red-50 px-6 py-10 text-center">
+          <p className="text-red-700 font-medium mb-1">Unable to load audit log</p>
+          <p className="text-red-500 text-sm">
+            The API may be temporarily unavailable. Please refresh.
+          </p>
+        </div>
+      </div>
+    );
+  }
   const totalPages = Math.ceil(result.total / result.limit);
 
   return (

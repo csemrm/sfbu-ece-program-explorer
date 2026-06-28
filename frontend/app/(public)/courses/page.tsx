@@ -20,12 +20,26 @@ export default async function CoursesPage({ searchParams }: Props) {
   const page = Math.max(1, parseInt(pageStr ?? '1', 10) || 1);
   const limit = 18;
 
-  const result = await api.courses.list({
-    ...(q ? { q } : {}),
-    ...(level ? { level } : {}),
-    page,
-    limit,
-  });
+  let result: Awaited<ReturnType<typeof api.courses.list>>;
+  try {
+    result = await api.courses.list({
+      ...(q ? { q } : {}),
+      ...(level ? { level } : {}),
+      page,
+      limit,
+    });
+  } catch {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-6 py-10 text-center">
+          <p className="text-red-700 font-medium mb-1">Unable to load courses</p>
+          <p className="text-red-500 text-sm">
+            The server may be temporarily unavailable. Please try again.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const rawParams: Record<string, string> = {};
   if (q) rawParams.q = q;

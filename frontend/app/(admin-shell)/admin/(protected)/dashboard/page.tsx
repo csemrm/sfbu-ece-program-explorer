@@ -6,8 +6,23 @@ export const metadata = { title: 'Dashboard' };
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
-  const token = cookieStore.get('admin_token')!.value;
-  const stats = await adminApi.dashboard.stats(token);
+  const token = cookieStore.get('admin_token')?.value ?? '';
+  let stats: Awaited<ReturnType<typeof adminApi.dashboard.stats>>;
+  try {
+    stats = await adminApi.dashboard.stats(token);
+  } catch {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
+        <div className="rounded-xl border border-red-200 bg-red-50 px-6 py-10 text-center">
+          <p className="text-red-700 font-medium mb-1">Unable to load dashboard data</p>
+          <p className="text-red-500 text-sm">
+            The API may be temporarily unavailable. Please refresh.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const cards = [
     {

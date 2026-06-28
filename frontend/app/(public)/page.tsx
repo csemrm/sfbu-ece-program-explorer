@@ -3,8 +3,13 @@ import { api } from '../../lib/api';
 import { ProgramCard } from '../../components/programs/ProgramCard';
 
 export default async function Home() {
-  const result = await api.programs.list({ limit: 100 });
-  const programs = result.data;
+  let programs: Awaited<ReturnType<typeof api.programs.list>>['data'] = [];
+  try {
+    const result = await api.programs.list({ limit: 100 });
+    programs = result.data;
+  } catch {
+    // Backend unavailable — render page with empty programs list
+  }
 
   return (
     <div>
