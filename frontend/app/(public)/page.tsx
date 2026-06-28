@@ -70,6 +70,13 @@ const FEATURES = [
   },
 ];
 
+const STATS = [
+  { value: '3', label: 'Degree Programs' },
+  { value: '70+', label: 'Courses' },
+  { value: '2026', label: 'Current Catalog' },
+  { value: 'WASC', label: 'Accredited' },
+];
+
 export default async function Home() {
   let programs: Awaited<ReturnType<typeof api.programs.list>>['data'] = [];
   try {
@@ -83,7 +90,7 @@ export default async function Home() {
     <div>
       {/* Hero */}
       <section
-        className="text-white py-20 px-4 relative overflow-hidden"
+        className="text-white py-24 px-4 relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #1c3766 0%, #0d2144 100%)' }}
       >
         {/* Dot pattern */}
@@ -96,6 +103,9 @@ export default async function Home() {
           }}
         />
         <div className="relative max-w-4xl mx-auto text-center">
+          <p className="text-white/50 text-xs uppercase tracking-[0.2em] font-medium mb-5">
+            San Francisco Bay University · ECE Department
+          </p>
           <div className="flex justify-center gap-3 mb-6 flex-wrap">
             {programs.map((p) => (
               <span
@@ -106,12 +116,12 @@ export default async function Home() {
               </span>
             ))}
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4 leading-tight">
-            SFBU ECE Program Explorer
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-5 leading-tight">
+            ECE Program Explorer
           </h1>
-          <p className="text-white/75 text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
-            Interactive curriculum visualization for the Electrical and Computer Engineering
-            Department at San Francisco Bay University.
+          <p className="text-white/70 text-lg max-w-2xl mx-auto mb-9 leading-relaxed">
+            Explore degree programs, course requirements, prerequisite graphs, and semester roadmaps
+            for the Electrical and Computer Engineering Department.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
@@ -123,7 +133,7 @@ export default async function Home() {
             </Link>
             <Link
               href="/courses"
-              className="rounded-full border border-white/40 text-white font-semibold px-7 py-3 text-sm hover:bg-white/10 transition-colors"
+              className="rounded-full border border-white/30 text-white font-semibold px-7 py-3 text-sm hover:bg-white/10 transition-colors"
             >
               Browse Courses
             </Link>
@@ -131,10 +141,37 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Stats bar */}
+      <div className="bg-white border-b border-gray-100 shadow-sm">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5">
+          <div className="flex flex-wrap items-center justify-center gap-0 divide-x divide-gray-200">
+            {STATS.map((s) => (
+              <div key={s.label} className="text-center px-8 py-1">
+                <p
+                  className="text-2xl font-bold leading-tight"
+                  style={{ color: 'var(--sfbu-navy)' }}
+                >
+                  {s.value}
+                </p>
+                <p className="text-[11px] text-gray-500 uppercase tracking-widest mt-0.5">
+                  {s.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Programs grid */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-end justify-between mb-8">
           <div>
+            <p
+              className="text-xs font-semibold uppercase tracking-widest mb-1"
+              style={{ color: 'var(--sfbu-gold)' }}
+            >
+              Degree Programs
+            </p>
             <h2 className="text-2xl font-bold text-gray-900">Academic Programs</h2>
             <p className="text-gray-500 mt-1">
               Select a program to view requirements and curriculum.
@@ -142,7 +179,7 @@ export default async function Home() {
           </div>
           <Link
             href="/programs"
-            className="text-sm font-medium hover:underline hidden sm:block"
+            className="text-sm font-medium hover:underline hidden sm:block pb-0.5"
             style={{ color: 'var(--sfbu-navy)' }}
           >
             View all →
@@ -158,17 +195,24 @@ export default async function Home() {
       {/* Features */}
       <section className="bg-white border-t border-gray-100 py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
-            What You Can Explore
-          </h2>
-          <p className="text-gray-500 text-center mb-10 text-sm">
-            Everything you need to understand your academic journey at SFBU.
-          </p>
+          <div className="text-center mb-12">
+            <p
+              className="text-xs font-semibold uppercase tracking-widest mb-2"
+              style={{ color: 'var(--sfbu-gold)' }}
+            >
+              Platform Features
+            </p>
+            <h2 className="text-2xl font-bold text-gray-900">What You Can Explore</h2>
+            <p className="text-gray-500 mt-2 text-sm max-w-lg mx-auto">
+              Everything you need to understand your academic journey — from requirements to
+              prerequisite chains.
+            </p>
+          </div>
           <div className="grid sm:grid-cols-3 gap-8">
             {FEATURES.map((f) => (
               <div key={f.title} className="text-center">
                 <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-white mx-auto mb-4"
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-white mx-auto mb-4 shadow-sm"
                   style={{ backgroundColor: f.accent }}
                 >
                   {f.icon}

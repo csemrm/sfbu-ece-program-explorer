@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { api } from '../../../lib/api';
 import { ProgramCard } from '../../../components/programs/ProgramCard';
 import { Breadcrumb } from '../../../components/ui/Breadcrumb';
@@ -32,26 +33,58 @@ export default async function ProgramsPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-      <Breadcrumb crumbs={[{ label: 'Home', href: '/' }, { label: 'Programs' }]} />
-
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Academic Programs</h1>
-        <p className="text-gray-500 text-lg">
-          Explore undergraduate and graduate programs in Computer Science and Electrical
-          Engineering.
-        </p>
+    <div>
+      {/* Page header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-7">
+          <Breadcrumb crumbs={[{ label: 'Home', href: '/' }, { label: 'Programs' }]} />
+          <p
+            className="text-xs font-semibold uppercase tracking-widest mb-1"
+            style={{ color: 'var(--sfbu-gold)' }}
+          >
+            ECE Department
+          </p>
+          <div className="flex items-end justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Academic Programs</h1>
+              <p className="text-gray-500 mt-1.5 text-base">
+                Undergraduate and graduate programs in Computer Science and Electrical Engineering.
+              </p>
+            </div>
+            <span className="hidden sm:block text-sm text-gray-400 pb-1">
+              {programs.length} program{programs.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {programs.map((program) => (
-          <ProgramCard key={program.id} program={program} />
-        ))}
-      </div>
+      {/* Content */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {programs.map((program) => (
+            <ProgramCard key={program.id} program={program} />
+          ))}
+        </div>
+        {programs.length === 0 && (
+          <p className="text-center text-gray-400 py-16">No programs found.</p>
+        )}
 
-      {programs.length === 0 && (
-        <p className="text-center text-gray-400 py-16">No programs found.</p>
-      )}
+        {/* Bottom CTA */}
+        {programs.length > 0 && (
+          <div className="mt-12 rounded-2xl border border-gray-200 bg-white p-8 text-center">
+            <p className="text-sm text-gray-500 mb-4">
+              Looking for course details, prerequisites, and semester roadmaps?
+            </p>
+            <Link
+              href="/courses"
+              className="inline-block rounded-full px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              style={{ backgroundColor: 'var(--sfbu-navy)' }}
+            >
+              Browse the Course Catalog →
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
