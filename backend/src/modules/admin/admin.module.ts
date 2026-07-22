@@ -9,6 +9,8 @@ import { KnowledgeArea } from '../../database/entities/knowledge-area.entity';
 import { Prerequisite } from '../../database/entities/prerequisite.entity';
 import { Corequisite } from '../../database/entities/corequisite.entity';
 import { AuditLog } from '../../database/entities/audit-log.entity';
+import { AcademicTerm } from '../../database/entities/academic-term.entity';
+import { CourseOffering } from '../../database/entities/course-offering.entity';
 import { AdminAuditService } from './admin-audit.service';
 import { DashboardController } from './dashboard/dashboard.controller';
 import { AdminProgramsController } from './programs/admin-programs.controller';
@@ -17,6 +19,7 @@ import { AdminRgController } from './requirement-groups/admin-rg.controller';
 import { AdminKaController } from './knowledge-areas/admin-ka.controller';
 import { AdminCyController } from './catalog-years/admin-cy.controller';
 import { AdminAuditLogController } from './audit-log/admin-audit-log.controller';
+import { AdminOfferingsController } from './offerings/admin-offerings.controller';
 
 @Module({
   imports: [
@@ -29,6 +32,8 @@ import { AdminAuditLogController } from './audit-log/admin-audit-log.controller'
       Prerequisite,
       Corequisite,
       AuditLog,
+      AcademicTerm,
+      CourseOffering,
     ]),
     AuthModule,
   ],
@@ -40,6 +45,7 @@ import { AdminAuditLogController } from './audit-log/admin-audit-log.controller'
     AdminKaController,
     AdminCyController,
     AdminAuditLogController,
+    AdminOfferingsController,
   ],
   providers: [AdminAuditService],
 })

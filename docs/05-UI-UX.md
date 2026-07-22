@@ -284,6 +284,23 @@ Displays
 
 ⸻
 
+Admin — Course Offerings
+
+Route: /admin/offerings (protected)
+
+Two-column tool for curating per-term course offerings and checking registration eligibility.
+
+Displays
+
+* Term selectors for "this semester" (left) and "next semester" (right), plus inline term creation
+* Left column: courses offered this semester (add via picker / remove)
+* Right column: courses offered next semester, each with an eligibility badge, blocking reason, and a checkbox to select for registration
+* Selection summary (N selected — X eligible, Y blocked)
+
+A next-semester course is eligible when its prerequisites are covered by the left column. Reuses POST /planner/evaluate; offerings are persisted via the admin API.
+
+⸻
+
 9. Component Library
 
 Core Components

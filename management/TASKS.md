@@ -18,6 +18,17 @@ Status: 🟡 In Progress
 
 ## High Priority
 
+### Admin Course Offerings (two-column eligibility tool)
+
+- [x] Backend: AcademicTerm + CourseOffering entities + migration (seeds two starter terms)
+- [x] Backend: admin `/admin/offerings` CRUD (terms + offerings), JWT-guarded, audit-logged
+- [x] Backend: AdminOfferingsController unit tests (mapping, dedupe conflicts, not-found)
+- [x] Frontend: `/admin/offerings` two-column page (this semester vs. next semester) with live eligibility via planner.evaluate
+- [x] Frontend: admin-api offerings client + "Course Offerings" sidebar link
+- [x] Migration applied to dev DB; docs (03 DB, 04 API, 05 UI/UX) updated
+
+---
+
 ### Semester Planner (prerequisite eligibility)
 
 - [x] Backend: stateless `POST /planner/evaluate` module (multi-term prereq/coreq evaluation + suggestions)

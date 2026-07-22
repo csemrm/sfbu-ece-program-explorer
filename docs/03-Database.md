@@ -105,6 +105,14 @@ Defines corequisite relationships between courses.
 
 Tracks metadata about catalog data imports for audit and rollback.
 
+### AcademicTerms
+
+Semesters/terms in which courses may be offered (e.g. "Fall 2026"), with a `sort_order` for chronological ordering. Admin-managed.
+
+### CourseOfferings
+
+Join between AcademicTerms and Courses recording which courses are offered in a given term. Unique on (term_id, course_id); cascades on delete of either side. Admin-managed; powers the offerings/eligibility tool.
+
 ---
 
 ## 7. Mermaid ER Diagram
