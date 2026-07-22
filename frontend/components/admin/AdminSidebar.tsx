@@ -66,6 +66,26 @@ const NAV = [
     ),
   },
   {
+    href: '/admin/offerings',
+    label: 'Course Offerings',
+    icon: (
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <rect x="3" y="4" width="8" height="16" rx="1" />
+        <rect x="13" y="4" width="8" height="16" rx="1" />
+        <path d="M16 9h2M16 13h2" />
+      </svg>
+    ),
+  },
+  {
     href: '/admin/requirement-groups',
     label: 'Requirement Groups',
     icon: (

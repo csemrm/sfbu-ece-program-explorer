@@ -12,6 +12,8 @@ import {
   RequirementGroup,
   AdminUser,
   AuditLog,
+  AcademicTerm,
+  CourseOffering,
 } from './entities';
 
 export function getDatabaseConfig(): TypeOrmModuleOptions {
@@ -36,6 +38,8 @@ export function getDatabaseConfig(): TypeOrmModuleOptions {
       CatalogImport,
       AdminUser,
       AuditLog,
+      AcademicTerm,
+      CourseOffering,
     ],
     migrations: [__dirname + '/migrations/*{.ts,.js}'],
     synchronize: false,

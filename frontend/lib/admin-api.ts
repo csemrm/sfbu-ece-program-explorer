@@ -95,6 +95,24 @@ export interface AdminKnowledgeArea {
   description: string | null;
 }
 
+export interface AdminTerm {
+  id: string;
+  name: string;
+  sortOrder: number;
+}
+
+export interface AdminOffering {
+  id: string;
+  courseId: string;
+  course: {
+    id: string;
+    courseCode: string;
+    title: string;
+    creditHours: number;
+    level: string;
+  };
+}
+
 // Client-side login (uses NEXT_PUBLIC_API_URL)
 export async function loginAdmin(email: string, password: string): Promise<AdminUser> {
   const base = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost/api/v1';
@@ -216,5 +234,24 @@ export const adminApi = {
   auditLog: {
     list: (token: string, page = 1) =>
       adminFetch<PaginatedResponse<AuditEntry>>(`audit-log?page=${page}`, token),
+  },
+  offerings: {
+    terms: (token: string) => adminFetch<AdminTerm[]>('offerings/terms', token),
+    createTerm: (token: string, body: { name: string; sortOrder?: number }) =>
+      adminFetch<AdminTerm>('offerings/terms', token, {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
+    deleteTerm: (token: string, id: string) =>
+      adminFetch<{ success: boolean }>(`offerings/terms/${id}`, token, { method: 'DELETE' }),
+    list: (token: string, termId: string) =>
+      adminFetch<AdminOffering[]>(`offerings?termId=${termId}`, token),
+    add: (token: string, body: { termId: string; courseId: string }) =>
+      adminFetch<{ id: string }>('offerings', token, {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
+    remove: (token: string, id: string) =>
+      adminFetch<{ success: boolean }>(`offerings/${id}`, token, { method: 'DELETE' }),
   },
 };

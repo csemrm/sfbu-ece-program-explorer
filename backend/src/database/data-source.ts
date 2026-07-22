@@ -14,6 +14,8 @@ import {
   RequirementGroup,
   AdminUser,
   AuditLog,
+  AcademicTerm,
+  CourseOffering,
 } from './entities';
 
 dotenv.config();
@@ -34,6 +36,8 @@ export const AppDataSource = new DataSource({
     CatalogImport,
     AdminUser,
     AuditLog,
+    AcademicTerm,
+    CourseOffering,
   ],
   migrations: [__dirname + '/migrations/*{.ts,.js}'],
   synchronize: false,

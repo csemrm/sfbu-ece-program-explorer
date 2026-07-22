@@ -353,6 +353,26 @@ DELETE
 
 ⸻
 
+Course Offerings
+
+Admin-curated record of which courses are offered in each academic term. Powers the admin two-column offerings tool (this semester vs. next semester) with prerequisite-eligibility checks.
+
+GET /admin/offerings/terms — list academic terms (ordered by sortOrder)
+
+POST /admin/offerings/terms — create a term { name, sortOrder? }
+
+DELETE /admin/offerings/terms/:id — delete a term (cascades its offerings)
+
+GET /admin/offerings?termId= — list courses offered in a term (with course details)
+
+POST /admin/offerings — add an offering { termId, courseId } (409 if already offered)
+
+DELETE /admin/offerings/:id — remove an offering
+
+Eligibility for a next-semester course reuses POST /planner/evaluate with terms [thisSemesterOfferings, nextSemesterOfferings]: a right-column course is eligible when its prerequisites are covered by the left (this-semester) column. All routes require a valid admin JWT.
+
+⸻
+
 Catalog Import
 
 POST
