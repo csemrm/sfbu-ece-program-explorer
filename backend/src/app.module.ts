@@ -10,6 +10,7 @@ import { CatalogYearsModule } from './modules/catalog-years/catalog-years.module
 import { SearchModule } from './modules/search/search.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { PlannerModule } from './modules/planner/planner.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AdminModule } from './modules/admin/admin.module';
     SearchModule,
     AuthModule,
     AdminModule,
+    PlannerModule,
   ],
   controllers: [AppController],
 })

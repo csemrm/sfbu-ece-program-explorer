@@ -39,6 +39,7 @@ async function bootstrap() {
     .addTag('knowledge-areas')
     .addTag('catalog-years')
     .addTag('search')
+    .addTag('planner')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);

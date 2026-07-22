@@ -18,6 +18,17 @@ Status: 🟡 In Progress
 
 ## High Priority
 
+### Semester Planner (prerequisite eligibility)
+
+- [x] Backend: stateless `POST /planner/evaluate` module (multi-term prereq/coreq evaluation + suggestions)
+- [x] Backend: PlannerService unit tests (eligibility, ordering conflicts, corequisites, suggestions)
+- [x] Frontend: typed `api.planner.evaluate` client + `post` helper
+- [x] Frontend: `/plan` page — completed picker, ordered semester cards, live verdicts, suggestions, localStorage persistence
+- [x] Add "Plan" to public navigation
+- [x] Docs: API (04) and UI/UX (05) updated
+
+---
+
 ### Project Setup
 
 - [x] Initialize Git repository
