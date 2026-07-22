@@ -18,6 +18,21 @@ async function get<T>(path: string, params?: Record<string, string | number>): P
   return res.json() as Promise<T>;
 }
 
+async function post<T>(path: string, body: unknown): Promise<T> {
+  const res = await fetch(`${base()}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    cache: 'no-store',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const message = Array.isArray(err.message) ? err.message.join('; ') : err.message;
+    throw new Error(message ?? `API error ${res.status}`);
+  }
+  return res.json() as Promise<T>;
+}
+
 // ── Types ──────────────────────────────────────────────────────
 
 export interface Program {
@@ -150,6 +165,58 @@ export interface SearchResult {
   level?: string;
 }
 
+// ── Semester Planner ───────────────────────────────────────────
+
+export interface PlannerCourseRef {
+  id: string;
+  courseCode: string;
+  title: string;
+  creditHours: number;
+  level: 'undergraduate' | 'graduate';
+}
+
+export type CorequisiteStatus = 'completed' | 'same-term' | 'unmet';
+
+export interface MissingPrerequisite extends PlannerCourseRef {
+  plannedInLaterTerm: number | null;
+}
+
+export interface CorequisiteStatusItem extends PlannerCourseRef {
+  status: CorequisiteStatus;
+}
+
+export interface EvaluatedCourse {
+  courseId: string;
+  courseCode: string;
+  title: string;
+  creditHours: number;
+  level: 'undergraduate' | 'graduate';
+  eligible: boolean;
+  alreadyCompleted: boolean;
+  satisfiedPrerequisites: PlannerCourseRef[];
+  missingPrerequisites: MissingPrerequisite[];
+  corequisites: CorequisiteStatusItem[];
+  reason: string;
+}
+
+export interface EvaluatedTerm {
+  term: number;
+  termCredits: number;
+  courses: EvaluatedCourse[];
+}
+
+export interface PlanEvaluation {
+  terms: EvaluatedTerm[];
+  suggestions: PlannerCourseRef[];
+  totalPlannedCredits: number;
+  allEligible: boolean;
+}
+
+export interface EvaluatePlanRequest {
+  completedCourseIds: string[];
+  terms: { courseIds: string[] }[];
+}
+
 // ── API calls ──────────────────────────────────────────────────
 
 export const api = {
@@ -176,5 +243,8 @@ export const api = {
         string,
         string | number
       >),
+  },
+  planner: {
+    evaluate: (body: EvaluatePlanRequest) => post<PlanEvaluation>('/planner/evaluate', body),
   },
 };

@@ -256,6 +256,24 @@ Displays
 
 ⸻
 
+Semester Planner
+
+Route: /plan
+
+Lets a user check prerequisite eligibility before registering, without any login or stored records.
+
+Displays
+
+* Completed-courses panel (searchable picker + removable chips)
+* Ordered semester cards, each with a course picker and per-course eligibility verdict (eligible / blocked, with a plain-language reason)
+* Corequisite status per course (done / this term / not scheduled)
+* Plan summary (completed, semesters, planned courses, planned credits, overall eligibility)
+* Suggested next courses (unlocked once the plan is complete)
+
+State persists in browser localStorage only. Eligibility is computed by POST /planner/evaluate.
+
+⸻
+
 Admin Dashboard
 
 Displays

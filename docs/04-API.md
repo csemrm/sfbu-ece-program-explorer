@@ -249,6 +249,42 @@ GET /search?q=machine learning
 
 ⸻
 
+Semester Planner
+
+POST /planner/evaluate
+
+Stateless prerequisite-eligibility check for a multi-term registration plan. Nothing is persisted — the request carries the full plan and the response is computed on demand.
+
+Request body
+
+```json
+{
+  "completedCourseIds": ["<uuid>", "..."],
+  "terms": [
+    { "courseIds": ["<uuid>", "..."] },
+    { "courseIds": ["<uuid>"] }
+  ]
+}
+```
+
+* completedCourseIds — courses already finished before the plan begins.
+* terms — ordered list of planned semesters; each earlier term counts as completed for later terms.
+
+Response
+
+For each term, every course is returned with:
+
+* eligible — true when all prerequisites are satisfied and no corequisite is unmet.
+* satisfiedPrerequisites / missingPrerequisites — the latter flags plannedInLaterTerm when a prerequisite is scheduled too late (an ordering conflict).
+* corequisites — each with status of completed, same-term, or unmet.
+* reason — a human-readable explanation of the verdict.
+
+The response also includes suggestions (courses unlocked once the whole plan is complete), totalPlannedCredits, and allEligible.
+
+Returns 400 when any course ID does not exist.
+
+⸻
+
 8. Administration API
 
 Base URL
