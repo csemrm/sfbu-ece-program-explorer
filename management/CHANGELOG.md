@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# [1.1.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.0.0...v1.1.0) (2026-07-22)
+
+
+### Features
+
+* **planner:** semester registration planner with prerequisite eligibility ([#3](https://github.com/csemrm/sfbu-ece-program-explorer/issues/3)) ([f6eb714](https://github.com/csemrm/sfbu-ece-program-explorer/commit/f6eb71419c25e98ec81135c8ed585ef372a7222d))
+
 # 1.0.0 (2026-06-28)
 
 
