@@ -395,3 +395,57 @@ Always read in this order:
 7. Current Epic
 
 Do not read every Epic unless required.
+
+⸻
+
+# Development Reference
+
+This is a monorepo with two independently-installed npm workspaces: `frontend/` (Next.js) and `backend/` (NestJS). The root `package.json` holds orchestration scripts, Prettier, Husky, and semantic-release; it does **not** hoist dependencies. Run `npm install` separately inside `frontend/` and `backend/`.
+
+## Commands
+
+Run from the repository root unless noted.
+
+Dev servers (each needs its own terminal):
+
+* `npm run dev:frontend` — Next.js on http://localhost:3000
+* `npm run dev:backend` — NestJS on http://localhost:3001/api/v1 (watch mode)
+
+Docker (full stack incl. Postgres + Nginx):
+
+* `docker compose up -d` — frontend :3000, backend API :3001, health at `/api/v1/health`
+* `docker compose up postgres -d` — database only (the usual local-dev DB)
+
+Build / lint / format:
+
+* `npm run build:frontend` / `npm run build:backend`
+* `npm run lint` (both), or `npm run lint:frontend` / `npm run lint:backend`
+* `npm run format` / `npm run format:check` — Prettier across the repo
+
+Tests:
+
+* Backend: `npm run test:backend`, or from `backend/`: `npm test`. Unit specs are `*.spec.ts` under `src/`. E2E: `cd backend && npm run test:e2e`.
+* Frontend: `cd frontend && npm test` (Jest + Testing Library). Single test: `cd frontend && npx jest <path-or-name>`; watch: `npm run test:watch`. Accessibility assertions use `jest-axe`.
+
+Database (run from `backend/`, requires Postgres reachable via `DATABASE_URL`):
+
+* `npm run migration:run` / `npm run migration:revert`
+* `npm run migration:generate -- src/database/migrations/<Name>` — generate from entity diffs
+* `npm run seed` — seeds catalog data + the admin user from `ADMIN_SEED_*` env vars
+
+Commits are Prettier-formatted via a Husky `lint-staged` pre-commit hook. Releases run through **semantic-release** (Conventional Commits → version + changelog), so commit messages drive versioning.
+
+## Architecture
+
+**Backend (NestJS + TypeORM + PostgreSQL).** `src/main.ts` sets a global `api/v1` prefix, a global `ValidationPipe` (whitelist + transform, so DTOs are the contract), an `AllExceptionsFilter`, cookie parsing, CORS, and Swagger at `/api/docs`. `AppModule` composes one feature module per domain under `src/modules/`. Two parallel surfaces exist:
+
+* **Public read modules** — `programs`, `courses`, `requirement-groups`, `knowledge-areas`, `catalog-years`, `search`. Read-only curriculum data, no auth.
+* **Admin write modules** — everything under `src/modules/admin/*` (programs, courses, requirement-groups, knowledge-areas, catalog-years, dashboard, audit-log), gated by JWT. `auth` issues the token; guards/strategies/decorators live in `src/modules/auth/`. Mutations are recorded via the audit-log entity.
+
+TypeORM entities live in `src/database/entities/` (registered explicitly — not glob-autoloaded — in both `data-source.ts` and the database module). The catalog domain model is: `Program` → `CatalogYear` → `RequirementGroup` → `ProgramRequirement`, with `Course` linked to `KnowledgeArea` via the `CourseKnowledgeArea` join, and course dependencies modeled as `Prerequisite` / `Corequisite` self-relations. `synchronize` is **off** — schema changes go through migrations in `src/database/migrations/`.
+
+**Frontend (Next.js App Router, React 19).** Routes use **route groups**: `app/(public)/` is the unauthenticated explorer (programs, courses, compare, course/program detail pages), `app/(admin-shell)/admin/` is the CRUD dashboard with an `(protected)` subgroup. `middleware.ts` guards `/admin/*` (except `/admin/login`) by checking the `admin_token` cookie and redirecting to login with a `next` param.
+
+All backend calls go through two typed clients: `lib/api.ts` (public) and `lib/admin-api.ts` (admin). `api.ts` picks its base URL by execution context — server components use `API_BASE_URL` (internal Docker host `backend:3001`), the browser uses `NEXT_PUBLIC_API_URL` (through Nginx). Keep interface types in these files in sync with backend DTOs. Visualization is React Flow (`@xyflow/react`) — see `components/graph/` (prerequisite graph, `lib/graphLayout.ts`) and `components/roadmap/` (curriculum roadmap). Feature components are grouped by domain under `components/`; shared primitives in `components/ui/`. `next.config.ts` uses `output: 'standalone'` for the Docker image.
+
+**Environment.** Copy `.env.example` → `.env`. Key vars: `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGIN`, `ADMIN_SEED_EMAIL`/`ADMIN_SEED_PASSWORD`, and the frontend `API_BASE_URL` (server-side) vs `NEXT_PUBLIC_API_URL` (client-side) split described above.
