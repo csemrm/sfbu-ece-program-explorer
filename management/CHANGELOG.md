@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# [1.2.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.1.0...v1.2.0) (2026-07-22)
+
+
+### Features
+
+* **admin:** course offerings tool with prerequisite eligibility ([#4](https://github.com/csemrm/sfbu-ece-program-explorer/issues/4)) ([1edb12b](https://github.com/csemrm/sfbu-ece-program-explorer/commit/1edb12bd9c865dd46388810d73ce430bbb9d9d8f))
+
 # [1.1.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.0.0...v1.1.0) (2026-07-22)
 
 
