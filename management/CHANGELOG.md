@@ -61,6 +61,28 @@
 
 ## [Unreleased]
 
+### Milestone 9 — Knowledge Area Explorer
+
+#### Added
+
+- `backend/src/database/seeds/catalog-data.ts` — `KNOWLEDGE_AREAS` (14 learning domains) and `COURSE_KNOWLEDGE_AREAS` (77 joins covering all 60 seeded courses). Knowledge areas were previously defined as entities and exposed through admin CRUD, but no seed data existed, so both tables were empty.
+- `backend/src/database/seeds/seed.ts` — idempotent upsert of knowledge areas and course↔area joins; unknown course codes or area names warn and skip rather than aborting the run.
+- `backend/src/modules/knowledge-areas/knowledge-areas.service.ts` — `findAll` now returns `courseCount`, `undergraduateCount`, `graduateCount` via a grouped `FILTER` query; `findOne` returns the area with its courses (creditHours coerced to number).
+- `GET /programs/:id/knowledge-areas` — knowledge-area distribution for a program's latest catalog year, ranked by course count with a percentage of program courses. Closes the last open Milestone 10 item.
+- `frontend/app/(public)/knowledge-areas/page.tsx` — area card grid with per-area course counts and an undergraduate/graduate split bar.
+- `frontend/app/(public)/knowledge-areas/[id]/page.tsx` — navy hero, stat row, courses grouped by level (reuses `CourseCard`), empty state.
+- `frontend/components/knowledge-areas/KnowledgeAreaCard.tsx` — card with an `aria-label`led level-split bar.
+- `frontend/lib/api.ts` — `KnowledgeAreaSummary`, `KnowledgeAreaDetail`, `ProgramKnowledgeAreas` types plus `api.knowledgeAreas.{list,get}` and `api.programs.knowledgeAreas`.
+- Tests: 7 `KnowledgeAreasService` specs, 6 `ProgramsService.findKnowledgeAreas` specs, 11 `KnowledgeAreaCard` component/axe tests. Backend 44 → 57, frontend 46 → 57.
+
+#### Changed
+
+- `frontend/app/(public)/programs/compare/page.tsx` — added a Knowledge Area Coverage table comparing MSCS and MSEE by area, with a note that specialization tracks are all counted (breadth offered, not one student's path).
+- `frontend/components/ui/Nav.tsx` — added "Knowledge Areas" to public navigation.
+- `backend/src/modules/programs/programs.{module,service,controller}.ts` — `ProgramsService` now injects the `CourseKnowledgeArea` and `KnowledgeArea` repositories.
+- `backend/src/modules/programs/programs.service.spec.ts` — registered the two new repository providers.
+- `management/PROJECT_ROADMAP.md` — corrected stale status: Milestone 10 was marked "Not Started" despite shipping in v1.0.0, and Milestone 13 was marked "Not Started" despite the v0.9.1 test suite. Added v0.9.1–v1.3.0 to the version table; current milestone is now 12 (Polish).
+
 ---
 
 ## [1.0.1] — 2026-06-27

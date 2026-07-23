@@ -182,6 +182,7 @@ Desktop	>1024px
 Home
 Programs
 Course Explorer
+Knowledge Areas
 Curriculum Roadmap
 Prerequisite Graph
 Compare Programs
@@ -232,6 +233,36 @@ Displays
 * Filters
 * Course Cards
 * Course Detail
+
+⸻
+
+Knowledge Area Explorer
+
+Routes: /knowledge-areas, /knowledge-areas/[id]
+
+Groups courses by subject matter rather than by degree requirement, letting a
+user explore a domain across program boundaries.
+
+List page displays
+
+* Page header with area count and link to the full course catalog
+* Card grid — one per area, showing name, description, and course count
+* Undergraduate / graduate split bar per card (navy = UG, gold = graduate),
+  labelled for assistive technology
+* Footnote noting that courses spanning multiple domains are counted in each
+
+Detail page displays
+
+* Navy gradient hero with gold rule, area name, description
+* Stat row — total courses, undergraduate count, graduate count
+* Courses grouped under Undergraduate and Graduate headings, reusing CourseCard
+* Empty state when an area has no courses assigned
+* CTAs back to all areas and out to Programs
+
+Program comparison (/programs/compare) additionally renders a Knowledge Area
+Coverage table: union of areas across the compared programs, one bar-and-count
+cell per program, ranked by combined coverage. Areas absent from a program show
+an em dash. The table scrolls horizontally on narrow viewports.
 
 ⸻
 

@@ -46,6 +46,15 @@ export class ProgramsController {
     return this.programsService.findRoadmap(id);
   }
 
+  @Get(':id/knowledge-areas')
+  @ApiOperation({
+    summary:
+      'Get knowledge-area distribution for a program (latest catalog year)',
+  })
+  findKnowledgeAreas(@Param('id', ParseUUIDPipe) id: string) {
+    return this.programsService.findKnowledgeAreas(id);
+  }
+
   @Get(':id/graph')
   @ApiOperation({
     summary: 'Get prerequisite graph nodes and edges for a program',

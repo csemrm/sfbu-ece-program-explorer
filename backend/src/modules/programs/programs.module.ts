@@ -7,6 +7,8 @@ import { ProgramRequirement } from '../../database/entities/program-requirement.
 import { Course } from '../../database/entities/course.entity';
 import { Prerequisite } from '../../database/entities/prerequisite.entity';
 import { Corequisite } from '../../database/entities/corequisite.entity';
+import { CourseKnowledgeArea } from '../../database/entities/course-knowledge-area.entity';
+import { KnowledgeArea } from '../../database/entities/knowledge-area.entity';
 import { ProgramsController } from './programs.controller';
 import { ProgramsService } from './programs.service';
 
@@ -20,6 +22,8 @@ import { ProgramsService } from './programs.service';
       Course,
       Prerequisite,
       Corequisite,
+      CourseKnowledgeArea,
+      KnowledgeArea,
     ]),
   ],
   controllers: [ProgramsController],

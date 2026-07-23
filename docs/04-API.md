@@ -219,7 +219,49 @@ Knowledge Areas
 
 GET /knowledge-areas
 
-Returns all knowledge areas.
+Returns a paginated list of knowledge areas. Each entry carries course counts
+derived from the course_knowledge_areas join.
+
+Response fields per area
+
+* id
+* name
+* description
+* courseCount
+* undergraduateCount
+* graduateCount
+
+⸻
+
+GET /knowledge-areas/{id}
+
+Returns a single knowledge area with the courses assigned to it, ordered by
+course code. Adds a courses array to the fields above:
+
+* id
+* courseCode
+* title
+* creditHours (number)
+* level
+* description
+
+Returns 404 when the area does not exist.
+
+⸻
+
+GET /programs/{id}/knowledge-areas
+
+Returns the knowledge-area distribution for a program's latest catalog year,
+sorted by course count descending.
+
+* programId, programName, programAbbreviation
+* academicYear
+* totalCourses — distinct courses reachable from the program's requirement groups
+* knowledgeAreas[] — id, name, description, courseCount, percentage
+
+Percentage is courseCount / totalCourses. All specialization tracks are
+included, so this reports the subject breadth a program offers, not the areas
+a single student's plan will span.
 
 ⸻
 

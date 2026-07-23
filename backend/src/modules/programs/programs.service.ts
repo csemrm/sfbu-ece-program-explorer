@@ -8,6 +8,8 @@ import { ProgramRequirement } from '../../database/entities/program-requirement.
 import { Course } from '../../database/entities/course.entity';
 import { Prerequisite } from '../../database/entities/prerequisite.entity';
 import { Corequisite } from '../../database/entities/corequisite.entity';
+import { CourseKnowledgeArea } from '../../database/entities/course-knowledge-area.entity';
+import { KnowledgeArea } from '../../database/entities/knowledge-area.entity';
 import { paginate, PaginatedResult } from '../../common/dto/pagination.dto';
 import { QueryProgramsDto } from './dto/program.dto';
 
@@ -28,6 +30,10 @@ export class ProgramsService {
     private readonly prereqRepo: Repository<Prerequisite>,
     @InjectRepository(Corequisite)
     private readonly coreqRepo: Repository<Corequisite>,
+    @InjectRepository(CourseKnowledgeArea)
+    private readonly ckaRepo: Repository<CourseKnowledgeArea>,
+    @InjectRepository(KnowledgeArea)
+    private readonly kaRepo: Repository<KnowledgeArea>,
   ) {}
 
   async findAll(query: QueryProgramsDto): Promise<PaginatedResult<Program>> {
@@ -217,6 +223,100 @@ export class ProgramsService {
       catalogYearId: cy.id,
       academicYear: cy.academicYear,
       phases,
+    };
+  }
+
+  /**
+   * Knowledge-area distribution for a program's latest catalog year.
+   *
+   * Counts every distinct course reachable from the program's requirement
+   * groups, including all specialization tracks. Students choose only one
+   * track, so this describes subject *coverage* offered by the program —
+   * not the areas a single student's degree plan will span.
+   */
+  async findKnowledgeAreas(programId: string) {
+    const program = await this.findOne(programId);
+
+    const years = await this.cyRepo.find({
+      where: { programId },
+      order: { academicYear: 'DESC' },
+    });
+
+    const empty = {
+      programId: program.id,
+      programName: program.name,
+      programAbbreviation: program.abbreviation,
+      academicYear: null as string | null,
+      totalCourses: 0,
+      knowledgeAreas: [] as Array<{
+        id: string;
+        name: string;
+        description: string | null;
+        courseCount: number;
+        percentage: number;
+      }>,
+    };
+    if (!years.length) return empty;
+    const cy = years[0];
+
+    const groups = await this.rgRepo.find({ where: { catalogYearId: cy.id } });
+    if (!groups.length) return { ...empty, academicYear: cy.academicYear };
+
+    const pReqs = await this.prRepo.find({
+      where: { requirementGroupId: In(groups.map((g) => g.id)) },
+    });
+    const courseIds = [
+      ...new Set(
+        pReqs.filter((r) => r.courseId != null).map((r) => r.courseId!),
+      ),
+    ];
+    if (!courseIds.length) return { ...empty, academicYear: cy.academicYear };
+
+    const links = await this.ckaRepo.find({
+      where: { courseId: In(courseIds) },
+    });
+    if (!links.length) {
+      return {
+        ...empty,
+        academicYear: cy.academicYear,
+        totalCourses: courseIds.length,
+      };
+    }
+
+    const areas = await this.kaRepo.find({
+      where: { id: In([...new Set(links.map((l) => l.knowledgeAreaId))]) },
+    });
+
+    const countByArea = new Map<string, number>();
+    for (const l of links) {
+      countByArea.set(
+        l.knowledgeAreaId,
+        (countByArea.get(l.knowledgeAreaId) ?? 0) + 1,
+      );
+    }
+
+    const knowledgeAreas = areas
+      .map((a) => {
+        const courseCount = countByArea.get(a.id) ?? 0;
+        return {
+          id: a.id,
+          name: a.name,
+          description: a.description,
+          courseCount,
+          percentage: Math.round((courseCount / courseIds.length) * 100),
+        };
+      })
+      .sort(
+        (a, b) => b.courseCount - a.courseCount || a.name.localeCompare(b.name),
+      );
+
+    return {
+      programId: program.id,
+      programName: program.name,
+      programAbbreviation: program.abbreviation,
+      academicYear: cy.academicYear,
+      totalCourses: courseIds.length,
+      knowledgeAreas,
     };
   }
 

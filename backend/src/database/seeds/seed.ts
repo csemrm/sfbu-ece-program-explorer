@@ -6,7 +6,9 @@ import { AppDataSource } from '../data-source';
 import {
   CATALOG_IMPORT_STATUS,
   COREQUISITES,
+  COURSE_KNOWLEDGE_AREAS,
   COURSES,
+  KNOWLEDGE_AREAS,
   PREREQUISITES,
   PROGRAMS,
 } from './catalog-data';
@@ -14,6 +16,8 @@ import { CatalogImport } from '../entities/catalog-import.entity';
 import { CatalogYear } from '../entities/catalog-year.entity';
 import { Corequisite } from '../entities/corequisite.entity';
 import { Course } from '../entities/course.entity';
+import { CourseKnowledgeArea } from '../entities/course-knowledge-area.entity';
+import { KnowledgeArea } from '../entities/knowledge-area.entity';
 import { Prerequisite } from '../entities/prerequisite.entity';
 import { Program } from '../entities/program.entity';
 import { ProgramRequirement } from '../entities/program-requirement.entity';
@@ -84,6 +88,52 @@ async function seed(dataSource: DataSource): Promise<void> {
       await coreqRepo.save(
         coreqRepo.create({ courseId, corequisiteCourseId: coreqId }),
       );
+    }
+  }
+
+  // ── Knowledge Areas ────────────────────────────────────────
+  console.log(`  Upserting ${KNOWLEDGE_AREAS.length} knowledge areas...`);
+  const kaRepo = dataSource.getRepository(KnowledgeArea);
+  const kaMap = new Map<string, string>(); // name → id
+
+  for (const ka of KNOWLEDGE_AREAS) {
+    let area = await kaRepo.findOne({ where: { name: ka.name } });
+    if (!area) {
+      area = kaRepo.create({ name: ka.name, description: ka.description });
+      await kaRepo.save(area);
+    } else {
+      await kaRepo.update(area.id, { description: ka.description });
+    }
+    kaMap.set(ka.name, area.id);
+  }
+
+  // ── Course ↔ Knowledge Area ────────────────────────────────
+  console.log(
+    `  Upserting knowledge-area mappings for ${COURSE_KNOWLEDGE_AREAS.length} courses...`,
+  );
+  const ckaRepo = dataSource.getRepository(CourseKnowledgeArea);
+  for (const mapping of COURSE_KNOWLEDGE_AREAS) {
+    const courseId = courseMap.get(mapping.courseCode);
+    if (!courseId) {
+      console.warn(
+        `    Skipping knowledge areas for unknown course: ${mapping.courseCode}`,
+      );
+      continue;
+    }
+    for (const areaName of mapping.knowledgeAreaNames) {
+      const knowledgeAreaId = kaMap.get(areaName);
+      if (!knowledgeAreaId) {
+        console.warn(
+          `    Skipping unknown knowledge area "${areaName}" for ${mapping.courseCode}`,
+        );
+        continue;
+      }
+      const exists = await ckaRepo.findOne({
+        where: { courseId, knowledgeAreaId },
+      });
+      if (!exists) {
+        await ckaRepo.save(ckaRepo.create({ courseId, knowledgeAreaId }));
+      }
     }
   }
 

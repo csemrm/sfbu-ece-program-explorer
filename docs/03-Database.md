@@ -305,6 +305,27 @@ erDiagram
 - Seed data scripts will be idempotent and versioned.
 - Use environment-specific seeding to avoid overwriting production data.
 
+### Knowledge Area Seed
+
+`backend/src/database/seeds/catalog-data.ts` defines two exports that populate
+the `knowledge_areas` and `course_knowledge_areas` tables:
+
+- `KNOWLEDGE_AREAS` — 14 learning domains (name + description).
+- `COURSE_KNOWLEDGE_AREAS` — maps each seeded course code to one or more area
+  names, producing 77 joins across the 60 catalog courses.
+
+Knowledge areas are a **pedagogical taxonomy layered over the catalog**, not a
+catalog artifact. The published catalog organizes courses by requirement group;
+these areas group them by subject matter so courses can be browsed across
+program boundaries. A course may belong to more than one area (for example
+CS581 Secure Software Development is both Cybersecurity and Software
+Engineering), so the sum of area course counts exceeds the course total.
+
+The seeder resolves areas by name and is idempotent: existing areas have their
+description refreshed, and a join row is inserted only when absent. Unknown
+course codes or area names are warned about and skipped rather than aborting
+the run.
+
 ---
 
 ## 13. Catalog Import Workflow

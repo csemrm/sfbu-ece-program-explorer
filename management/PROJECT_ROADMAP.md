@@ -232,7 +232,15 @@ Examples
 * Embedded Systems
 * Digital Design
 
-Status: 🟡 Partial — Admin CRUD complete; public browsing page not yet built.
+Delivered
+
+* 14-domain taxonomy seeded (77 course↔area joins across 60 courses)
+* /knowledge-areas list with per-area course counts and UG/grad split
+* /knowledge-areas/[id] detail with courses grouped by level
+* GET /programs/:id/knowledge-areas distribution endpoint
+* "Knowledge Areas" in public navigation
+
+Status: ✅ Complete (v1.3.0)
 
 ⸻
 
@@ -250,7 +258,7 @@ Compare
 * Knowledge areas
 * Capstone requirements
 
-Status: ⬜ Not Started — next milestone.
+Status: ✅ Complete (v1.0.0; knowledge-area coverage table added in v1.3.0)
 
 ⸻
 
@@ -303,7 +311,9 @@ Types
 * API tests
 * UI tests
 
-Status: ⬜ Not Started
+Status: 🟡 In Progress — unit, API (Supertest e2e), component, and jest-axe
+accessibility tests are in place. Backend↔database integration tests remain
+(they require a dedicated test database).
 
 ⸻
 
@@ -327,9 +337,11 @@ Status: ✅ Complete (Epic 009 — v0.9.0)
 
 Current Milestone
 
-Milestone 10 — Program Comparison
+Milestone 12 — Polish
 
-Next development task should target Program Comparison unless priorities change.
+Milestones 1–11 and 14 are complete. Remaining work is a formal WCAG 2.1 AA
+accessibility audit and responsive QA (Milestone 12), plus backend↔database
+integration tests (Milestone 13), which need a dedicated test database.
 
 ⸻
 
@@ -350,6 +362,11 @@ Completed Versions
 | v0.8.3  | Public UI brand theme | — |
 | v0.8.4  | Public UI polish + grid/list toggle | — |
 | v0.9.0  | Deployment infrastructure | 009 |
+| v0.9.1  | Testing (unit, e2e, component, axe) | — |
+| v1.0.0  | Program Comparison | — |
+| v1.1.0  | Semester Registration Planner | — |
+| v1.2.0  | Admin Course Offerings | — |
+| v1.3.0  | Knowledge Area Explorer | — |
 
 ⸻
 
