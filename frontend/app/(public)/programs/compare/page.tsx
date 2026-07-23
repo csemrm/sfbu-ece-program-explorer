@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { api } from '../../../../lib/api';
 import { Breadcrumb } from '../../../../components/ui/Breadcrumb';
-import type { ProgramRoadmap } from '../../../../lib/api';
+import type { ProgramKnowledgeAreas, ProgramRoadmap } from '../../../../lib/api';
 
 export const metadata: Metadata = {
   title: 'Compare Programs',
@@ -234,6 +234,7 @@ function PhaseList({ stats }: { stats: ProgramStats }) {
 
 export default async function ComparePage() {
   let statsList: ProgramStats[] = [];
+  let kaByProgram: Record<string, ProgramKnowledgeAreas> = {};
   let fetchError = false;
 
   try {
@@ -243,6 +244,11 @@ export default async function ComparePage() {
       .map(computeStats)
       .filter((s) => s.abbreviation === 'MSCS' || s.abbreviation === 'MSEE')
       .sort((a) => (a.abbreviation === 'MSCS' ? -1 : 1));
+
+    const kaResults = await Promise.all(
+      statsList.map((s) => api.programs.knowledgeAreas(s.id))
+    );
+    kaByProgram = Object.fromEntries(kaResults.map((r) => [r.programId, r]));
   } catch {
     fetchError = true;
   }
@@ -261,6 +267,28 @@ export default async function ComparePage() {
   }
 
   const maxCredits = Math.max(...statsList.map((s) => s.totalCredits), 1);
+
+  // Union of knowledge areas across the compared programs, ranked by total coverage.
+  const areaRows = Object.values(
+    statsList.reduce<Record<string, { name: string; counts: Record<string, number> }>>(
+      (acc, s) => {
+        for (const area of kaByProgram[s.id]?.knowledgeAreas ?? []) {
+          acc[area.name] ??= { name: area.name, counts: {} };
+          acc[area.name].counts[s.id] = area.courseCount;
+        }
+        return acc;
+      },
+      {}
+    )
+  ).sort((a, b) => {
+    const total = (r: typeof a) => Object.values(r.counts).reduce((x, y) => x + y, 0);
+    return total(b) - total(a) || a.name.localeCompare(b.name);
+  });
+
+  const maxAreaCount = Math.max(
+    ...areaRows.flatMap((r) => Object.values(r.counts)),
+    1
+  );
 
   const STAT_ROWS: { label: string; getValue: (s: ProgramStats) => string }[] = [
     { label: 'Total Credits', getValue: (s) => `${s.totalCredits}` },
@@ -398,6 +426,83 @@ export default async function ComparePage() {
             })}
           </div>
         </section>
+
+        {/* Knowledge area comparison */}
+        {areaRows.length > 0 && (
+          <section>
+            <h2 className="text-xl font-bold text-gray-900 mb-1">Knowledge Area Coverage</h2>
+            <p className="text-sm text-gray-500 mb-5">
+              Subject areas each program covers, by number of courses offered. Specialization
+              tracks are all included — students choose one, so this shows breadth available, not
+              a single student&apos;s path.
+            </p>
+            <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm min-w-[520px]">
+                  <thead>
+                    <tr style={{ backgroundColor: 'var(--sfbu-navy)' }}>
+                      <th className="text-left text-white font-semibold px-5 py-3">
+                        Knowledge Area
+                      </th>
+                      {statsList.map((s) => (
+                        <th
+                          key={s.id}
+                          className="text-center text-white font-semibold px-5 py-3 w-40"
+                        >
+                          {s.abbreviation}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {areaRows.map((row, i) => (
+                      <tr
+                        key={row.name}
+                        className={i % 2 === 1 ? 'bg-gray-50/60' : undefined}
+                      >
+                        <td className="px-5 py-3 text-gray-800 font-medium">{row.name}</td>
+                        {statsList.map((s) => {
+                          const cell = row.counts[s.id] ?? 0;
+                          const meta = DEGREE_META[s.abbreviation];
+                          const pct = maxAreaCount > 0 ? (cell / maxAreaCount) * 100 : 0;
+                          return (
+                            <td key={s.id} className="px-5 py-3">
+                              {cell === 0 ? (
+                                <span className="block text-center text-gray-300">—</span>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <div className="h-2 flex-1 rounded-full bg-gray-100 overflow-hidden">
+                                    <div
+                                      className="h-full rounded-full"
+                                      style={{
+                                        width: `${pct}%`,
+                                        backgroundColor: meta?.color ?? '#374151',
+                                      }}
+                                    />
+                                  </div>
+                                  <span className="text-xs text-gray-600 tabular-nums w-4 text-right">
+                                    {cell}
+                                  </span>
+                                </div>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <p className="mt-3 text-xs text-gray-400">
+              Browse every domain on the{' '}
+              <Link href="/knowledge-areas" className="underline hover:text-gray-600">
+                Knowledge Areas
+              </Link>{' '}
+              page.
+            </p>
+          </section>
+        )}
 
         {/* Explore CTAs */}
         <section>

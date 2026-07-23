@@ -217,6 +217,42 @@ export interface EvaluatePlanRequest {
   terms: { courseIds: string[] }[];
 }
 
+export interface KnowledgeAreaSummary {
+  id: string;
+  name: string;
+  description: string | null;
+  courseCount: number;
+  undergraduateCount: number;
+  graduateCount: number;
+}
+
+export interface KnowledgeAreaDetail extends KnowledgeAreaSummary {
+  courses: Array<{
+    id: string;
+    courseCode: string;
+    title: string;
+    /** Serialized as a number by the API; `Course.creditHours` is a string. */
+    creditHours: number;
+    level: 'undergraduate' | 'graduate';
+    description: string | null;
+  }>;
+}
+
+export interface ProgramKnowledgeAreas {
+  programId: string;
+  programName: string;
+  programAbbreviation: string;
+  academicYear: string | null;
+  totalCourses: number;
+  knowledgeAreas: Array<{
+    id: string;
+    name: string;
+    description: string | null;
+    courseCount: number;
+    percentage: number;
+  }>;
+}
+
 // ── API calls ──────────────────────────────────────────────────
 
 export const api = {
@@ -227,6 +263,16 @@ export const api = {
     requirements: (id: string) => get<ProgramRequirements>(`/programs/${id}/requirements`),
     roadmap: (id: string) => get<ProgramRoadmap>(`/programs/${id}/roadmap`),
     graph: (id: string) => get<ProgramGraph>(`/programs/${id}/graph`),
+    knowledgeAreas: (id: string) =>
+      get<ProgramKnowledgeAreas>(`/programs/${id}/knowledge-areas`),
+  },
+  knowledgeAreas: {
+    list: (params?: { page?: number; limit?: number }) =>
+      get<PaginatedResult<KnowledgeAreaSummary>>(
+        '/knowledge-areas',
+        params as Record<string, string | number>
+      ),
+    get: (id: string) => get<KnowledgeAreaDetail>(`/knowledge-areas/${id}`),
   },
   catalogYears: {
     list: () => get<PaginatedResult<CatalogYear>>('/catalog-years', { limit: 100 }),

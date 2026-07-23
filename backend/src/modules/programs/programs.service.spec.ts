@@ -9,6 +9,8 @@ import { ProgramRequirement } from '../../database/entities/program-requirement.
 import { Course } from '../../database/entities/course.entity';
 import { Prerequisite } from '../../database/entities/prerequisite.entity';
 import { Corequisite } from '../../database/entities/corequisite.entity';
+import { CourseKnowledgeArea } from '../../database/entities/course-knowledge-area.entity';
+import { KnowledgeArea } from '../../database/entities/knowledge-area.entity';
 
 const mockProgram = (overrides: Partial<Program> = {}): Program =>
   ({
@@ -39,6 +41,8 @@ describe('ProgramsService', () => {
   let courseRepo: any;
   let prereqRepo: any;
   let coreqRepo: any;
+  let ckaRepo: any;
+  let kaRepo: any;
 
   beforeEach(async () => {
     programRepo = { createQueryBuilder: jest.fn(), findOne: jest.fn() };
@@ -48,6 +52,8 @@ describe('ProgramsService', () => {
     courseRepo = { find: jest.fn() };
     prereqRepo = { find: jest.fn() };
     coreqRepo = { find: jest.fn() };
+    ckaRepo = { find: jest.fn() };
+    kaRepo = { find: jest.fn() };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -62,6 +68,11 @@ describe('ProgramsService', () => {
         { provide: getRepositoryToken(Course), useValue: courseRepo },
         { provide: getRepositoryToken(Prerequisite), useValue: prereqRepo },
         { provide: getRepositoryToken(Corequisite), useValue: coreqRepo },
+        {
+          provide: getRepositoryToken(CourseKnowledgeArea),
+          useValue: ckaRepo,
+        },
+        { provide: getRepositoryToken(KnowledgeArea), useValue: kaRepo },
       ],
     }).compile();
 
@@ -161,6 +172,120 @@ describe('ProgramsService', () => {
     it('throws NotFoundException when program not found', async () => {
       programRepo.findOne.mockResolvedValue(null);
       await expect(service.findRequirements('missing')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('findKnowledgeAreas()', () => {
+    const setupProgramWithCourses = (courseIds: string[]) => {
+      programRepo.findOne.mockResolvedValue(mockProgram());
+      cyRepo.find.mockResolvedValue([
+        { id: 'cy-1', academicYear: '2025-2026' },
+      ]);
+      rgRepo.find.mockResolvedValue([{ id: 'rg-1' }]);
+      prRepo.find.mockResolvedValue(
+        courseIds.map((courseId) => ({ courseId })),
+      );
+    };
+
+    it('ranks areas by course count and computes percentage of program courses', async () => {
+      setupProgramWithCourses(['c-1', 'c-2', 'c-3', 'c-4']);
+      ckaRepo.find.mockResolvedValue([
+        { courseId: 'c-1', knowledgeAreaId: 'ka-net' },
+        { courseId: 'c-2', knowledgeAreaId: 'ka-net' },
+        { courseId: 'c-3', knowledgeAreaId: 'ka-net' },
+        { courseId: 'c-4', knowledgeAreaId: 'ka-ai' },
+      ]);
+      kaRepo.find.mockResolvedValue([
+        { id: 'ka-ai', name: 'Artificial Intelligence', description: null },
+        { id: 'ka-net', name: 'Computer Networks', description: null },
+      ]);
+
+      const result = await service.findKnowledgeAreas('prog-1');
+
+      expect(result.totalCourses).toBe(4);
+      expect(result.academicYear).toBe('2025-2026');
+      expect(result.knowledgeAreas[0]).toMatchObject({
+        name: 'Computer Networks',
+        courseCount: 3,
+        percentage: 75,
+      });
+      expect(result.knowledgeAreas[1]).toMatchObject({
+        name: 'Artificial Intelligence',
+        courseCount: 1,
+        percentage: 25,
+      });
+    });
+
+    it('counts a course once per area it belongs to', async () => {
+      setupProgramWithCourses(['c-1']);
+      ckaRepo.find.mockResolvedValue([
+        { courseId: 'c-1', knowledgeAreaId: 'ka-a' },
+        { courseId: 'c-1', knowledgeAreaId: 'ka-b' },
+      ]);
+      kaRepo.find.mockResolvedValue([
+        { id: 'ka-a', name: 'Area A', description: null },
+        { id: 'ka-b', name: 'Area B', description: null },
+      ]);
+
+      const result = await service.findKnowledgeAreas('prog-1');
+
+      expect(result.totalCourses).toBe(1);
+      expect(result.knowledgeAreas).toHaveLength(2);
+      expect(result.knowledgeAreas.every((a) => a.percentage === 100)).toBe(
+        true,
+      );
+    });
+
+    it('deduplicates a course required by more than one requirement group', async () => {
+      programRepo.findOne.mockResolvedValue(mockProgram());
+      cyRepo.find.mockResolvedValue([
+        { id: 'cy-1', academicYear: '2025-2026' },
+      ]);
+      rgRepo.find.mockResolvedValue([{ id: 'rg-1' }, { id: 'rg-2' }]);
+      prRepo.find.mockResolvedValue([
+        { courseId: 'c-1' },
+        { courseId: 'c-1' },
+        { courseId: null },
+      ]);
+      ckaRepo.find.mockResolvedValue([
+        { courseId: 'c-1', knowledgeAreaId: 'ka-a' },
+      ]);
+      kaRepo.find.mockResolvedValue([
+        { id: 'ka-a', name: 'Area A', description: null },
+      ]);
+
+      const result = await service.findKnowledgeAreas('prog-1');
+
+      expect(result.totalCourses).toBe(1);
+    });
+
+    it('returns totalCourses with no areas when courses are unmapped', async () => {
+      setupProgramWithCourses(['c-1', 'c-2']);
+      ckaRepo.find.mockResolvedValue([]);
+
+      const result = await service.findKnowledgeAreas('prog-1');
+
+      expect(result.totalCourses).toBe(2);
+      expect(result.knowledgeAreas).toEqual([]);
+      expect(kaRepo.find).not.toHaveBeenCalled();
+    });
+
+    it('returns an empty result when the program has no catalog years', async () => {
+      programRepo.findOne.mockResolvedValue(mockProgram());
+      cyRepo.find.mockResolvedValue([]);
+
+      const result = await service.findKnowledgeAreas('prog-1');
+
+      expect(result.academicYear).toBeNull();
+      expect(result.knowledgeAreas).toEqual([]);
+      expect(result.totalCourses).toBe(0);
+    });
+
+    it('throws NotFoundException when program not found', async () => {
+      programRepo.findOne.mockResolvedValue(null);
+      await expect(service.findKnowledgeAreas('missing')).rejects.toThrow(
         NotFoundException,
       );
     });

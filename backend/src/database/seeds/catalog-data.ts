@@ -19,6 +19,16 @@ export interface CorequisiteSeed {
   corequisiteCode: string;
 }
 
+export interface KnowledgeAreaSeed {
+  name: string;
+  description: string;
+}
+
+export interface CourseKnowledgeAreaSeed {
+  courseCode: string;
+  knowledgeAreaNames: string[];
+}
+
 export interface ProgramRequirementSeed {
   courseCode: string | null;
   minCredits: number | null;
@@ -658,6 +668,339 @@ export const COREQUISITES: CorequisiteSeed[] = [
   { courseCode: 'CS500', corequisiteCode: 'CS500L' },
   { courseCode: 'CE450G', corequisiteCode: 'CE450LG' },
   { courseCode: 'EE461G', corequisiteCode: 'EE461LG' },
+];
+
+// ──────────────────────────────────────────────────────────────
+// KNOWLEDGE AREAS
+//
+// Learning domains used to group courses across all programs.
+// These are a pedagogical taxonomy layered over the catalog — the
+// catalog itself organizes courses by requirement group, not by
+// subject matter. A course may belong to more than one area.
+// ──────────────────────────────────────────────────────────────
+
+export const KNOWLEDGE_AREAS: KnowledgeAreaSeed[] = [
+  {
+    name: 'Programming Foundations',
+    description:
+      'Introductory and object-oriented programming, problem decomposition, and core language skills.',
+  },
+  {
+    name: 'Data Structures & Algorithms',
+    description:
+      'Fundamental data structures, algorithm design paradigms, complexity analysis, and computability.',
+  },
+  {
+    name: 'Mathematical Foundations',
+    description:
+      'Calculus, linear algebra, discrete mathematics, and the formal reasoning that underpins computing.',
+  },
+  {
+    name: 'Operating Systems & Distributed Computing',
+    description:
+      'Process and memory management, concurrency, distributed systems, virtualization, and cloud platforms.',
+  },
+  {
+    name: 'Computer Networks',
+    description:
+      'Network architecture and protocols, routing, wireless and mobile networking, and software-defined networks.',
+  },
+  {
+    name: 'Cybersecurity',
+    description:
+      'Cryptography, network defense, secure software development, and security policy and analysis.',
+  },
+  {
+    name: 'Artificial Intelligence & Machine Learning',
+    description:
+      'Search and knowledge representation, statistical learning, deep learning, computer vision, and language models.',
+  },
+  {
+    name: 'Data Management & Analytics',
+    description:
+      'Relational and NoSQL database design, query processing, and large-scale data engineering.',
+  },
+  {
+    name: 'Software Engineering',
+    description:
+      'Software lifecycle and process, architecture and design patterns, testing, and quality assurance.',
+  },
+  {
+    name: 'Computer Architecture & Digital Design',
+    description:
+      'Digital logic, instruction set architecture, pipelining, memory hierarchy, FPGAs, and system-on-chip design.',
+  },
+  {
+    name: 'Embedded Systems & IoT',
+    description:
+      'Microcontroller and real-time design, hardware-software co-design, sensor networks, and edge computing.',
+  },
+  {
+    name: 'Signal Processing & Integrated Circuits',
+    description:
+      'Digital signal processing, VLSI and CMOS circuit design, RF design, and physical verification.',
+  },
+  {
+    name: 'High-Performance & Parallel Computing',
+    description:
+      'Parallel programming models, GPU and multicore computing, HPC clusters, and performance engineering.',
+  },
+  {
+    name: 'Capstone & Professional Practice',
+    description:
+      'Culminating project work, research and industry application, entrepreneurship, and special topics.',
+  },
+];
+
+// ──────────────────────────────────────────────────────────────
+// COURSE → KNOWLEDGE AREA MAPPING
+//
+// Names must match KNOWLEDGE_AREAS above; the seeder warns and
+// skips on any mismatch rather than failing the whole run.
+// ──────────────────────────────────────────────────────────────
+
+export const COURSE_KNOWLEDGE_AREAS: CourseKnowledgeAreaSeed[] = [
+  // ── Undergraduate Math ──
+  { courseCode: 'MATH201', knowledgeAreaNames: ['Mathematical Foundations'] },
+  { courseCode: 'MATH202', knowledgeAreaNames: ['Mathematical Foundations'] },
+  {
+    courseCode: 'MATH203',
+    knowledgeAreaNames: [
+      'Mathematical Foundations',
+      'Data Structures & Algorithms',
+    ],
+  },
+  { courseCode: 'MATH208', knowledgeAreaNames: ['Mathematical Foundations'] },
+
+  // ── BSCS Core ──
+  { courseCode: 'CS200', knowledgeAreaNames: ['Programming Foundations'] },
+  { courseCode: 'CS230', knowledgeAreaNames: ['Programming Foundations'] },
+  { courseCode: 'CS230L', knowledgeAreaNames: ['Programming Foundations'] },
+  {
+    courseCode: 'CS250',
+    knowledgeAreaNames: [
+      'Programming Foundations',
+      'Data Structures & Algorithms',
+    ],
+  },
+  {
+    courseCode: 'CS250L',
+    knowledgeAreaNames: ['Data Structures & Algorithms'],
+  },
+  {
+    courseCode: 'CE305',
+    knowledgeAreaNames: ['Computer Architecture & Digital Design'],
+  },
+  {
+    courseCode: 'CS350',
+    knowledgeAreaNames: ['Operating Systems & Distributed Computing'],
+  },
+  {
+    courseCode: 'CS350L',
+    knowledgeAreaNames: ['Operating Systems & Distributed Computing'],
+  },
+  { courseCode: 'CS360', knowledgeAreaNames: ['Computer Networks'] },
+  { courseCode: 'CS360L', knowledgeAreaNames: ['Computer Networks'] },
+  { courseCode: 'CS380', knowledgeAreaNames: ['Data Structures & Algorithms'] },
+  {
+    courseCode: 'BUS450',
+    knowledgeAreaNames: ['Capstone & Professional Practice'],
+  },
+  { courseCode: 'CS455', knowledgeAreaNames: ['Data Management & Analytics'] },
+  { courseCode: 'CS457', knowledgeAreaNames: ['Software Engineering'] },
+  { courseCode: 'CS457L', knowledgeAreaNames: ['Software Engineering'] },
+  {
+    courseCode: 'CS480',
+    knowledgeAreaNames: ['Artificial Intelligence & Machine Learning'],
+  },
+  {
+    courseCode: 'CS480L',
+    knowledgeAreaNames: ['Artificial Intelligence & Machine Learning'],
+  },
+  {
+    courseCode: 'CS481',
+    knowledgeAreaNames: ['Artificial Intelligence & Machine Learning'],
+  },
+  {
+    courseCode: 'CS487',
+    knowledgeAreaNames: ['Capstone & Professional Practice'],
+  },
+  {
+    courseCode: 'CS494',
+    knowledgeAreaNames: ['Capstone & Professional Practice'],
+  },
+
+  // ── BSCS Specialization Electives ──
+  {
+    courseCode: 'CE450',
+    knowledgeAreaNames: ['Computer Architecture & Digital Design'],
+  },
+  {
+    courseCode: 'CS453',
+    knowledgeAreaNames: [
+      'Data Structures & Algorithms',
+      'Mathematical Foundations',
+    ],
+  },
+  { courseCode: 'CS470', knowledgeAreaNames: ['Cybersecurity'] },
+  { courseCode: 'CS477', knowledgeAreaNames: ['Computer Networks'] },
+  {
+    courseCode: 'CS478',
+    knowledgeAreaNames: ['Operating Systems & Distributed Computing'],
+  },
+  {
+    courseCode: 'CS483',
+    knowledgeAreaNames: ['Artificial Intelligence & Machine Learning'],
+  },
+  {
+    courseCode: 'CS485',
+    knowledgeAreaNames: ['Artificial Intelligence & Machine Learning'],
+  },
+
+  // ── MSCS Foundation ──
+  { courseCode: 'CS455G', knowledgeAreaNames: ['Data Management & Analytics'] },
+  { courseCode: 'CS457G', knowledgeAreaNames: ['Software Engineering'] },
+  { courseCode: 'CS457LG', knowledgeAreaNames: ['Software Engineering'] },
+  { courseCode: 'CS500', knowledgeAreaNames: ['Data Structures & Algorithms'] },
+  {
+    courseCode: 'CS500L',
+    knowledgeAreaNames: ['Data Structures & Algorithms'],
+  },
+  {
+    courseCode: 'CS501',
+    knowledgeAreaNames: ['Operating Systems & Distributed Computing'],
+  },
+
+  // ── MSCS Specialization — Cybersecurity ──
+  {
+    courseCode: 'CS535',
+    knowledgeAreaNames: ['Cybersecurity', 'Computer Networks'],
+  },
+  {
+    courseCode: 'CS571',
+    knowledgeAreaNames: ['Cybersecurity', 'Mathematical Foundations'],
+  },
+  {
+    courseCode: 'CS581',
+    knowledgeAreaNames: ['Cybersecurity', 'Software Engineering'],
+  },
+  {
+    courseCode: 'CS589',
+    knowledgeAreaNames: ['Capstone & Professional Practice'],
+  },
+  { courseCode: 'CS477G', knowledgeAreaNames: ['Computer Networks'] },
+
+  // ── MSCS Specialization — Data Science ──
+  {
+    courseCode: 'CS550',
+    knowledgeAreaNames: [
+      'Data Management & Analytics',
+      'High-Performance & Parallel Computing',
+    ],
+  },
+  {
+    courseCode: 'CS570',
+    knowledgeAreaNames: ['Artificial Intelligence & Machine Learning'],
+  },
+  {
+    courseCode: 'CS481G',
+    knowledgeAreaNames: ['Artificial Intelligence & Machine Learning'],
+  },
+
+  // ── MSCS Specialization — Network Engineering ──
+  { courseCode: 'CS515', knowledgeAreaNames: ['Computer Networks'] },
+  {
+    courseCode: 'CS565',
+    knowledgeAreaNames: ['Operating Systems & Distributed Computing'],
+  },
+  {
+    courseCode: 'CS575',
+    knowledgeAreaNames: ['Embedded Systems & IoT', 'Computer Networks'],
+  },
+
+  // ── MSCS Capstone ──
+  {
+    courseCode: 'CS595',
+    knowledgeAreaNames: ['Capstone & Professional Practice'],
+  },
+
+  // ── MSEE Foundation ──
+  {
+    courseCode: 'CE450G',
+    knowledgeAreaNames: ['Computer Architecture & Digital Design'],
+  },
+  {
+    courseCode: 'CE450LG',
+    knowledgeAreaNames: ['Computer Architecture & Digital Design'],
+  },
+  {
+    courseCode: 'EE461G',
+    knowledgeAreaNames: ['Signal Processing & Integrated Circuits'],
+  },
+  {
+    courseCode: 'EE461LG',
+    knowledgeAreaNames: ['Signal Processing & Integrated Circuits'],
+  },
+  { courseCode: 'EE488G', knowledgeAreaNames: ['Embedded Systems & IoT'] },
+
+  // ── MSEE Specialization — IoT and Embedded Systems ──
+  { courseCode: 'EE517', knowledgeAreaNames: ['Embedded Systems & IoT'] },
+  {
+    courseCode: 'CE521',
+    knowledgeAreaNames: [
+      'Computer Architecture & Digital Design',
+      'Embedded Systems & IoT',
+    ],
+  },
+  {
+    courseCode: 'CE522',
+    knowledgeAreaNames: ['Computer Architecture & Digital Design'],
+  },
+  {
+    courseCode: 'CE523',
+    knowledgeAreaNames: [
+      'Computer Architecture & Digital Design',
+      'High-Performance & Parallel Computing',
+    ],
+  },
+  { courseCode: 'CE530', knowledgeAreaNames: ['Embedded Systems & IoT'] },
+
+  // ── MSEE Specialization — Multicore and Parallel Computing ──
+  {
+    courseCode: 'EE504',
+    knowledgeAreaNames: ['High-Performance & Parallel Computing'],
+  },
+  {
+    courseCode: 'EE553',
+    knowledgeAreaNames: ['High-Performance & Parallel Computing'],
+  },
+
+  // ── MSEE Specialization — Modern Integrated Circuits ──
+  {
+    courseCode: 'EE505',
+    knowledgeAreaNames: ['Signal Processing & Integrated Circuits'],
+  },
+  {
+    courseCode: 'EE511',
+    knowledgeAreaNames: ['Signal Processing & Integrated Circuits'],
+  },
+  {
+    courseCode: 'EE520',
+    knowledgeAreaNames: [
+      'Signal Processing & Integrated Circuits',
+      'Computer Architecture & Digital Design',
+    ],
+  },
+  {
+    courseCode: 'EE577',
+    knowledgeAreaNames: ['Signal Processing & Integrated Circuits'],
+  },
+
+  // ── MSEE Capstone ──
+  {
+    courseCode: 'EE595',
+    knowledgeAreaNames: ['Capstone & Professional Practice'],
+  },
 ];
 
 // ──────────────────────────────────────────────────────────────

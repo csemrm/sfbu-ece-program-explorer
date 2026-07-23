@@ -18,6 +18,24 @@ Status: 🟡 In Progress
 
 ## High Priority
 
+### Knowledge Area Explorer (Milestone 9)
+
+- [x] Seed: `KNOWLEDGE_AREAS` (14 domains) + `COURSE_KNOWLEDGE_AREAS` (77 joins over 60 courses) in catalog-data.ts
+- [x] Seed: idempotent knowledge-area + join upsert in seed.ts (warns and skips unknown codes/names)
+- [x] Backend: `GET /knowledge-areas` returns courseCount / undergraduateCount / graduateCount
+- [x] Backend: `GET /knowledge-areas/:id` returns the area with its courses
+- [x] Backend: `GET /programs/:id/knowledge-areas` — area distribution for the latest catalog year
+- [x] Backend: KnowledgeAreasService unit tests (7) + ProgramsService.findKnowledgeAreas tests (6)
+- [x] Frontend: typed `api.knowledgeAreas.{list,get}` + `api.programs.knowledgeAreas` clients
+- [x] Frontend: `/knowledge-areas` list page with UG/grad split bars
+- [x] Frontend: `/knowledge-areas/[id]` detail page (hero, stats, courses grouped by level)
+- [x] Frontend: "Knowledge Areas" added to public navigation
+- [x] Frontend: KnowledgeAreaCard component tests + jest-axe (11)
+- [x] Docs: 03 Database (seed strategy), 04 API (3 endpoints), 05 UI/UX (pages + nav)
+- [ ] Knowledge-area chips on the course detail page (needs a per-course areas endpoint)
+
+---
+
 ### Admin Course Offerings (two-column eligibility tool)
 
 - [x] Backend: AcademicTerm + CourseOffering entities + migration (seeds two starter terms)
@@ -192,7 +210,7 @@ Status: 🟡 In Progress
 - [x] Credit comparison (total credits, credit bars, UG/grad breakdown)
 - [x] Requirement comparison (requirement phases per program side-by-side)
 - [x] Program CTAs (Requirements, Roadmap, Graph per program)
-- [ ] Knowledge area comparison (requires new backend endpoint)
+- [x] Knowledge area comparison (Knowledge Area Coverage table; uses GET /programs/:id/knowledge-areas)
 
 ---
 
