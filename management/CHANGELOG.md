@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# [1.3.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.2.0...v1.3.0) (2026-07-23)
+
+
+### Features
+
+* **knowledge-areas:** public Knowledge Area Explorer with program coverage ([#5](https://github.com/csemrm/sfbu-ece-program-explorer/issues/5)) ([057144f](https://github.com/csemrm/sfbu-ece-program-explorer/commit/057144f94afc9ca2aca5a291975e12e8a836d157))
+
 # [1.2.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.1.0...v1.2.0) (2026-07-22)
 
 
