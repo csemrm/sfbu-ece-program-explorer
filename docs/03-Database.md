@@ -326,6 +326,28 @@ description refreshed, and a join row is inserted only when absent. Unknown
 course codes or area names are warned about and skipped rather than aborting
 the run.
 
+### Course Offering Seed
+
+`COURSE_OFFERINGS` in the same file populates `course_offerings` — which courses
+run in which academic term.
+
+The academic terms themselves ("Fall 2026", "Spring 2027") are created by the
+`CourseOfferings` migration, not by the seeder. The seeder resolves them **by
+name** and warns/skips if one is missing, rather than creating it: a term that
+the migration did not define means the environment is out of date, and silently
+inventing one would hide that.
+
+The two terms deliberately differ — foundations and the first half of each
+specialization track run in Fall, follow-ons in Spring, with high-demand core
+courses (CS500, CS501, CS515) and the capstones in both. A course absent from a
+term is a genuine "not offered" signal, which is what the planner's availability
+check reads. Without this seed both tables would be empty and the check would
+pass vacuously for every course.
+
+Admins can override any of it through the offerings tool; this is only a
+plausible starting schedule. Seeding is idempotent — an offering row is inserted
+only when absent.
+
 ---
 
 ## 13. Catalog Import Workflow

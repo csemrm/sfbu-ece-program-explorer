@@ -5,6 +5,8 @@ import { PlannerService } from './planner.service';
 import { Course, CourseLevel } from '../../database/entities/course.entity';
 import { Prerequisite } from '../../database/entities/prerequisite.entity';
 import { Corequisite } from '../../database/entities/corequisite.entity';
+import { AcademicTerm } from '../../database/entities/academic-term.entity';
+import { CourseOffering } from '../../database/entities/course-offering.entity';
 
 const course = (id: string, courseCode: string, creditHours = 3): Course =>
   ({
@@ -35,10 +37,31 @@ const PREREQS = [
 
 const COREQS = [{ courseId: 'c200', corequisiteCourseId: 'lab201' }];
 
+// Fall offers the intro courses, Spring the follow-ons. CS300 is offered in
+// neither, so it exercises the "planned but never offered" path.
+const TERMS = [
+  { id: 'fall26', name: 'Fall 2026', sortOrder: 1 },
+  { id: 'spring27', name: 'Spring 2027', sortOrder: 2 },
+];
+
+const OFFERINGS = [
+  { termId: 'fall26', courseId: 'c100' },
+  { termId: 'fall26', courseId: 'c250' },
+  { termId: 'spring27', courseId: 'c200' },
+  { termId: 'spring27', courseId: 'lab201' },
+];
+
 describe('PlannerService', () => {
   let service: PlannerService;
+  let termRepo: { find: jest.Mock };
+  let offeringRepo: { find: jest.Mock };
 
   beforeEach(async () => {
+    // The service filters by `In(termIds)`; the mocks return the full fixture
+    // and let the service's own bookkeeping do the narrowing.
+    termRepo = { find: jest.fn().mockResolvedValue(TERMS) };
+    offeringRepo = { find: jest.fn().mockResolvedValue(OFFERINGS) };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PlannerService,
@@ -54,6 +77,8 @@ describe('PlannerService', () => {
           provide: getRepositoryToken(Corequisite),
           useValue: { find: jest.fn().mockResolvedValue(COREQS) },
         },
+        { provide: getRepositoryToken(AcademicTerm), useValue: termRepo },
+        { provide: getRepositoryToken(CourseOffering), useValue: offeringRepo },
       ],
     }).compile();
 
@@ -155,5 +180,151 @@ describe('PlannerService', () => {
     await expect(
       service.evaluate({ completedCourseIds: ['nope'], terms: [] }),
     ).rejects.toThrow(BadRequestException);
+  });
+
+  describe('offering awareness', () => {
+    it('reports offered = null and skips offering queries for unbound terms', async () => {
+      const result = await service.evaluate({
+        completedCourseIds: ['c100'],
+        terms: [{ courseIds: ['c250'] }],
+      });
+
+      expect(result.terms[0].termId).toBeNull();
+      expect(result.terms[0].termName).toBeNull();
+      expect(result.terms[0].courses[0].offered).toBeNull();
+      expect(result.allOffered).toBe(true); // vacuously true
+      expect(termRepo.find).not.toHaveBeenCalled();
+      expect(offeringRepo.find).not.toHaveBeenCalled();
+    });
+
+    it('marks a course offered in its bound term as registrable', async () => {
+      const result = await service.evaluate({
+        completedCourseIds: ['c100'],
+        terms: [{ termId: 'fall26', courseIds: ['c250'] }],
+      });
+
+      const cs250 = result.terms[0].courses[0];
+      expect(result.terms[0].termName).toBe('Fall 2026');
+      expect(cs250.eligible).toBe(true);
+      expect(cs250.offered).toBe(true);
+      expect(cs250.registrable).toBe(true);
+      expect(result.allOffered).toBe(true);
+    });
+
+    it('keeps eligible true but registrable false when the course is not offered', async () => {
+      // CS250's prerequisite is met, but Spring 2027 does not offer it.
+      const result = await service.evaluate({
+        completedCourseIds: ['c100'],
+        terms: [{ termId: 'spring27', courseIds: ['c250'] }],
+      });
+
+      const cs250 = result.terms[0].courses[0];
+      expect(cs250.eligible).toBe(true);
+      expect(cs250.offered).toBe(false);
+      expect(cs250.registrable).toBe(false);
+      expect(cs250.reason).toBe(
+        'Prerequisites satisfied, but this course is not offered in Spring 2027.',
+      );
+      expect(result.allEligible).toBe(true);
+      expect(result.allOffered).toBe(false);
+    });
+
+    it('reports both failures when a course is neither eligible nor offered', async () => {
+      // CS300 needs CS200 (not taken) and is offered in no term at all.
+      const result = await service.evaluate({
+        completedCourseIds: [],
+        terms: [{ termId: 'fall26', courseIds: ['c300'] }],
+      });
+
+      const cs300 = result.terms[0].courses[0];
+      expect(cs300.eligible).toBe(false);
+      expect(cs300.offered).toBe(false);
+      expect(cs300.registrable).toBe(false);
+      expect(cs300.reason).toContain('missing prerequisite');
+      expect(cs300.reason).toContain('not offered in Fall 2026');
+    });
+
+    it('evaluates each term against its own offerings', async () => {
+      const result = await service.evaluate({
+        completedCourseIds: [],
+        terms: [
+          { termId: 'fall26', courseIds: ['c100'] },
+          { termId: 'spring27', courseIds: ['c200', 'lab201'] },
+        ],
+      });
+
+      expect(result.terms[0].courses[0].offered).toBe(true); // CS100 in Fall
+      expect(result.terms[1].courses.map((c) => c.offered)).toEqual([
+        true,
+        true,
+      ]); // CS200 + LAB201 in Spring
+      expect(result.allEligible).toBe(true);
+      expect(result.allOffered).toBe(true);
+    });
+
+    it('supports mixing bound and unbound terms in one plan', async () => {
+      const result = await service.evaluate({
+        completedCourseIds: ['c100'],
+        terms: [
+          { termId: 'spring27', courseIds: ['c250'] }, // not offered
+          { courseIds: ['c300'] }, // unbound → unknown
+        ],
+      });
+
+      expect(result.terms[0].courses[0].offered).toBe(false);
+      expect(result.terms[1].courses[0].offered).toBeNull();
+      expect(result.allOffered).toBe(false);
+    });
+
+    it('annotates suggestions with the bound terms that offer them, offered first', async () => {
+      const result = await service.evaluate({
+        completedCourseIds: [],
+        terms: [{ termId: 'fall26', courseIds: ['c100'] }],
+      });
+
+      const cs250 = result.suggestions.find((s) => s.courseCode === 'CS250');
+      const cs200 = result.suggestions.find((s) => s.courseCode === 'CS200');
+      expect(cs250?.offeredInTerms).toEqual([
+        { termId: 'fall26', termName: 'Fall 2026' },
+      ]);
+      // CS200 is unlocked by the plan but Fall 2026 does not offer it.
+      expect(cs200?.offeredInTerms).toEqual([]);
+      // Offerable suggestions are ranked ahead of unofferable ones.
+      expect(result.suggestions[0].courseCode).toBe('CS250');
+    });
+
+    it('leaves suggestions unannotated when no term is bound', async () => {
+      const result = await service.evaluate({
+        completedCourseIds: [],
+        terms: [{ courseIds: ['c100'] }],
+      });
+
+      expect(
+        result.suggestions.every((s) => s.offeredInTerms.length === 0),
+      ).toBe(true);
+    });
+
+    it('rejects unknown academic term ids rather than passing vacuously', async () => {
+      termRepo.find.mockResolvedValue([]);
+
+      await expect(
+        service.evaluate({
+          completedCourseIds: [],
+          terms: [{ termId: 'ghost-term', courseIds: ['c100'] }],
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('treats a term with no curated offerings as offering nothing', async () => {
+      offeringRepo.find.mockResolvedValue([]);
+
+      const result = await service.evaluate({
+        completedCourseIds: ['c100'],
+        terms: [{ termId: 'fall26', courseIds: ['c250'] }],
+      });
+
+      expect(result.terms[0].courses[0].offered).toBe(false);
+      expect(result.allOffered).toBe(false);
+    });
   });
 });

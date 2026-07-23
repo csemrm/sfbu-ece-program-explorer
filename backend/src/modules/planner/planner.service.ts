@@ -1,17 +1,21 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Course } from '../../database/entities/course.entity';
 import { Prerequisite } from '../../database/entities/prerequisite.entity';
 import { Corequisite } from '../../database/entities/corequisite.entity';
+import { AcademicTerm } from '../../database/entities/academic-term.entity';
+import { CourseOffering } from '../../database/entities/course-offering.entity';
 import {
   CorequisiteStatus,
   EvaluatePlanDto,
   EvaluatedCourseDto,
   EvaluatedTermDto,
   MissingPrerequisiteDto,
+  OfferedTermRefDto,
   PlanEvaluationDto,
   PlannerCourseRefDto,
+  SuggestedCourseDto,
 } from './dto/planner.dto';
 
 const MAX_SUGGESTIONS = 20;
@@ -24,6 +28,10 @@ export class PlannerService {
     private readonly prereqRepo: Repository<Prerequisite>,
     @InjectRepository(Corequisite)
     private readonly coreqRepo: Repository<Corequisite>,
+    @InjectRepository(AcademicTerm)
+    private readonly termRepo: Repository<AcademicTerm>,
+    @InjectRepository(CourseOffering)
+    private readonly offeringRepo: Repository<CourseOffering>,
   ) {}
 
   /**
@@ -33,6 +41,12 @@ export class PlannerService {
    * A course in term N is eligible when every prerequisite is already
    * satisfied by the completed set plus all earlier terms, and no
    * corequisite is left unscheduled.
+   *
+   * Eligibility is deliberately independent of availability: a term may
+   * optionally bind to an AcademicTerm, in which case each course is also
+   * checked against that term's curated offerings and reported via
+   * `offered`. `registrable` combines the two. Unbound terms report
+   * `offered: null` and behave exactly as they did before offerings existed.
    */
   async evaluate(dto: EvaluatePlanDto): Promise<PlanEvaluationDto> {
     // The catalog is small, so loading it whole is cheaper and simpler than
@@ -56,6 +70,8 @@ export class PlannerService {
         `Unknown course id(s): ${unknown.join(', ')}`,
       );
     }
+
+    const { termNames, offeredByTerm } = await this.loadOfferings(dto);
 
     const prereqMap = groupBy(
       prereqs,
@@ -98,6 +114,12 @@ export class PlannerService {
     dto.terms.forEach((term, index) => {
       const termNo = index + 1;
       const sameTerm = new Set(term.courseIds);
+      // Only bound terms carry offering data; otherwise every course in this
+      // slot reports offered = null.
+      const offeredHere = term.termId ? offeredByTerm.get(term.termId) : null;
+      const termName = term.termId
+        ? (termNames.get(term.termId) ?? null)
+        : null;
 
       const courseResults = term.courseIds.map(
         (courseId): EvaluatedCourseDto => {
@@ -133,6 +155,8 @@ export class PlannerService {
             missingPrerequisites.length === 0 &&
             corequisites.every((c) => c.status !== 'unmet');
 
+          const offered = offeredHere ? offeredHere.has(courseId) : null;
+
           return {
             courseId,
             courseCode: course.courseCode,
@@ -140,6 +164,8 @@ export class PlannerService {
             creditHours: Number(course.creditHours),
             level: course.level,
             eligible,
+            offered,
+            registrable: eligible && offered !== false,
             alreadyCompleted: completedSet.has(courseId),
             satisfiedPrerequisites,
             missingPrerequisites,
@@ -149,6 +175,8 @@ export class PlannerService {
               missingPrerequisites,
               corequisites,
               completedSet.has(courseId),
+              offered,
+              termName,
             ),
           };
         },
@@ -156,6 +184,8 @@ export class PlannerService {
 
       evaluatedTerms.push({
         term: termNo,
+        termId: term.termId ?? null,
+        termName,
         termCredits: round1(
           courseResults.reduce((sum, c) => sum + c.creditHours, 0),
         ),
@@ -167,15 +197,36 @@ export class PlannerService {
     });
 
     // Suggestions: courses not yet taken/planned whose prerequisites are all
-    // satisfied once the entire plan is done.
-    const suggestions = courses
+    // satisfied once the entire plan is done. Each is annotated with the bound
+    // terms that actually offer it, and those are surfaced first — an
+    // unofferable suggestion is not actionable this year.
+    const boundTerms = dto.terms
+      .filter((t) => t.termId)
+      .map((t) => ({ termId: t.termId!, termName: termNames.get(t.termId!) }))
+      .filter((t): t is OfferedTermRefDto => t.termName != null);
+
+    const offeredIn = (courseId: string): OfferedTermRefDto[] => {
+      const seen = new Set<string>();
+      return boundTerms.filter((t) => {
+        if (seen.has(t.termId)) return false;
+        seen.add(t.termId);
+        return offeredByTerm.get(t.termId)?.has(courseId) ?? false;
+      });
+    };
+
+    const suggestions: SuggestedCourseDto[] = courses
       .filter((c) => !satisfied.has(c.id))
       .filter((c) =>
         (prereqMap.get(c.id) ?? []).every((pid) => satisfied.has(pid)),
       )
-      .sort((a, b) => a.courseCode.localeCompare(b.courseCode))
-      .slice(0, MAX_SUGGESTIONS)
-      .map((c) => ref(c.id));
+      .map((c) => ({ ...ref(c.id), offeredInTerms: offeredIn(c.id) }))
+      .sort(
+        (a, b) =>
+          Number(b.offeredInTerms.length > 0) -
+            Number(a.offeredInTerms.length > 0) ||
+          a.courseCode.localeCompare(b.courseCode),
+      )
+      .slice(0, MAX_SUGGESTIONS);
 
     const totalPlannedCredits = round1(
       evaluatedTerms.reduce((sum, t) => sum + t.termCredits, 0),
@@ -183,13 +234,59 @@ export class PlannerService {
     const allEligible = evaluatedTerms.every((t) =>
       t.courses.every((c) => c.eligible),
     );
+    const allOffered = evaluatedTerms.every((t) =>
+      t.courses.every((c) => c.offered !== false),
+    );
 
     return {
       terms: evaluatedTerms,
       suggestions,
       totalPlannedCredits,
       allEligible,
+      allOffered,
     };
+  }
+
+  /**
+   * Resolve the academic terms referenced by the plan and the set of courses
+   * each one offers. Unknown term IDs fail loudly, matching how unknown course
+   * IDs are handled — silently dropping the binding would downgrade a real
+   * offering check into a vacuous pass.
+   */
+  private async loadOfferings(dto: EvaluatePlanDto): Promise<{
+    termNames: Map<string, string>;
+    offeredByTerm: Map<string, Set<string>>;
+  }> {
+    const termNames = new Map<string, string>();
+    const offeredByTerm = new Map<string, Set<string>>();
+
+    const termIds = [
+      ...new Set(dto.terms.filter((t) => t.termId).map((t) => t.termId!)),
+    ];
+    if (!termIds.length) return { termNames, offeredByTerm };
+
+    const terms = await this.termRepo.find({ where: { id: In(termIds) } });
+    const found = new Set(terms.map((t) => t.id));
+    const missing = termIds.filter((id) => !found.has(id));
+    if (missing.length) {
+      throw new BadRequestException(
+        `Unknown academic term id(s): ${missing.join(', ')}`,
+      );
+    }
+
+    for (const t of terms) {
+      termNames.set(t.id, t.name);
+      offeredByTerm.set(t.id, new Set());
+    }
+
+    const offerings = await this.offeringRepo.find({
+      where: { termId: In(termIds) },
+    });
+    for (const o of offerings) {
+      offeredByTerm.get(o.termId)?.add(o.courseId);
+    }
+
+    return { termNames, offeredByTerm };
   }
 }
 
@@ -213,8 +310,18 @@ function buildReason(
   missing: MissingPrerequisiteDto[],
   coreqs: { courseCode: string; status: CorequisiteStatus }[],
   alreadyCompleted: boolean,
+  offered: boolean | null,
+  termName: string | null,
 ): string {
+  // "Not offered" is a scheduling fact, not a readiness failure, so it is
+  // reported alongside the prerequisite verdict rather than replacing it.
+  const notOffered = offered === false;
+  const where = termName ? ` in ${termName}` : ' in the selected term';
+
   if (eligible) {
+    if (notOffered) {
+      return `Prerequisites satisfied, but this course is not offered${where}.`;
+    }
     if (alreadyCompleted) {
       return 'Eligible, but you have already marked this course as completed.';
     }
@@ -239,6 +346,9 @@ function buildReason(
     parts.push(
       `corequisite${unmetCoreqs.length > 1 ? 's' : ''} not scheduled: ${unmetCoreqs.join(', ')}`,
     );
+  }
+  if (notOffered) {
+    parts.push(`it is also not offered${where}`);
   }
   return `Not eligible — ${parts.join('; ')}.`;
 }

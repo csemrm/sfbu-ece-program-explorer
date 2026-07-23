@@ -68,7 +68,37 @@
 
 ## [Unreleased]
 
-### Milestone 9 — Knowledge Area Explorer
+### Offering-Aware Planner
+
+Connects the admin offerings tool (v1.2.0) to the public planner (v1.1.0). Admins curated which courses run in which term, but the planner never read that data — so a student could plan a course into a semester it isn't offered in and still get a green "Eligible" verdict.
+
+#### Added
+
+- `backend/src/database/seeds/catalog-data.ts` — `COURSE_OFFERINGS`, 28 courses per term across Fall 2026 / Spring 2027. The `CourseOfferings` migration created the two terms but zero offerings, so the availability check had nothing to check against and would have passed vacuously for every course.
+- `backend/src/database/seeds/seed.ts` — idempotent offering upsert. Terms are resolved **by name** and warned/skipped when missing rather than created, since a term the migration didn't define means the environment is out of date.
+- `backend/src/modules/terms/` — public `GET /terms` and `GET /terms/:id`. Offerings were reachable only through JWT-guarded `/admin/offerings`; the planner needs them unauthenticated, so this is a separate read-only surface rather than a relaxed guard.
+- `PlannerTermDto.termId` (optional) — binds a planned slot to an academic term.
+- `offered` (`true`/`false`/`null`) and `registrable` on every evaluated course; `termId`/`termName` per term; `allOffered` on the response.
+- `offeredInTerms` on suggestions, with offerable courses ranked first.
+- `frontend/lib/api.ts` — `TermSummary`, `TermDetail`, `SuggestedCourse`, `OfferedTermRef` types plus `api.terms.{list,get}`.
+- Tests: 7 `TermsService` specs, 10 `PlannerService` offering specs, 10 `CourseVerdictRow` and 8 `TermCard` component/axe tests. Backend 57 → 74, frontend 57 → 75.
+
+#### Changed
+
+- `frontend/components/planner/CourseVerdictRow.tsx` — three verdict states instead of two: green eligible, amber "Not offered", red blocked. Each carries a distinct screen-reader prefix so colour is never the only signal. A course that is both blocked and unoffered keeps the red treatment (the more actionable failure) while still showing the availability badge.
+- `frontend/components/planner/TermCard.tsx` — academic-term selector, hidden entirely when no terms are curated.
+- `frontend/components/planner/SemesterPlanner.tsx` — plan state moved from `string[][]` to `{ courseIds, termId }[]`; storage key bumped to `semester-plan-v2` with a read-time migration so existing saved plans are converted rather than discarded.
+- `frontend/app/(public)/plan/page.tsx` — loads terms server-side and degrades to prerequisite-only checking if that fails, rather than taking the page down.
+
+#### Design notes
+
+- `eligible` deliberately keeps its original meaning (prerequisites/corequisites only) and availability is reported separately. "You aren't ready" and "the university isn't running it" are different problems with different fixes, and collapsing them into one flag would misreport both. It also leaves the v1.1.0 API contract and the admin offerings page untouched.
+- Terms without a `termId` stay offering-agnostic (`offered: null`), so sketching an abstract sequence still works and all 8 pre-existing planner tests pass unchanged.
+- An unknown `termId` returns 400 rather than being ignored — silently dropping the binding would downgrade a real availability check into a vacuous pass.
+
+---
+
+### Milestone 9 — Knowledge Area Explorer (released in v1.3.0)
 
 #### Added
 

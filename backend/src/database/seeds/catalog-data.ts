@@ -1614,3 +1614,103 @@ export const PROGRAMS: ProgramSeed[] = [
 ];
 
 export const CATALOG_IMPORT_STATUS = ImportStatus.COMPLETED;
+
+// ── Course Offerings ───────────────────────────────────────────
+
+export interface CourseOfferingSeed {
+  /** Must match an academic_terms.name created by the CourseOfferings migration. */
+  termName: string;
+  courseCodes: string[];
+}
+
+/**
+ * Which courses run in which term.
+ *
+ * The migration creates the two starter terms but no offerings, so without
+ * this the planner's availability check has nothing to check against. Terms
+ * deliberately differ: foundations and the first half of each track run in
+ * Fall, follow-ons and capstones in Spring, with high-demand core courses in
+ * both. A course absent from a term is a real "not offered" signal, which is
+ * the entire point of the feature.
+ *
+ * Admins can override any of this through the offerings tool; this is only a
+ * plausible starting schedule.
+ */
+export const COURSE_OFFERINGS: CourseOfferingSeed[] = [
+  {
+    termName: 'Fall 2026',
+    courseCodes: [
+      // Undergraduate foundations
+      'MATH201',
+      'MATH203',
+      'CS200',
+      'CS250',
+      'CS350',
+      'CS380',
+      'CE305',
+      'CS453',
+      'CS470',
+      'CS480',
+      'CS485',
+      'CS494',
+      // Graduate core — offered every term
+      'CS500',
+      'CS501',
+      'CS515',
+      // MSCS tracks: Cybersecurity + Data Science intake
+      'CS535',
+      'CS550',
+      'CS570',
+      'CS581',
+      'CS589',
+      // MSEE tracks: IoT/Embedded + Integrated Circuits intake
+      'EE504',
+      'EE511',
+      'EE520',
+      'CE521',
+      'CE530',
+      // Capstones run in both terms
+      'CS595',
+      'EE595',
+      'BUS450',
+    ],
+  },
+  {
+    termName: 'Spring 2027',
+    courseCodes: [
+      // Undergraduate foundations
+      'MATH202',
+      'MATH208',
+      'CS230',
+      'CS250',
+      'CS360',
+      'CS455',
+      'CS457',
+      'CS477',
+      'CS478',
+      'CS481',
+      'CS483',
+      'CS487',
+      'CE450',
+      // Graduate core — offered every term
+      'CS500',
+      'CS501',
+      'CS515',
+      // MSCS tracks: Network Engineering + follow-on electives
+      'CS565',
+      'CS571',
+      'CS575',
+      // MSEE tracks: Multicore/Parallel + follow-on electives
+      'EE505',
+      'EE517',
+      'EE553',
+      'EE577',
+      'CE522',
+      'CE523',
+      // Capstones run in both terms
+      'CS595',
+      'EE595',
+      'BUS450',
+    ],
+  },
+];

@@ -18,6 +18,36 @@ Status: 🟡 In Progress
 
 ## High Priority
 
+### Offering-Aware Planner
+
+Closes the gap between the admin offerings tool (v1.2.0) and the public planner
+(v1.1.0): admins curate which courses run in which term, but the planner never
+reads that data, so a student can plan a course into a semester it isn't offered
+in and still see a green "Eligible" verdict.
+
+Design decisions: `eligible` keeps meaning "prerequisites satisfied" (unchanged
+contract); offering status is a separate `offered` signal combined into
+`registrable`. Terms without a `termId` stay offering-agnostic (`offered: null`),
+so the existing "sketch an abstract sequence" flow and saved localStorage plans
+keep working.
+
+- [x] Seed: `COURSE_OFFERINGS` (28 courses per term across Fall 2026 / Spring 2027) — both tables were empty, so the check had nothing to check against
+- [x] Seed: idempotent offering upsert in seed.ts (resolves terms by name, warns and skips unknown terms/courses)
+- [x] Backend: public `GET /terms` + `GET /terms/:id` (academic terms + offered courses) — offerings were admin-only
+- [x] Backend: `PlannerTermDto.termId` (optional) + `offered` / `registrable` on evaluated courses
+- [x] Backend: `EvaluatedTermDto.termId` / `termName`, `allOffered` on the evaluation response
+- [x] Backend: offering-aware suggestions (`offeredInTerms`, offerable ranked first)
+- [x] Backend: unknown `termId` rejected with 400 rather than passing vacuously
+- [x] Backend: TermsService (7) + PlannerService offering tests (10); all 8 pre-existing planner tests pass unchanged
+- [x] Frontend: typed `api.terms.{list,get}` client
+- [x] Frontend: per-term academic-term selector on `TermCard` (hidden when no terms are curated)
+- [x] Frontend: three-state verdict on `CourseVerdictRow` — amber "Not offered" distinct from red prereq failure
+- [x] Frontend: localStorage v1 → v2 migration so saved plans survive the term-binding schema change
+- [x] Frontend: planner component tests + jest-axe (CourseVerdictRow 10, TermCard 8)
+- [x] Docs: 03 Database (offering seed), 04 API (terms endpoint + planner contract), 05 UI/UX (selector, verdict states)
+
+---
+
 ### Knowledge Area Explorer (Milestone 9)
 
 - [x] Seed: `KNOWLEDGE_AREAS` (14 domains) + `COURSE_KNOWLEDGE_AREAS` (77 joins over 60 courses) in catalog-data.ts

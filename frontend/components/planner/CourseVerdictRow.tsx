@@ -7,23 +7,59 @@ interface Props {
   onRemove: () => void;
 }
 
+/**
+ * Three distinct verdicts, because "you aren't ready" and "the school isn't
+ * running it" are different problems with different fixes:
+ *   blocked     — prerequisites unmet (red)
+ *   not-offered — prerequisites fine, but not scheduled this term (amber)
+ *   ok          — registrable (green)
+ */
+type Verdict = 'ok' | 'not-offered' | 'blocked';
+
+const STYLES: Record<Verdict, { row: string; icon: string; text: string; glyph: string }> = {
+  ok: {
+    row: 'border-green-200 bg-green-50/50',
+    icon: 'bg-green-600',
+    text: 'text-green-700',
+    glyph: '✓',
+  },
+  'not-offered': {
+    row: 'border-amber-200 bg-amber-50/50',
+    icon: 'bg-amber-500',
+    text: 'text-amber-700',
+    glyph: '—',
+  },
+  blocked: {
+    row: 'border-red-200 bg-red-50/50',
+    icon: 'bg-red-500',
+    text: 'text-red-600',
+    glyph: '!',
+  },
+};
+
+const SR_PREFIX: Record<Verdict, string> = {
+  ok: 'Eligible: ',
+  'not-offered': 'Not offered this term: ',
+  blocked: 'Not eligible: ',
+};
+
 /** One course inside a term: code, title, eligibility badge, and explanation. */
 export function CourseVerdictRow({ course, onRemove }: Props) {
-  const ok = course.eligible;
+  const verdict: Verdict = !course.eligible
+    ? 'blocked'
+    : course.offered === false
+      ? 'not-offered'
+      : 'ok';
+  const style = STYLES[verdict];
+
   return (
-    <li
-      className={`rounded-lg border px-3 py-2.5 ${
-        ok ? 'border-green-200 bg-green-50/50' : 'border-red-200 bg-red-50/50'
-      }`}
-    >
+    <li className={`rounded-lg border px-3 py-2.5 ${style.row}`}>
       <div className="flex items-start gap-2.5">
         <span
-          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${
-            ok ? 'bg-green-600' : 'bg-red-500'
-          }`}
+          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${style.icon}`}
           aria-hidden
         >
-          {ok ? '✓' : '!'}
+          {style.glyph}
         </span>
 
         <div className="min-w-0 flex-1">
@@ -32,11 +68,16 @@ export function CourseVerdictRow({ course, onRemove }: Props) {
               {course.courseCode}
             </span>
             <span className="truncate text-sm font-medium text-gray-800">{course.title}</span>
+            {course.offered === false && (
+              <span className="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[11px] font-semibold text-amber-800">
+                Not offered
+              </span>
+            )}
             <span className="ml-auto shrink-0 text-xs text-gray-400">{course.creditHours} cr</span>
           </div>
 
-          <p className={`mt-1 text-xs ${ok ? 'text-green-700' : 'text-red-600'}`}>
-            <span className="sr-only">{ok ? 'Eligible: ' : 'Not eligible: '}</span>
+          <p className={`mt-1 text-xs ${style.text}`}>
+            <span className="sr-only">{SR_PREFIX[verdict]}</span>
             {course.reason}
           </p>
 

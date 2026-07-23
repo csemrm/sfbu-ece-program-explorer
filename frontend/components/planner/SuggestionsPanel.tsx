@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import type { PlannerCourseRef } from '../../lib/api';
+import type { SuggestedCourse } from '../../lib/api';
 
 interface Props {
-  suggestions: PlannerCourseRef[];
+  suggestions: SuggestedCourse[];
   /** Add a suggested course to the last term. */
   onAdd: (courseId: string) => void;
 }
@@ -35,7 +35,14 @@ export function SuggestionsPanel({ suggestions, onAdd }: Props) {
               >
                 {s.courseCode}
               </Link>
-              <span className="min-w-0 flex-1 truncate text-sm text-gray-700">{s.title}</span>
+              <span className="min-w-0 flex-1 truncate text-sm text-gray-700">
+                {s.title}
+                {s.offeredInTerms.length > 0 && (
+                  <span className="mt-0.5 block truncate text-[11px] font-medium text-green-700">
+                    Offered in {s.offeredInTerms.map((t) => t.termName).join(', ')}
+                  </span>
+                )}
+              </span>
               <button
                 type="button"
                 onClick={() => onAdd(s.id)}

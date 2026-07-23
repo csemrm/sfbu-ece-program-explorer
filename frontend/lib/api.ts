@@ -191,7 +191,12 @@ export interface EvaluatedCourse {
   title: string;
   creditHours: number;
   level: 'undergraduate' | 'graduate';
+  /** Prerequisites/corequisites only — independent of whether the course runs. */
   eligible: boolean;
+  /** Null when the term is not bound to an academic term. */
+  offered: boolean | null;
+  /** eligible && offered !== false */
+  registrable: boolean;
   alreadyCompleted: boolean;
   satisfiedPrerequisites: PlannerCourseRef[];
   missingPrerequisites: MissingPrerequisite[];
@@ -201,20 +206,56 @@ export interface EvaluatedCourse {
 
 export interface EvaluatedTerm {
   term: number;
+  termId: string | null;
+  termName: string | null;
   termCredits: number;
   courses: EvaluatedCourse[];
 }
 
+export interface OfferedTermRef {
+  termId: string;
+  termName: string;
+}
+
+export interface SuggestedCourse extends PlannerCourseRef {
+  offeredInTerms: OfferedTermRef[];
+}
+
 export interface PlanEvaluation {
   terms: EvaluatedTerm[];
-  suggestions: PlannerCourseRef[];
+  suggestions: SuggestedCourse[];
   totalPlannedCredits: number;
   allEligible: boolean;
+  allOffered: boolean;
 }
 
 export interface EvaluatePlanRequest {
   completedCourseIds: string[];
-  terms: { courseIds: string[] }[];
+  terms: { courseIds: string[]; termId?: string }[];
+}
+
+// ── Academic Terms & Offerings ─────────────────────────────────
+
+export interface TermSummary {
+  id: string;
+  name: string;
+  sortOrder: number;
+  courseCount: number;
+  offeredCourseIds: string[];
+}
+
+export interface TermDetail {
+  id: string;
+  name: string;
+  sortOrder: number;
+  courseCount: number;
+  courses: Array<{
+    id: string;
+    courseCode: string;
+    title: string;
+    creditHours: number;
+    level: 'undergraduate' | 'graduate';
+  }>;
 }
 
 export interface KnowledgeAreaSummary {
@@ -292,5 +333,9 @@ export const api = {
   },
   planner: {
     evaluate: (body: EvaluatePlanRequest) => post<PlanEvaluation>('/planner/evaluate', body),
+  },
+  terms: {
+    list: () => get<TermSummary[]>('/terms'),
+    get: (id: string) => get<TermDetail>(`/terms/${id}`),
   },
 };

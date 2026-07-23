@@ -1,6 +1,6 @@
 'use client';
 
-import type { Course, EvaluatedTerm } from '../../lib/api';
+import type { Course, EvaluatedTerm, TermSummary } from '../../lib/api';
 import { CoursePicker } from './CoursePicker';
 import { CourseVerdictRow } from './CourseVerdictRow';
 
@@ -9,6 +9,10 @@ interface Props {
   courseIds: string[];
   courses: Course[];
   evaluation?: EvaluatedTerm;
+  /** Academic terms available to bind this slot to. Empty if none are curated. */
+  academicTerms: TermSummary[];
+  termId: string | null;
+  onChangeTerm: (termId: string | null) => void;
   onAddCourse: (courseId: string) => void;
   onRemoveCourse: (courseId: string) => void;
   onRemoveTerm: () => void;
@@ -20,6 +24,9 @@ export function TermCard({
   courseIds,
   courses,
   evaluation,
+  academicTerms,
+  termId,
+  onChangeTerm,
   onAddCourse,
   onRemoveCourse,
   onRemoveTerm,
@@ -27,6 +34,8 @@ export function TermCard({
   const exclude = new Set(courseIds);
   const byId = new Map(courses.map((c) => [c.id, c]));
   const blocked = evaluation?.courses.filter((c) => !c.eligible).length ?? 0;
+  const notOffered = evaluation?.courses.filter((c) => c.offered === false).length ?? 0;
+  const selectId = `term-${index}-academic-term`;
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -44,6 +53,7 @@ export function TermCard({
               {courseIds.length} course{courseIds.length !== 1 ? 's' : ''}
               {evaluation ? ` · ${evaluation.termCredits} cr` : ''}
               {blocked > 0 ? ` · ${blocked} blocked` : ''}
+              {notOffered > 0 ? ` · ${notOffered} not offered` : ''}
             </p>
           </div>
         </div>
@@ -57,6 +67,32 @@ export function TermCard({
       </div>
 
       <div className="space-y-3 px-4 py-3">
+        {academicTerms.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            <label htmlFor={selectId} className="text-xs font-medium text-gray-500">
+              Academic term
+            </label>
+            <select
+              id={selectId}
+              value={termId ?? ''}
+              onChange={(e) => onChangeTerm(e.target.value || null)}
+              className="rounded-lg border border-gray-200 px-2 py-1 text-xs text-gray-700 focus:border-sfbu-navy focus:outline-none"
+            >
+              <option value="">Any term (no availability check)</option>
+              {academicTerms.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+            {termId && (
+              <span className="text-xs text-gray-400">
+                Courses are checked against this term&rsquo;s offerings.
+              </span>
+            )}
+          </div>
+        )}
+
         <CoursePicker
           courses={courses}
           excludeIds={exclude}

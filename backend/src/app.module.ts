@@ -11,6 +11,7 @@ import { SearchModule } from './modules/search/search.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { PlannerModule } from './modules/planner/planner.module';
+import { TermsModule } from './modules/terms/terms.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { PlannerModule } from './modules/planner/planner.module';
     AuthModule,
     AdminModule,
     PlannerModule,
+    TermsModule,
   ],
   controllers: [AppController],
 })

@@ -296,12 +296,28 @@ Lets a user check prerequisite eligibility before registering, without any login
 Displays
 
 * Completed-courses panel (searchable picker + removable chips)
-* Ordered semester cards, each with a course picker and per-course eligibility verdict (eligible / blocked, with a plain-language reason)
+* Ordered semester cards, each with an academic-term selector, a course picker, and a per-course verdict with a plain-language reason
 * Corequisite status per course (done / this term / not scheduled)
 * Plan summary (completed, semesters, planned courses, planned credits, overall eligibility)
-* Suggested next courses (unlocked once the plan is complete)
+* Suggested next courses (unlocked once the plan is complete), annotated with the terms that offer them and ranked offerable-first
 
-State persists in browser localStorage only. Eligibility is computed by POST /planner/evaluate.
+Verdict states
+
+Three states, because "you aren't ready" and "the school isn't running it" are different problems:
+
+| State | Colour | Meaning |
+| --- | --- | --- |
+| Eligible | Green | Prerequisites satisfied and not known to be unoffered |
+| Not offered | Amber + "Not offered" badge | Prerequisites satisfied, but the course isn't scheduled in the selected term |
+| Blocked | Red | Prerequisites or corequisites unmet (wins the row treatment even if also unoffered, since it's the more actionable failure — the availability badge still shows) |
+
+Screen readers get a distinct visually-hidden prefix per state ("Eligible:", "Not offered this term:", "Not eligible:") so the colour is never the only signal.
+
+Academic term selector
+
+Each semester card offers "Any term (no availability check)" plus every curated term. Leaving it unset keeps the slot offering-agnostic, so a user can still sketch an abstract sequence. The selector is hidden entirely when no terms are curated, and the planner degrades to prerequisite-only checking if the terms endpoint is unavailable.
+
+State persists in browser localStorage only (`semester-plan-v2`; v1 plans are migrated on read, not discarded). Eligibility is computed by POST /planner/evaluate; terms come from GET /terms.
 
 ⸻
 
