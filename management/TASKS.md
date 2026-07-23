@@ -34,7 +34,10 @@ keep working.
 - [x] Seed: `COURSE_OFFERINGS` from the real SFBU registration list (`docs/Fall 2026.md`) — 8 in-catalog courses; Spring 2027 left unseeded rather than fabricated
 - [x] Backend: a term with zero offerings reports `offered: null` (not curated), never `false` — an empty schedule must not claim the whole catalog is unavailable
 - [x] Frontend: unpublished-schedule terms labelled in the selector, with an explanatory note when selected
+- [x] Frontend: two-column `/plan` — completed courses left, next-semester offerings right, pending prerequisites highlighted (`OfferingPlanner`, `OfferedCourseRow`)
 - [ ] Catalog gap: CS521, CS522, CS547, CS582, CS583, CS587 are on the official Fall 2026 list but have no catalog entry (need title, credits, prerequisites, requirement-group placement, knowledge areas)
+- [ ] **Catalog titles are wrong for the seeded graduate CS courses.** Codes match the real catalog but map to different courses — e.g. CS500 is seeded as "Advanced Algorithms" but is really "Object-Oriented Design in Python"; CS571 is seeded as "Advanced Cryptography" but is really "Cloud Computing Infrastructure". 7 of the 8 Fall 2026 offerings are affected. This predates the planner work and invalidates the prerequisite chains and knowledge-area mappings built on top of those records. Needs reconciliation against `docs/sfbu-2025-2026-university-catalog-10.27.pdf`.
+- [ ] Decide the fate of `SemesterPlanner` / `TermCard` — the multi-semester planner they implement is no longer rendered by any route now that `/plan` is the two-column screen. Still tested; kept rather than deleted pending that decision.
 - [ ] Model `Open For Registration` and section counts (on the official list, not in the schema — a seeded offering currently means "runs this term", not "registration is open")
 - [ ] Spring 2027 offerings once a real schedule is published
 - [x] Seed: idempotent offering upsert in seed.ts (resolves terms by name, warns and skips unknown terms/courses)

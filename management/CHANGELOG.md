@@ -85,6 +85,7 @@ Connects the admin offerings tool (v1.2.0) to the public planner (v1.1.0). Admin
 
 #### Changed
 
+- **`/plan` rebuilt as a two-column screen** — completed courses on the left, next semester's actual offerings on the right, with pending prerequisites highlighted and the missing courses named. New `OfferingPlanner` and `OfferedCourseRow` components. The right column is scoped to the term's real offerings rather than the whole catalog, since the question is "what can I register for next semester". Blocked courses stay selectable — the planner advises, it does not gate registration — and the summary counts how many picks are still blocked. `SemesterPlanner`/`TermCard` are no longer rendered by any route; kept and still tested pending a decision on the multi-semester view.
 - `frontend/components/planner/CourseVerdictRow.tsx` — three verdict states instead of two: green eligible, amber "Not offered", red blocked. Each carries a distinct screen-reader prefix so colour is never the only signal. A course that is both blocked and unoffered keeps the red treatment (the more actionable failure) while still showing the availability badge.
 - `frontend/components/planner/TermCard.tsx` — academic-term selector, hidden entirely when no terms are curated.
 - `frontend/components/planner/SemesterPlanner.tsx` — plan state moved from `string[][]` to `{ courseIds, termId }[]`; storage key bumped to `semester-plan-v2` with a read-time migration so existing saved plans are converted rather than discarded.

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { api, type Course, type TermSummary } from '../../../lib/api';
 import { Breadcrumb } from '../../../components/ui/Breadcrumb';
-import { SemesterPlanner } from '../../../components/planner/SemesterPlanner';
+import { OfferingPlanner } from '../../../components/planner/OfferingPlanner';
 
 export const metadata: Metadata = {
   title: 'Semester Planner',
@@ -65,17 +65,16 @@ export default async function PlanPage() {
           </p>
           <h1 className="text-3xl font-bold text-gray-900">Semester Planner</h1>
           <p className="text-gray-500 mt-1.5 text-base max-w-2xl">
-            Mark the courses you&apos;ve completed, then build out your upcoming semesters. The
-            planner checks prerequisites and corequisites for every course and explains what&apos;s
-            blocking you. Pick an academic term for a semester and it will also flag courses that
-            aren&apos;t offered then. Nothing is saved to any server — your plan lives only in this
-            browser.
+            Mark the courses you&apos;ve completed on the left, then pick from what&apos;s actually
+            offered next semester on the right. Anything with prerequisites you haven&apos;t met yet
+            is highlighted, with the missing courses named. Nothing is saved to any server — your
+            plan lives only in this browser.
           </p>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        <SemesterPlanner courses={courses} academicTerms={academicTerms} />
+        <OfferingPlanner courses={courses} academicTerms={academicTerms} />
       </div>
     </div>
   );
