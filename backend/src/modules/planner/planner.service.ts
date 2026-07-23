@@ -252,6 +252,12 @@ export class PlannerService {
    * each one offers. Unknown term IDs fail loudly, matching how unknown course
    * IDs are handled — silently dropping the binding would downgrade a real
    * offering check into a vacuous pass.
+   *
+   * A term with no offerings at all is omitted from the returned map, so its
+   * courses report `offered: null` rather than `false`. An empty schedule means
+   * "nobody has curated this term yet", not "this term runs no courses" —
+   * reporting the latter would tell a student, with apparent authority, that
+   * every course in the catalog is unavailable.
    */
   private async loadOfferings(dto: EvaluatePlanDto): Promise<{
     termNames: Map<string, string>;
@@ -276,14 +282,17 @@ export class PlannerService {
 
     for (const t of terms) {
       termNames.set(t.id, t.name);
-      offeredByTerm.set(t.id, new Set());
     }
 
     const offerings = await this.offeringRepo.find({
       where: { termId: In(termIds) },
     });
+    // Built only from rows that exist, so a term with zero offerings never
+    // gets an (empty, and therefore falsifying) entry.
     for (const o of offerings) {
-      offeredByTerm.get(o.termId)?.add(o.courseId);
+      const set = offeredByTerm.get(o.termId);
+      if (set) set.add(o.courseId);
+      else offeredByTerm.set(o.termId, new Set([o.courseId]));
     }
 
     return { termNames, offeredByTerm };

@@ -315,12 +315,29 @@ describe('PlannerService', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('treats a term with no curated offerings as offering nothing', async () => {
+    it('treats a term with no curated offerings as unknown, not as offering nothing', async () => {
+      // An empty schedule means nobody has curated the term yet. Reporting
+      // `false` would tell the student every course is unavailable.
       offeringRepo.find.mockResolvedValue([]);
 
       const result = await service.evaluate({
         completedCourseIds: ['c100'],
         terms: [{ termId: 'fall26', courseIds: ['c250'] }],
+      });
+
+      expect(result.terms[0].courses[0].offered).toBeNull();
+      expect(result.terms[0].courses[0].registrable).toBe(true);
+      expect(result.allOffered).toBe(true);
+      // The term is still resolved and named, so the UI can show the binding.
+      expect(result.terms[0].termName).toBe('Fall 2026');
+    });
+
+    it('still reports offered = false for a curated term that omits the course', async () => {
+      // Distinct from the empty-schedule case above: Spring 2027 has a
+      // schedule, and CS250 is simply not on it.
+      const result = await service.evaluate({
+        completedCourseIds: ['c100'],
+        terms: [{ termId: 'spring27', courseIds: ['c250'] }],
       });
 
       expect(result.terms[0].courses[0].offered).toBe(false);

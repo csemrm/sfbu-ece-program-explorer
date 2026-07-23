@@ -36,6 +36,7 @@ export function TermCard({
   const blocked = evaluation?.courses.filter((c) => !c.eligible).length ?? 0;
   const notOffered = evaluation?.courses.filter((c) => c.offered === false).length ?? 0;
   const selectId = `term-${index}-academic-term`;
+  const selectedTerm = termId ? academicTerms.find((t) => t.id === termId) : undefined;
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -82,14 +83,24 @@ export function TermCard({
               {academicTerms.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.name}
+                  {t.courseCount === 0 ? ' — schedule not published yet' : ''}
                 </option>
               ))}
             </select>
-            {termId && (
-              <span className="text-xs text-gray-400">
-                Courses are checked against this term&rsquo;s offerings.
-              </span>
-            )}
+            {termId &&
+              (selectedTerm?.courseCount === 0 ? (
+                // Say so explicitly rather than letting every course sit at an
+                // unexplained "unknown" — the term is bound, there is just no
+                // schedule to check against.
+                <span className="text-xs text-gray-400">
+                  No schedule published for this term yet, so availability
+                  isn&rsquo;t checked.
+                </span>
+              ) : (
+                <span className="text-xs text-gray-400">
+                  Courses are checked against this term&rsquo;s offerings.
+                </span>
+              ))}
           </div>
         )}
 

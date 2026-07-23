@@ -74,7 +74,7 @@ Connects the admin offerings tool (v1.2.0) to the public planner (v1.1.0). Admin
 
 #### Added
 
-- `backend/src/database/seeds/catalog-data.ts` — `COURSE_OFFERINGS`, 28 courses per term across Fall 2026 / Spring 2027. The `CourseOfferings` migration created the two terms but zero offerings, so the availability check had nothing to check against and would have passed vacuously for every course.
+- `backend/src/database/seeds/catalog-data.ts` — `COURSE_OFFERINGS`, transcribed from the real SFBU registration list (`docs/Fall 2026.md`). The `CourseOfferings` migration created two starter terms but zero offerings, so the availability check had nothing to check against and would have passed vacuously for every course. Fall 2026 is graduate CS only; 8 of its 14 courses have catalog entries and are seeded, the other 6 (CS521, CS522, CS547, CS582, CS583, CS587) have none and are omitted rather than invented. Spring 2027 is left unseeded — no real schedule exists and fabricating one would put invented availability in front of students.
 - `backend/src/database/seeds/seed.ts` — idempotent offering upsert. Terms are resolved **by name** and warned/skipped when missing rather than created, since a term the migration didn't define means the environment is out of date.
 - `backend/src/modules/terms/` — public `GET /terms` and `GET /terms/:id`. Offerings were reachable only through JWT-guarded `/admin/offerings`; the planner needs them unauthenticated, so this is a separate read-only surface rather than a relaxed guard.
 - `PlannerTermDto.termId` (optional) — binds a planned slot to an academic term.
@@ -95,6 +95,8 @@ Connects the admin offerings tool (v1.2.0) to the public planner (v1.1.0). Admin
 - `eligible` deliberately keeps its original meaning (prerequisites/corequisites only) and availability is reported separately. "You aren't ready" and "the university isn't running it" are different problems with different fixes, and collapsing them into one flag would misreport both. It also leaves the v1.1.0 API contract and the admin offerings page untouched.
 - Terms without a `termId` stay offering-agnostic (`offered: null`), so sketching an abstract sequence still works and all 8 pre-existing planner tests pass unchanged.
 - An unknown `termId` returns 400 rather than being ignored — silently dropping the binding would downgrade a real availability check into a vacuous pass.
+- A term with **zero** offerings reports `offered: null`, not `false`. An empty schedule means nobody has curated that term yet; reporting `false` would tell a student, with apparent authority, that every course in the catalog is unavailable. The dropdown labels such terms "schedule not published yet" so the absence is visible rather than mysterious.
+- `Open For Registration` and section counts from the official list are **not modeled** — a seeded offering means "runs this term", not "registration is open". Tracked in TASKS.md.
 
 ---
 

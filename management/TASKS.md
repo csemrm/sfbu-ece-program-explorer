@@ -31,7 +31,12 @@ contract); offering status is a separate `offered` signal combined into
 so the existing "sketch an abstract sequence" flow and saved localStorage plans
 keep working.
 
-- [x] Seed: `COURSE_OFFERINGS` (28 courses per term across Fall 2026 / Spring 2027) — both tables were empty, so the check had nothing to check against
+- [x] Seed: `COURSE_OFFERINGS` from the real SFBU registration list (`docs/Fall 2026.md`) — 8 in-catalog courses; Spring 2027 left unseeded rather than fabricated
+- [x] Backend: a term with zero offerings reports `offered: null` (not curated), never `false` — an empty schedule must not claim the whole catalog is unavailable
+- [x] Frontend: unpublished-schedule terms labelled in the selector, with an explanatory note when selected
+- [ ] Catalog gap: CS521, CS522, CS547, CS582, CS583, CS587 are on the official Fall 2026 list but have no catalog entry (need title, credits, prerequisites, requirement-group placement, knowledge areas)
+- [ ] Model `Open For Registration` and section counts (on the official list, not in the schema — a seeded offering currently means "runs this term", not "registration is open")
+- [ ] Spring 2027 offerings once a real schedule is published
 - [x] Seed: idempotent offering upsert in seed.ts (resolves terms by name, warns and skips unknown terms/courses)
 - [x] Backend: public `GET /terms` + `GET /terms/:id` (academic terms + offered courses) — offerings were admin-only
 - [x] Backend: `PlannerTermDto.termId` (optional) + `offered` / `registrable` on evaluated courses

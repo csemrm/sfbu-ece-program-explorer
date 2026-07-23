@@ -1624,93 +1624,44 @@ export interface CourseOfferingSeed {
 }
 
 /**
- * Which courses run in which term.
+ * Which courses actually run in which term.
  *
- * The migration creates the two starter terms but no offerings, so without
- * this the planner's availability check has nothing to check against. Terms
- * deliberately differ: foundations and the first half of each track run in
- * Fall, follow-ons and capstones in Spring, with high-demand core courses in
- * both. A course absent from a term is a real "not offered" signal, which is
- * the entire point of the feature.
+ * Fall 2026 is transcribed from the real SFBU registration list
+ * (`docs/Fall 2026.md`) — it is not a plausible-looking guess. The real term
+ * is graduate Computer Science only: no undergraduate courses, no EE/CE, and
+ * notably no EE595 capstone.
  *
- * Admins can override any of this through the offerings tool; this is only a
- * plausible starting schedule.
+ * Six courses on the official list have no catalog entry yet and are therefore
+ * omitted rather than invented: CS521 Software Project Management, CS522
+ * Software Quality Assurance and Test Automation, CS547 Advanced Database
+ * Design and Analysis, CS582 Agentic AI, CS583 Enterprise AI, and CS587
+ * Individual Research Project. Seeding offerings for courses that do not exist
+ * would fail; adding the courses themselves needs catalog data (prerequisites,
+ * requirement-group placement, knowledge areas) that the registration list
+ * does not carry.
+ *
+ * Spring 2027 is deliberately absent. No real schedule for it exists, and
+ * inventing one would put fabricated availability in front of students. A term
+ * with no curated offerings is treated as "not yet curated" (offered: null),
+ * not as "offers nothing" — see PlannerService.
+ *
+ * Two fields on the official list are not modeled: "Open For Registration"
+ * (false for CS522, CS571 and CS583 — the course runs but is not open) and
+ * section counts. Capturing those needs a schema change; until then a seeded
+ * offering means "runs this term", not "you can register right now".
  */
 export const COURSE_OFFERINGS: CourseOfferingSeed[] = [
   {
     termName: 'Fall 2026',
     courseCodes: [
-      // Undergraduate foundations
-      'MATH201',
-      'MATH203',
-      'CS200',
-      'CS250',
-      'CS350',
-      'CS380',
-      'CE305',
-      'CS453',
-      'CS470',
-      'CS480',
-      'CS485',
-      'CS494',
-      // Graduate core — offered every term
-      'CS500',
-      'CS501',
-      'CS515',
-      // MSCS tracks: Cybersecurity + Data Science intake
-      'CS535',
-      'CS550',
-      'CS570',
-      'CS581',
-      'CS589',
-      // MSEE tracks: IoT/Embedded + Integrated Circuits intake
-      'EE504',
-      'EE511',
-      'EE520',
-      'CE521',
-      'CE530',
-      // Capstones run in both terms
-      'CS595',
-      'EE595',
-      'BUS450',
-    ],
-  },
-  {
-    termName: 'Spring 2027',
-    courseCodes: [
-      // Undergraduate foundations
-      'MATH202',
-      'MATH208',
-      'CS230',
-      'CS250',
-      'CS360',
-      'CS455',
-      'CS457',
-      'CS477',
-      'CS478',
-      'CS481',
-      'CS483',
-      'CS487',
-      'CE450',
-      // Graduate core — offered every term
-      'CS500',
-      'CS501',
-      'CS515',
-      // MSCS tracks: Network Engineering + follow-on electives
-      'CS565',
-      'CS571',
-      'CS575',
-      // MSEE tracks: Multicore/Parallel + follow-on electives
-      'EE505',
-      'EE517',
-      'EE553',
-      'EE577',
-      'CE522',
-      'CE523',
-      // Capstones run in both terms
-      'CS595',
-      'EE595',
-      'BUS450',
+      'CS500', // Object-Oriented Design in Python
+      'CS500L', // Object-Oriented Design in Python Lab (corequisite of CS500)
+      'CS501', // Practical Application of Algorithms
+      'CS550', // Machine Learning and Business Intelligence
+      'CS570', // Big Data Processing & Analytics
+      'CS571', // Cloud Computing Infrastructure
+      'CS575', // Network Analysis & Testing
+      'CS595', // Computer Science Capstone Course
     ],
   },
 ];

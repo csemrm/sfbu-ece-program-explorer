@@ -115,6 +115,23 @@ describe('TermCard', () => {
     expect(screen.queryByText(/not offered/)).not.toBeInTheDocument();
   });
 
+  it('flags a term whose schedule has not been published', () => {
+    const uncurated: TermSummary[] = [
+      { id: 'spring27', name: 'Spring 2027', sortOrder: 2, courseCount: 0, offeredCourseIds: [] },
+    ];
+    render(<TermCard {...defaults} academicTerms={uncurated} termId="spring27" />);
+
+    expect(
+      screen.getByRole('option', { name: /Spring 2027 — schedule not published yet/ }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/No schedule published for this term yet/)).toBeInTheDocument();
+  });
+
+  it('says offerings are checked when the term does have a schedule', () => {
+    render(<TermCard {...defaults} termId="fall26" />);
+    expect(screen.getByText(/Courses are checked against this term/)).toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(
       <TermCard

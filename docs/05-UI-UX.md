@@ -317,6 +317,8 @@ Academic term selector
 
 Each semester card offers "Any term (no availability check)" plus every curated term. Leaving it unset keeps the slot offering-agnostic, so a user can still sketch an abstract sequence. The selector is hidden entirely when no terms are curated, and the planner degrades to prerequisite-only checking if the terms endpoint is unavailable.
 
+A term whose schedule has not been published yet is labelled "— schedule not published yet" in the dropdown, and selecting it shows "No schedule published for this term yet, so availability isn't checked." Its courses report `offered: null` and stay green. Silently showing every course as unknown would look like a bug; claiming they are all unavailable would be a lie.
+
 State persists in browser localStorage only (`semester-plan-v2`; v1 plans are migrated on read, not discarded). Eligibility is computed by POST /planner/evaluate; terms come from GET /terms.
 
 ⸻
