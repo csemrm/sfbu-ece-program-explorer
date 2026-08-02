@@ -68,7 +68,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@sfbu.edu}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
     ports:
-      - "8080:80"
+      - "${PGADMIN_PORT:-8088}:80"
     depends_on:
       - postgres
 
