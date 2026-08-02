@@ -293,16 +293,41 @@ Route: /plan
 
 Lets a user check prerequisite eligibility before registering, without any login or stored records.
 
-Layout — two columns
+Layout — three columns
 
 | Column | Contents |
 | --- | --- |
-| Left | Courses the user has already completed (searchable picker + removable chips) |
-| Right | Courses actually offered next semester, each selectable, with pending prerequisites highlighted |
+| Left | Courses the user has already completed — the catalog as a clickable checklist grouped by subject, plus removable chips |
+| Middle | Courses actually offered next semester, each selectable, with pending prerequisites highlighted |
+| Right | Courses ready to register, then the chosen plan with credits, blocked warnings and a PDF download |
 
-A term selector above the columns chooses which semester the right column shows.
+Two selectors sit above the columns: **Degree** and **Next semester**.
 
-The right column is scoped to the term's real offerings rather than the whole catalog, because the question the screen answers is "what can I register for next semester" — a catalog-wide search would surface courses that aren't running.
+The middle column is scoped to the term's real offerings rather than the whole catalog, because the question the screen answers is "what can I register for next semester" — a catalog-wide search would surface courses that aren't running.
+
+Degree scope
+
+The degree selector narrows both catalog columns to that program's courses, derived from `GET /programs/:id/roadmap` (there is no "courses in this program" endpoint, and the roadmap already carries them).
+
+Scoping the offerings can empty the middle column outright — Fall 2026 runs graduate CS only, so BSCS and MSEE match none of its 8 courses. That gap is stated in words ("None of Fall 2026's 8 courses are part of BSCS") with a **Show all N anyway** toggle, rather than rendering a blank panel that reads as a bug. When the overlap is partial the same notice reports how many were hidden.
+
+A program whose roadmap returns no courses is treated as "do not scope" — filtering the planner down to nothing would look broken rather than like missing data.
+
+Completed-courses column
+
+The whole catalog is listed as checkboxes grouped by subject prefix (CS, CE, EE, MATH, BUS), first section expanded and the rest collapsed. The search box **filters** the list rather than being the only way in: browsing suits recognition, which is how students recall what they have taken. While a filter is active every group expands, so a match can never hide inside a collapsed section.
+
+Courses completed under one degree stay marked when the user switches degree; the chips resolve against the unscoped catalog so their codes still render.
+
+Suggested column
+
+"Ready to register" is drawn from the term's own offerings — registrable, not already completed, not already chosen — rather than the planner API's `suggestions` feed, which answers the different question of what the *whole plan* would unlock later.
+
+PDF download
+
+The plan prints through a hidden `.plan-print` sheet revealed only under `@media print`, with `window.print()` behind a "Download as PDF" button; the user chooses "Save as PDF" in the browser dialog. No PDF library is bundled, keeping the client bundle unchanged.
+
+The sheet carries the term, degree, planned courses with per-course status, total credits, the completed-course list, and an "Advisory only — not a registration record" disclaimer. Suggestions are deliberately left off paper: the printed artefact is the registration sheet, not the recommendation.
 
 Course states in the right column
 

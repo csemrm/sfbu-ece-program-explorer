@@ -1,10 +1,17 @@
 'use client';
 
 import type { Course } from '../../lib/api';
-import { CoursePicker } from './CoursePicker';
+import { CompletedCourseList } from './CompletedCourseList';
 
 interface Props {
+  /** Courses to list — already narrowed to the chosen degree. */
   courses: Course[];
+  /**
+   * The unscoped catalog, used only to resolve the chips. A course completed
+   * under one degree stays marked when the user switches to another, so its
+   * code must still resolve even though it is absent from `courses`.
+   */
+  allCourses?: Course[];
   completedIds: string[];
   onAdd: (courseId: string) => void;
   onRemove: (courseId: string) => void;
@@ -12,9 +19,19 @@ interface Props {
 }
 
 /** Panel for marking courses the user has already completed. */
-export function CompletedPanel({ courses, completedIds, onAdd, onRemove, onClear }: Props) {
-  const byId = new Map(courses.map((c) => [c.id, c]));
-  const exclude = new Set(completedIds);
+export function CompletedPanel({
+  courses,
+  allCourses,
+  completedIds,
+  onAdd,
+  onRemove,
+  onClear,
+}: Props) {
+  const byId = new Map((allCourses ?? courses).map((c) => [c.id, c]));
+  const marked = new Set(completedIds);
+
+  const toggle = (courseId: string) =>
+    marked.has(courseId) ? onRemove(courseId) : onAdd(courseId);
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
@@ -22,7 +39,8 @@ export function CompletedPanel({ courses, completedIds, onAdd, onRemove, onClear
         <div>
           <h2 className="text-sm font-semibold text-gray-800">Completed courses</h2>
           <p className="text-xs text-gray-400">
-            {completedIds.length} marked — these satisfy prerequisites in your plan.
+            {completedIds.length} of {courses.length} marked — these satisfy prerequisites in your
+            plan.
           </p>
         </div>
         {completedIds.length > 0 && (
@@ -36,15 +54,10 @@ export function CompletedPanel({ courses, completedIds, onAdd, onRemove, onClear
         )}
       </div>
 
-      <CoursePicker
-        courses={courses}
-        excludeIds={exclude}
-        onSelect={onAdd}
-        placeholder="Mark a completed course…"
-      />
+      <CompletedCourseList courses={courses} completedIds={completedIds} onToggle={toggle} />
 
       {completedIds.length > 0 && (
-        <ul className="mt-3 flex flex-wrap gap-2">
+        <ul className="mt-3 flex flex-wrap gap-2 border-t border-gray-100 pt-3">
           {completedIds.map((id) => {
             const c = byId.get(id);
             if (!c) return null;

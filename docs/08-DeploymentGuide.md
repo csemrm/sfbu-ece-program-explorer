@@ -40,7 +40,7 @@ Access points:
 - Frontend: http://localhost
 - Admin: http://localhost/admin
 - API: http://localhost/api/v1
-- pgAdmin: http://localhost:8080
+- pgAdmin: http://localhost:8088 (override with `PGADMIN_PORT`)
 
 ---
 

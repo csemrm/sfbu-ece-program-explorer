@@ -35,6 +35,18 @@ keep working.
 - [x] Backend: a term with zero offerings reports `offered: null` (not curated), never `false` — an empty schedule must not claim the whole catalog is unavailable
 - [x] Frontend: unpublished-schedule terms labelled in the selector, with an explanatory note when selected
 - [x] Frontend: two-column `/plan` — completed courses left, next-semester offerings right, pending prerequisites highlighted (`OfferingPlanner`, `OfferedCourseRow`)
+
+### Planner: degree scope, browsable catalog, printable plan
+
+Follow-on UX pass. `/plan` becomes three columns behind a degree selector.
+
+- [x] Frontend: completed courses are a browsable checklist grouped by subject (`CompletedCourseList`) — the type-ahead required knowing a course code before you could mark it; the search box now filters the list instead of being the only way in
+- [x] Frontend: degree selector (BSCS / MSCS / MSEE) scopes both catalog columns. Program course sets are derived from `GET /programs/:id/roadmap` (`lib/programScope.ts`) — there is no "courses in this program" endpoint and the roadmap already carries them, so no backend route was added
+- [x] Frontend: scoping the offerings can empty that column — Fall 2026 runs graduate CS only, so BSCS and MSEE match 0 of 8 — the gap is stated in words with a "show all N anyway" escape hatch rather than rendering a blank panel
+- [x] Frontend: third column (`PlanSummaryColumn`) — courses ready to register stacked over the chosen plan, with credits and blocked-prerequisite warnings
+- [x] Frontend: plan downloadable as PDF via a print-only sheet (`.plan-print` in `globals.css` + `window.print()`); no PDF library added, keeping the client bundle unchanged
+- [ ] A program whose roadmap has no courses is treated as "do not scope". Correct for a data gap, but indistinguishable from a genuinely empty program — revisit if a real program ever has zero roadmap courses
+- [ ] The print sheet is not covered by an automated visual check; only its DOM content is asserted
 - [ ] Catalog gap: CS521, CS522, CS547, CS582, CS583, CS587 are on the official Fall 2026 list but have no catalog entry (need title, credits, prerequisites, requirement-group placement, knowledge areas)
 - [ ] **Catalog titles are wrong for the seeded graduate CS courses.** Codes match the real catalog but map to different courses — e.g. CS500 is seeded as "Advanced Algorithms" but is really "Object-Oriented Design in Python"; CS571 is seeded as "Advanced Cryptography" but is really "Cloud Computing Infrastructure". 7 of the 8 Fall 2026 offerings are affected. This predates the planner work and invalidates the prerequisite chains and knowledge-area mappings built on top of those records. Needs reconciliation against `docs/sfbu-2025-2026-university-catalog-10.27.pdf`.
 - [ ] Decide the fate of `SemesterPlanner` / `TermCard` — the multi-semester planner they implement is no longer rendered by any route now that `/plan` is the two-column screen. Still tested; kept rather than deleted pending that decision.
