@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# [1.5.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.4.0...v1.5.0) (2026-08-02)
+
+
+### Features
+
+* **planner:** degree scope, browsable catalog and printable plan ([#7](https://github.com/csemrm/sfbu-ece-program-explorer/issues/7)) ([ec5e787](https://github.com/csemrm/sfbu-ece-program-explorer/commit/ec5e787e41d84f0cb40d3d8b5a2fb8e45c808a46))
+
 # [1.4.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.3.0...v1.4.0) (2026-08-02)
 
 
