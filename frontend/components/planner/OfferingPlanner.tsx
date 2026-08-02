@@ -18,6 +18,15 @@ interface PlanState {
   termId: string | null;
   selectedIds: string[];
   programId: string | null;
+  /**
+   * Whether the user chose to see offerings outside their degree.
+   *
+   * Persisted because it is not a transient view toggle: a plan built through
+   * the escape hatch is made of out-of-scope courses, so losing the flag on
+   * reload empties "Your plan" and hides the PDF button while the selections
+   * themselves are still stored — the plan looks discarded when it is not.
+   */
+  showAllOfferings: boolean;
 }
 
 const STORAGE_KEY = 'semester-plan-v3';
@@ -35,6 +44,7 @@ function loadState(): PlanState {
     termId: null,
     selectedIds: [],
     programId: null,
+    showAllOfferings: false,
   };
   if (typeof window === 'undefined') return empty;
 
@@ -42,13 +52,15 @@ function loadState(): PlanState {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<PlanState>;
-      // programId was added after v3 shipped; an older v3 plan simply has none
-      // and falls back to the default degree, so no storage bump is needed.
+      // programId and showAllOfferings were added after v3 shipped; an older v3
+      // plan simply has neither and falls back to the defaults, so no storage
+      // bump is needed.
       return {
         completedIds: toIdArray(parsed.completedIds),
         termId: toId(parsed.termId),
         selectedIds: toIdArray(parsed.selectedIds),
         programId: toId(parsed.programId),
+        showAllOfferings: parsed.showAllOfferings === true,
       };
     }
     // Salvage the completed list from an older plan rather than dropping it —
@@ -100,6 +112,7 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
     setProgramId(
       s.programId && programs.some((p) => p.id === s.programId) ? s.programId : defaultProgramId,
     );
+    setShowAllOfferings(s.showAllOfferings);
     setHydrated(true);
   }, [defaultTermId, defaultProgramId, programs]);
 
@@ -107,9 +120,9 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
     if (!hydrated) return;
     window.localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ completedIds, termId, selectedIds, programId }),
+      JSON.stringify({ completedIds, termId, selectedIds, programId, showAllOfferings }),
     );
-  }, [completedIds, termId, selectedIds, programId, hydrated]);
+  }, [completedIds, termId, selectedIds, programId, showAllOfferings, hydrated]);
 
   const term = academicTerms.find((t) => t.id === termId) ?? null;
   const program = programs.find((p) => p.id === programId) ?? null;

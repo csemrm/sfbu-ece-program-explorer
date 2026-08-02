@@ -45,6 +45,7 @@ Follow-on UX pass. `/plan` becomes three columns behind a degree selector.
 - [x] Frontend: scoping the offerings can empty that column — Fall 2026 runs graduate CS only, so BSCS and MSEE match 0 of 8 — the gap is stated in words with a "show all N anyway" escape hatch rather than rendering a blank panel
 - [x] Frontend: third column (`PlanSummaryColumn`) — courses ready to register stacked over the chosen plan, with credits and blocked-prerequisite warnings
 - [x] Frontend: plan downloadable as PDF via a print-only sheet (`.plan-print` in `globals.css` + `window.print()`); no PDF library added, keeping the client bundle unchanged
+- [x] Fix: persist the "show all offerings" escape hatch. It was component state while `selectedIds` was persisted, so a plan built through it evaluated to nothing after a reload — "Your plan" read empty and the PDF button vanished while the selections were still in storage. Found by testing the merged v1.5.0 build in a browser.
 - [ ] A program whose roadmap has no courses is treated as "do not scope". Correct for a data gap, but indistinguishable from a genuinely empty program — revisit if a real program ever has zero roadmap courses
 - [ ] The print sheet is not covered by an automated visual check; only its DOM content is asserted
 - [ ] Catalog gap: CS521, CS522, CS547, CS582, CS583, CS587 are on the official Fall 2026 list but have no catalog entry (need title, credits, prerequisites, requirement-group placement, knowledge areas)
