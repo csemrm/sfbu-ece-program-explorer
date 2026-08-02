@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.5.1](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.5.0...v1.5.1) (2026-08-02)
+
+
+### Bug Fixes
+
+* **planner:** persist the show-all-offerings escape hatch ([#8](https://github.com/csemrm/sfbu-ece-program-explorer/issues/8)) ([7432951](https://github.com/csemrm/sfbu-ece-program-explorer/commit/74329510072a2c1ef0a8a8068e5c9848fbd324dd))
+
 # [1.5.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.4.0...v1.5.0) (2026-08-02)
 
 
