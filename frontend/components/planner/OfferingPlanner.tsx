@@ -2,18 +2,22 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api, type Course, type PlanEvaluation, type TermSummary } from '../../lib/api';
+import { scopeFor, type ProgramOption } from '../../lib/programScope';
 import { CompletedPanel } from './CompletedPanel';
 import { OfferedCourseRow } from './OfferedCourseRow';
+import { PlanSummaryColumn } from './PlanSummaryColumn';
 
 interface Props {
   courses: Course[];
   academicTerms: TermSummary[];
+  programs: ProgramOption[];
 }
 
 interface PlanState {
   completedIds: string[];
   termId: string | null;
   selectedIds: string[];
+  programId: string | null;
 }
 
 const STORAGE_KEY = 'semester-plan-v3';
@@ -23,18 +27,28 @@ const LEGACY_KEYS = ['semester-plan-v2', 'semester-plan-v1'];
 const toIdArray = (value: unknown): string[] =>
   Array.isArray(value) ? value.filter((v): v is string => typeof v === 'string') : [];
 
+const toId = (value: unknown): string | null => (typeof value === 'string' ? value : null);
+
 function loadState(): PlanState {
-  const empty: PlanState = { completedIds: [], termId: null, selectedIds: [] };
+  const empty: PlanState = {
+    completedIds: [],
+    termId: null,
+    selectedIds: [],
+    programId: null,
+  };
   if (typeof window === 'undefined') return empty;
 
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<PlanState>;
+      // programId was added after v3 shipped; an older v3 plan simply has none
+      // and falls back to the default degree, so no storage bump is needed.
       return {
         completedIds: toIdArray(parsed.completedIds),
-        termId: typeof parsed.termId === 'string' ? parsed.termId : null,
+        termId: toId(parsed.termId),
         selectedIds: toIdArray(parsed.selectedIds),
+        programId: toId(parsed.programId),
       };
     }
     // Salvage the completed list from an older plan rather than dropping it —
@@ -52,18 +66,21 @@ function loadState(): PlanState {
 }
 
 /**
- * Two-column planner: completed courses on the left, next semester's actual
- * offerings on the right.
+ * Three-column planner: completed courses, the term's actual offerings, and
+ * the resulting plan.
  *
- * The right column is scoped to what the term genuinely offers rather than the
- * whole catalog, because the question it answers is "what can I register for
- * next semester" — a catalog-wide search would surface courses that aren't
- * running.
+ * A degree is chosen first and scopes both catalog columns, because a BSCS
+ * student has no use for the MSEE catalog. Scoping the offerings can empty
+ * that column outright — Fall 2026, for instance, runs graduate CS only — so
+ * the gap is stated in words and an escape hatch shows the unscoped term
+ * rather than leaving a blank panel that reads as a bug.
  */
-export function OfferingPlanner({ courses, academicTerms }: Props) {
+export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
   const [completedIds, setCompletedIds] = useState<string[]>([]);
   const [termId, setTermId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [programId, setProgramId] = useState<string | null>(null);
+  const [showAllOfferings, setShowAllOfferings] = useState(false);
   const [evaluation, setEvaluation] = useState<PlanEvaluation | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
@@ -73,32 +90,52 @@ export function OfferingPlanner({ courses, academicTerms }: Props) {
     () => academicTerms.find((t) => t.courseCount > 0)?.id ?? academicTerms[0]?.id ?? null,
     [academicTerms],
   );
+  const defaultProgramId = programs[0]?.id ?? null;
 
   useEffect(() => {
     const s = loadState();
     setCompletedIds(s.completedIds);
     setSelectedIds(s.selectedIds);
     setTermId(s.termId ?? defaultTermId);
+    setProgramId(
+      s.programId && programs.some((p) => p.id === s.programId) ? s.programId : defaultProgramId,
+    );
     setHydrated(true);
-  }, [defaultTermId]);
+  }, [defaultTermId, defaultProgramId, programs]);
 
   useEffect(() => {
     if (!hydrated) return;
     window.localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ completedIds, termId, selectedIds }),
+      JSON.stringify({ completedIds, termId, selectedIds, programId }),
     );
-  }, [completedIds, termId, selectedIds, hydrated]);
+  }, [completedIds, termId, selectedIds, programId, hydrated]);
 
   const term = academicTerms.find((t) => t.id === termId) ?? null;
+  const program = programs.find((p) => p.id === programId) ?? null;
+  const scope = useMemo(() => scopeFor(program), [program]);
+
+  /** The catalog narrowed to the chosen degree. */
+  const scopedCourses = useMemo(
+    () => (scope ? courses.filter((c) => scope.has(c.id)) : courses),
+    [courses, scope],
+  );
 
   // Every offered course is evaluated, not just the selected ones, so the
   // column can show what is blocked *before* the user commits to it.
-  const offeredIds = useMemo(() => {
+  const termOfferedIds = useMemo(() => {
     if (!term) return [];
     const known = new Set(courses.map((c) => c.id));
     return term.offeredCourseIds.filter((id) => known.has(id));
   }, [term, courses]);
+
+  const inScopeOfferedIds = useMemo(
+    () => (scope ? termOfferedIds.filter((id) => scope.has(id)) : termOfferedIds),
+    [termOfferedIds, scope],
+  );
+
+  const hiddenByDegree = termOfferedIds.length - inScopeOfferedIds.length;
+  const offeredIds = showAllOfferings ? termOfferedIds : inScopeOfferedIds;
 
   const reqId = useRef(0);
   useEffect(() => {
@@ -139,18 +176,29 @@ export function OfferingPlanner({ courses, academicTerms }: Props) {
   );
   const toggleSelected = useCallback(
     (id: string) =>
-      setSelectedIds((prev) =>
-        prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-      ),
+      setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id])),
+    [],
+  );
+  const addSelected = useCallback(
+    (id: string) => setSelectedIds((prev) => (prev.includes(id) ? prev : [...prev, id])),
     [],
   );
 
   const evaluated = evaluation?.terms[0]?.courses ?? [];
   const selectedSet = new Set(selectedIds);
   const selected = evaluated.filter((c) => selectedSet.has(c.courseId));
-  const selectedCredits =
-    Math.round(selected.reduce((sum, c) => sum + c.creditHours, 0) * 10) / 10;
+  const selectedCredits = Math.round(selected.reduce((sum, c) => sum + c.creditHours, 0) * 10) / 10;
   const blockedSelected = selected.filter((c) => !c.eligible).length;
+
+  /** Offered, registrable now, and not already chosen. */
+  const recommended = evaluated.filter(
+    (c) => c.registrable && !c.alreadyCompleted && !selectedSet.has(c.courseId),
+  );
+
+  const completedCodes = useMemo(() => {
+    const byId = new Map(courses.map((c) => [c.id, c]));
+    return completedIds.map((id) => byId.get(id)?.courseCode).filter((c): c is string => !!c);
+  }, [completedIds, courses]);
 
   const coreqsNotSelected = (courseId: string): string[] => {
     const c = evaluated.find((e) => e.courseId === courseId);
@@ -162,24 +210,51 @@ export function OfferingPlanner({ courses, academicTerms }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <label htmlFor="planner-term" className="text-sm font-medium text-gray-600">
-          Next semester
-        </label>
-        <select
-          id="planner-term"
-          value={termId ?? ''}
-          onChange={(e) => setTermId(e.target.value || null)}
-          className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 focus:border-sfbu-navy focus:outline-none"
-        >
-          {academicTerms.length === 0 && <option value="">No terms available</option>}
-          {academicTerms.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.name}
-              {t.courseCount === 0 ? ' — schedule not published yet' : ` (${t.courseCount} courses)`}
-            </option>
-          ))}
-        </select>
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+        {programs.length > 0 && (
+          <div className="flex items-center gap-3">
+            <label htmlFor="planner-program" className="text-sm font-medium text-gray-600">
+              Degree
+            </label>
+            <select
+              id="planner-program"
+              value={programId ?? ''}
+              onChange={(e) => {
+                setProgramId(e.target.value || null);
+                setShowAllOfferings(false);
+              }}
+              className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 focus:border-sfbu-navy focus:outline-none"
+            >
+              {programs.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.abbreviation} — {p.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        <div className="flex items-center gap-3">
+          <label htmlFor="planner-term" className="text-sm font-medium text-gray-600">
+            Next semester
+          </label>
+          <select
+            id="planner-term"
+            value={termId ?? ''}
+            onChange={(e) => setTermId(e.target.value || null)}
+            className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 focus:border-sfbu-navy focus:outline-none"
+          >
+            {academicTerms.length === 0 && <option value="">No terms available</option>}
+            {academicTerms.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+                {t.courseCount === 0
+                  ? ' — schedule not published yet'
+                  : ` (${t.courseCount} courses)`}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {error && (
@@ -188,11 +263,12 @@ export function OfferingPlanner({ courses, academicTerms }: Props) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* ── Left: what you have already done ── */}
         <div className="space-y-4">
           <CompletedPanel
-            courses={courses}
+            courses={scopedCourses}
+            allCourses={courses}
             completedIds={completedIds}
             onAdd={addCompleted}
             onRemove={removeCompleted}
@@ -200,7 +276,7 @@ export function OfferingPlanner({ courses, academicTerms }: Props) {
           />
         </div>
 
-        {/* ── Right: what is actually on offer ── */}
+        {/* ── Middle: what is actually on offer ── */}
         <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
           <div className="border-b border-gray-100 px-4 py-3">
             <h2 className="text-sm font-semibold text-gray-800">
@@ -213,14 +289,37 @@ export function OfferingPlanner({ courses, academicTerms }: Props) {
             </p>
           </div>
 
+          {hiddenByDegree > 0 && program && (
+            <div className="border-b border-gray-100 bg-amber-50 px-4 py-2.5">
+              <p className="text-xs text-amber-800">
+                {inScopeOfferedIds.length === 0
+                  ? `None of ${term?.name ?? 'this term'}'s ${termOfferedIds.length} courses are part of ${program.abbreviation}.`
+                  : `${hiddenByDegree} of ${termOfferedIds.length} offered courses are outside ${program.abbreviation}.`}
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowAllOfferings((v) => !v)}
+                className="mt-1 text-xs font-medium text-amber-900 underline hover:no-underline"
+              >
+                {showAllOfferings
+                  ? `Show only ${program.abbreviation} courses`
+                  : `Show all ${termOfferedIds.length} anyway`}
+              </button>
+            </div>
+          )}
+
           <div className="px-4 py-3">
             {!term ? (
               <p className="py-6 text-center text-sm text-gray-400">
                 No academic terms have been set up yet.
               </p>
-            ) : offeredIds.length === 0 ? (
+            ) : termOfferedIds.length === 0 ? (
               <p className="py-6 text-center text-sm text-gray-400">
                 The schedule for {term.name} hasn&rsquo;t been published yet.
+              </p>
+            ) : offeredIds.length === 0 ? (
+              <p className="py-6 text-center text-sm text-gray-400">
+                Nothing in {term.name} matches this degree.
               </p>
             ) : evaluated.length === 0 ? (
               <p className="py-6 text-center text-sm text-gray-400">Checking eligibility…</p>
@@ -243,9 +342,7 @@ export function OfferingPlanner({ courses, academicTerms }: Props) {
             <div className="border-t border-gray-100 px-4 py-3">
               <p
                 className={`rounded-lg px-3 py-2 text-xs font-medium ${
-                  blockedSelected > 0
-                    ? 'bg-red-50 text-red-700'
-                    : 'bg-green-50 text-green-700'
+                  blockedSelected > 0 ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'
                 }`}
               >
                 {blockedSelected > 0
@@ -262,6 +359,16 @@ export function OfferingPlanner({ courses, academicTerms }: Props) {
             </div>
           )}
         </div>
+
+        {/* ── Right: what to take, and the sheet you print ── */}
+        <PlanSummaryColumn
+          termName={term?.name ?? null}
+          programLabel={program ? `${program.abbreviation} — ${program.name}` : null}
+          recommended={recommended}
+          selected={selected}
+          completedCodes={completedCodes}
+          onAdd={addSelected}
+        />
       </div>
     </div>
   );

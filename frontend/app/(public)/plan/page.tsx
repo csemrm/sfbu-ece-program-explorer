@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { api, type Course, type TermSummary } from '../../../lib/api';
+import { courseIdsFromRoadmap, type ProgramOption } from '../../../lib/programScope';
 import { Breadcrumb } from '../../../components/ui/Breadcrumb';
 import { OfferingPlanner } from '../../../components/planner/OfferingPlanner';
 
@@ -33,6 +34,32 @@ async function loadTerms(): Promise<TermSummary[]> {
   }
 }
 
+/**
+ * Degrees the planner can be scoped to.
+ *
+ * There is no "courses in this program" endpoint, so each program's course set
+ * is derived from its roadmap. A program whose roadmap fails to load keeps an
+ * empty set, which the planner reads as "do not scope" rather than as "this
+ * degree has no courses".
+ */
+async function loadProgramOptions(): Promise<ProgramOption[]> {
+  try {
+    const programs = await api.programs.list({ limit: 50 });
+    return await Promise.all(
+      programs.data.map(async (p) => {
+        const base = { id: p.id, abbreviation: p.abbreviation, name: p.name };
+        try {
+          return { ...base, courseIds: courseIdsFromRoadmap(await api.programs.roadmap(p.id)) };
+        } catch {
+          return { ...base, courseIds: [] };
+        }
+      }),
+    );
+  } catch {
+    return [];
+  }
+}
+
 export default async function PlanPage() {
   let courses: Course[];
   try {
@@ -50,7 +77,7 @@ export default async function PlanPage() {
     );
   }
 
-  const academicTerms = await loadTerms();
+  const [academicTerms, programs] = await Promise.all([loadTerms(), loadProgramOptions()]);
 
   return (
     <div>
@@ -65,16 +92,17 @@ export default async function PlanPage() {
           </p>
           <h1 className="text-3xl font-bold text-gray-900">Semester Planner</h1>
           <p className="text-gray-500 mt-1.5 text-base max-w-2xl">
-            Mark the courses you&apos;ve completed on the left, then pick from what&apos;s actually
-            offered next semester on the right. Anything with prerequisites you haven&apos;t met yet
-            is highlighted, with the missing courses named. Nothing is saved to any server — your
-            plan lives only in this browser.
+            Choose your degree, mark the courses you&apos;ve completed, then pick from what&apos;s
+            actually offered next semester. Anything with prerequisites you haven&apos;t met yet is
+            highlighted, with the missing courses named, and your plan can be downloaded as a PDF.
+            Nothing is saved to any server — it lives only in this browser.
           </p>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        <OfferingPlanner courses={courses} academicTerms={academicTerms} />
+      {/* Wider than the rest of the site — three columns need the room. */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <OfferingPlanner courses={courses} academicTerms={academicTerms} programs={programs} />
       </div>
     </div>
   );
