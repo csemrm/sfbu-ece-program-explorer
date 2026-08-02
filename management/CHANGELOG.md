@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# [1.4.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.3.0...v1.4.0) (2026-08-02)
+
+
+### Features
+
+* **planner:** offering-aware semester planner ([#6](https://github.com/csemrm/sfbu-ece-program-explorer/issues/6)) ([d1aea38](https://github.com/csemrm/sfbu-ece-program-explorer/commit/d1aea38dcc44e193994be3173648df8081f1e976))
+
 # [1.3.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.2.0...v1.3.0) (2026-07-23)
 
 
