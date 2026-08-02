@@ -68,7 +68,40 @@
 
 ## [Unreleased]
 
-### Milestone 9 — Knowledge Area Explorer
+### Offering-Aware Planner
+
+Connects the admin offerings tool (v1.2.0) to the public planner (v1.1.0). Admins curated which courses run in which term, but the planner never read that data — so a student could plan a course into a semester it isn't offered in and still get a green "Eligible" verdict.
+
+#### Added
+
+- `backend/src/database/seeds/catalog-data.ts` — `COURSE_OFFERINGS`, transcribed from the real SFBU registration list (`docs/Fall 2026.md`). The `CourseOfferings` migration created two starter terms but zero offerings, so the availability check had nothing to check against and would have passed vacuously for every course. Fall 2026 is graduate CS only; 8 of its 14 courses have catalog entries and are seeded, the other 6 (CS521, CS522, CS547, CS582, CS583, CS587) have none and are omitted rather than invented. Spring 2027 is left unseeded — no real schedule exists and fabricating one would put invented availability in front of students.
+- `backend/src/database/seeds/seed.ts` — idempotent offering upsert. Terms are resolved **by name** and warned/skipped when missing rather than created, since a term the migration didn't define means the environment is out of date.
+- `backend/src/modules/terms/` — public `GET /terms` and `GET /terms/:id`. Offerings were reachable only through JWT-guarded `/admin/offerings`; the planner needs them unauthenticated, so this is a separate read-only surface rather than a relaxed guard.
+- `PlannerTermDto.termId` (optional) — binds a planned slot to an academic term.
+- `offered` (`true`/`false`/`null`) and `registrable` on every evaluated course; `termId`/`termName` per term; `allOffered` on the response.
+- `offeredInTerms` on suggestions, with offerable courses ranked first.
+- `frontend/lib/api.ts` — `TermSummary`, `TermDetail`, `SuggestedCourse`, `OfferedTermRef` types plus `api.terms.{list,get}`.
+- Tests: 7 `TermsService` specs, 10 `PlannerService` offering specs, 10 `CourseVerdictRow` and 8 `TermCard` component/axe tests. Backend 57 → 74, frontend 57 → 75.
+
+#### Changed
+
+- **`/plan` rebuilt as a two-column screen** — completed courses on the left, next semester's actual offerings on the right, with pending prerequisites highlighted and the missing courses named. New `OfferingPlanner` and `OfferedCourseRow` components. The right column is scoped to the term's real offerings rather than the whole catalog, since the question is "what can I register for next semester". Blocked courses stay selectable — the planner advises, it does not gate registration — and the summary counts how many picks are still blocked. `SemesterPlanner`/`TermCard` are no longer rendered by any route; kept and still tested pending a decision on the multi-semester view.
+- `frontend/components/planner/CourseVerdictRow.tsx` — three verdict states instead of two: green eligible, amber "Not offered", red blocked. Each carries a distinct screen-reader prefix so colour is never the only signal. A course that is both blocked and unoffered keeps the red treatment (the more actionable failure) while still showing the availability badge.
+- `frontend/components/planner/TermCard.tsx` — academic-term selector, hidden entirely when no terms are curated.
+- `frontend/components/planner/SemesterPlanner.tsx` — plan state moved from `string[][]` to `{ courseIds, termId }[]`; storage key bumped to `semester-plan-v2` with a read-time migration so existing saved plans are converted rather than discarded.
+- `frontend/app/(public)/plan/page.tsx` — loads terms server-side and degrades to prerequisite-only checking if that fails, rather than taking the page down.
+
+#### Design notes
+
+- `eligible` deliberately keeps its original meaning (prerequisites/corequisites only) and availability is reported separately. "You aren't ready" and "the university isn't running it" are different problems with different fixes, and collapsing them into one flag would misreport both. It also leaves the v1.1.0 API contract and the admin offerings page untouched.
+- Terms without a `termId` stay offering-agnostic (`offered: null`), so sketching an abstract sequence still works and all 8 pre-existing planner tests pass unchanged.
+- An unknown `termId` returns 400 rather than being ignored — silently dropping the binding would downgrade a real availability check into a vacuous pass.
+- A term with **zero** offerings reports `offered: null`, not `false`. An empty schedule means nobody has curated that term yet; reporting `false` would tell a student, with apparent authority, that every course in the catalog is unavailable. The dropdown labels such terms "schedule not published yet" so the absence is visible rather than mysterious.
+- `Open For Registration` and section counts from the official list are **not modeled** — a seeded offering means "runs this term", not "registration is open". Tracked in TASKS.md.
+
+---
+
+### Milestone 9 — Knowledge Area Explorer (released in v1.3.0)
 
 #### Added
 

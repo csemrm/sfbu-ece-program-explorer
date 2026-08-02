@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import { api, type Course } from '../../../lib/api';
+import { api, type Course, type TermSummary } from '../../../lib/api';
 import { Breadcrumb } from '../../../components/ui/Breadcrumb';
-import { SemesterPlanner } from '../../../components/planner/SemesterPlanner';
+import { OfferingPlanner } from '../../../components/planner/OfferingPlanner';
 
 export const metadata: Metadata = {
   title: 'Semester Planner',
@@ -18,6 +18,19 @@ async function loadAllCourses(): Promise<Course[]> {
     courses.push(...next.data);
   }
   return courses;
+}
+
+/**
+ * Academic terms are optional context: if none are curated (or the endpoint
+ * fails) the planner still works, it just skips the availability check rather
+ * than taking the whole page down with it.
+ */
+async function loadTerms(): Promise<TermSummary[]> {
+  try {
+    return await api.terms.list();
+  } catch {
+    return [];
+  }
 }
 
 export default async function PlanPage() {
@@ -37,6 +50,8 @@ export default async function PlanPage() {
     );
   }
 
+  const academicTerms = await loadTerms();
+
   return (
     <div>
       <div className="bg-white border-b border-gray-200">
@@ -50,15 +65,16 @@ export default async function PlanPage() {
           </p>
           <h1 className="text-3xl font-bold text-gray-900">Semester Planner</h1>
           <p className="text-gray-500 mt-1.5 text-base max-w-2xl">
-            Mark the courses you&apos;ve completed, then build out your upcoming semesters. The
-            planner checks prerequisites and corequisites for every course and explains what&apos;s
-            blocking you. Nothing is saved to any server — your plan lives only in this browser.
+            Mark the courses you&apos;ve completed on the left, then pick from what&apos;s actually
+            offered next semester on the right. Anything with prerequisites you haven&apos;t met yet
+            is highlighted, with the missing courses named. Nothing is saved to any server — your
+            plan lives only in this browser.
           </p>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        <SemesterPlanner courses={courses} />
+        <OfferingPlanner courses={courses} academicTerms={academicTerms} />
       </div>
     </div>
   );

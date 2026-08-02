@@ -1614,3 +1614,54 @@ export const PROGRAMS: ProgramSeed[] = [
 ];
 
 export const CATALOG_IMPORT_STATUS = ImportStatus.COMPLETED;
+
+// ── Course Offerings ───────────────────────────────────────────
+
+export interface CourseOfferingSeed {
+  /** Must match an academic_terms.name created by the CourseOfferings migration. */
+  termName: string;
+  courseCodes: string[];
+}
+
+/**
+ * Which courses actually run in which term.
+ *
+ * Fall 2026 is transcribed from the real SFBU registration list
+ * (`docs/Fall 2026.md`) — it is not a plausible-looking guess. The real term
+ * is graduate Computer Science only: no undergraduate courses, no EE/CE, and
+ * notably no EE595 capstone.
+ *
+ * Six courses on the official list have no catalog entry yet and are therefore
+ * omitted rather than invented: CS521 Software Project Management, CS522
+ * Software Quality Assurance and Test Automation, CS547 Advanced Database
+ * Design and Analysis, CS582 Agentic AI, CS583 Enterprise AI, and CS587
+ * Individual Research Project. Seeding offerings for courses that do not exist
+ * would fail; adding the courses themselves needs catalog data (prerequisites,
+ * requirement-group placement, knowledge areas) that the registration list
+ * does not carry.
+ *
+ * Spring 2027 is deliberately absent. No real schedule for it exists, and
+ * inventing one would put fabricated availability in front of students. A term
+ * with no curated offerings is treated as "not yet curated" (offered: null),
+ * not as "offers nothing" — see PlannerService.
+ *
+ * Two fields on the official list are not modeled: "Open For Registration"
+ * (false for CS522, CS571 and CS583 — the course runs but is not open) and
+ * section counts. Capturing those needs a schema change; until then a seeded
+ * offering means "runs this term", not "you can register right now".
+ */
+export const COURSE_OFFERINGS: CourseOfferingSeed[] = [
+  {
+    termName: 'Fall 2026',
+    courseCodes: [
+      'CS500', // Object-Oriented Design in Python
+      'CS500L', // Object-Oriented Design in Python Lab (corequisite of CS500)
+      'CS501', // Practical Application of Algorithms
+      'CS550', // Machine Learning and Business Intelligence
+      'CS570', // Big Data Processing & Analytics
+      'CS571', // Cloud Computing Infrastructure
+      'CS575', // Network Analysis & Testing
+      'CS595', // Computer Science Capstone Course
+    ],
+  },
+];

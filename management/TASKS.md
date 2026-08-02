@@ -18,6 +18,44 @@ Status: 🟡 In Progress
 
 ## High Priority
 
+### Offering-Aware Planner
+
+Closes the gap between the admin offerings tool (v1.2.0) and the public planner
+(v1.1.0): admins curate which courses run in which term, but the planner never
+reads that data, so a student can plan a course into a semester it isn't offered
+in and still see a green "Eligible" verdict.
+
+Design decisions: `eligible` keeps meaning "prerequisites satisfied" (unchanged
+contract); offering status is a separate `offered` signal combined into
+`registrable`. Terms without a `termId` stay offering-agnostic (`offered: null`),
+so the existing "sketch an abstract sequence" flow and saved localStorage plans
+keep working.
+
+- [x] Seed: `COURSE_OFFERINGS` from the real SFBU registration list (`docs/Fall 2026.md`) — 8 in-catalog courses; Spring 2027 left unseeded rather than fabricated
+- [x] Backend: a term with zero offerings reports `offered: null` (not curated), never `false` — an empty schedule must not claim the whole catalog is unavailable
+- [x] Frontend: unpublished-schedule terms labelled in the selector, with an explanatory note when selected
+- [x] Frontend: two-column `/plan` — completed courses left, next-semester offerings right, pending prerequisites highlighted (`OfferingPlanner`, `OfferedCourseRow`)
+- [ ] Catalog gap: CS521, CS522, CS547, CS582, CS583, CS587 are on the official Fall 2026 list but have no catalog entry (need title, credits, prerequisites, requirement-group placement, knowledge areas)
+- [ ] **Catalog titles are wrong for the seeded graduate CS courses.** Codes match the real catalog but map to different courses — e.g. CS500 is seeded as "Advanced Algorithms" but is really "Object-Oriented Design in Python"; CS571 is seeded as "Advanced Cryptography" but is really "Cloud Computing Infrastructure". 7 of the 8 Fall 2026 offerings are affected. This predates the planner work and invalidates the prerequisite chains and knowledge-area mappings built on top of those records. Needs reconciliation against `docs/sfbu-2025-2026-university-catalog-10.27.pdf`.
+- [ ] Decide the fate of `SemesterPlanner` / `TermCard` — the multi-semester planner they implement is no longer rendered by any route now that `/plan` is the two-column screen. Still tested; kept rather than deleted pending that decision.
+- [ ] Model `Open For Registration` and section counts (on the official list, not in the schema — a seeded offering currently means "runs this term", not "registration is open")
+- [ ] Spring 2027 offerings once a real schedule is published
+- [x] Seed: idempotent offering upsert in seed.ts (resolves terms by name, warns and skips unknown terms/courses)
+- [x] Backend: public `GET /terms` + `GET /terms/:id` (academic terms + offered courses) — offerings were admin-only
+- [x] Backend: `PlannerTermDto.termId` (optional) + `offered` / `registrable` on evaluated courses
+- [x] Backend: `EvaluatedTermDto.termId` / `termName`, `allOffered` on the evaluation response
+- [x] Backend: offering-aware suggestions (`offeredInTerms`, offerable ranked first)
+- [x] Backend: unknown `termId` rejected with 400 rather than passing vacuously
+- [x] Backend: TermsService (7) + PlannerService offering tests (10); all 8 pre-existing planner tests pass unchanged
+- [x] Frontend: typed `api.terms.{list,get}` client
+- [x] Frontend: per-term academic-term selector on `TermCard` (hidden when no terms are curated)
+- [x] Frontend: three-state verdict on `CourseVerdictRow` — amber "Not offered" distinct from red prereq failure
+- [x] Frontend: localStorage v1 → v2 migration so saved plans survive the term-binding schema change
+- [x] Frontend: planner component tests + jest-axe (CourseVerdictRow 10, TermCard 8)
+- [x] Docs: 03 Database (offering seed), 04 API (terms endpoint + planner contract), 05 UI/UX (selector, verdict states)
+
+---
+
 ### Knowledge Area Explorer (Milestone 9)
 
 - [x] Seed: `KNOWLEDGE_AREAS` (14 domains) + `COURSE_KNOWLEDGE_AREAS` (77 joins over 60 courses) in catalog-data.ts

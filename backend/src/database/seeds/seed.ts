@@ -7,16 +7,19 @@ import {
   CATALOG_IMPORT_STATUS,
   COREQUISITES,
   COURSE_KNOWLEDGE_AREAS,
+  COURSE_OFFERINGS,
   COURSES,
   KNOWLEDGE_AREAS,
   PREREQUISITES,
   PROGRAMS,
 } from './catalog-data';
+import { AcademicTerm } from '../entities/academic-term.entity';
 import { CatalogImport } from '../entities/catalog-import.entity';
 import { CatalogYear } from '../entities/catalog-year.entity';
 import { Corequisite } from '../entities/corequisite.entity';
 import { Course } from '../entities/course.entity';
 import { CourseKnowledgeArea } from '../entities/course-knowledge-area.entity';
+import { CourseOffering } from '../entities/course-offering.entity';
 import { KnowledgeArea } from '../entities/knowledge-area.entity';
 import { Prerequisite } from '../entities/prerequisite.entity';
 import { Program } from '../entities/program.entity';
@@ -133,6 +136,40 @@ async function seed(dataSource: DataSource): Promise<void> {
       });
       if (!exists) {
         await ckaRepo.save(ckaRepo.create({ courseId, knowledgeAreaId }));
+      }
+    }
+  }
+
+  // ── Course Offerings ───────────────────────────────────────
+  console.log(`  Upserting offerings for ${COURSE_OFFERINGS.length} terms...`);
+  const termRepo = dataSource.getRepository(AcademicTerm);
+  const offeringRepo = dataSource.getRepository(CourseOffering);
+  for (const seed of COURSE_OFFERINGS) {
+    // Terms come from the CourseOfferings migration, not from this seeder —
+    // if one is missing the environment is out of date, so say so loudly
+    // instead of silently creating a term the migration did not define.
+    const term = await termRepo.findOne({ where: { name: seed.termName } });
+    if (!term) {
+      console.warn(
+        `    Skipping offerings for unknown academic term: ${seed.termName}`,
+      );
+      continue;
+    }
+    for (const courseCode of seed.courseCodes) {
+      const courseId = courseMap.get(courseCode);
+      if (!courseId) {
+        console.warn(
+          `    Skipping offering for unknown course: ${courseCode} (${seed.termName})`,
+        );
+        continue;
+      }
+      const exists = await offeringRepo.findOne({
+        where: { termId: term.id, courseId },
+      });
+      if (!exists) {
+        await offeringRepo.save(
+          offeringRepo.create({ termId: term.id, courseId }),
+        );
       }
     }
   }

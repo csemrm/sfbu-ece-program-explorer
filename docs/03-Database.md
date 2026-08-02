@@ -326,6 +326,55 @@ description refreshed, and a join row is inserted only when absent. Unknown
 course codes or area names are warned about and skipped rather than aborting
 the run.
 
+### Course Offering Seed
+
+`COURSE_OFFERINGS` in the same file populates `course_offerings` — which courses
+run in which academic term.
+
+The academic terms themselves ("Fall 2026", "Spring 2027") are created by the
+`CourseOfferings` migration, not by the seeder. The seeder resolves them **by
+name** and warns/skips if one is missing, rather than creating it: a term that
+the migration did not define means the environment is out of date, and silently
+inventing one would hide that.
+
+**Fall 2026 is transcribed from the real SFBU registration list**
+(`docs/Fall 2026.md`), not generated to look plausible. The real term is
+graduate Computer Science only — no undergraduate courses, no EE/CE, and no
+EE595 capstone. Eight of its courses have catalog entries and are seeded:
+
+`CS500`, `CS500L`, `CS501`, `CS550`, `CS570`, `CS571`, `CS575`, `CS595`
+
+Six more appear on the official list with **no catalog entry**, so they are
+omitted rather than invented: CS521, CS522, CS547, CS582, CS583, CS587. Seeding
+offerings for non-existent courses would fail, and adding the courses needs
+prerequisite, requirement-group and knowledge-area data the registration list
+does not carry. This is a genuine catalog gap, tracked in TASKS.md.
+
+**Spring 2027 is deliberately unseeded.** No real schedule exists for it, and
+fabricating one would put invented availability in front of students. A term
+with no offerings is treated as *not yet curated* (`offered: null`), never as
+"offers nothing" — see the planner note below.
+
+Two fields on the official list are **not modeled**: `Open For Registration`
+(false for CS522, CS571 and CS583 — the course runs but is not open) and section
+counts. Capturing them needs a schema change. Until then a seeded offering means
+"runs this term", not "you can register right now".
+
+Seeding is idempotent, but **insert-only**: it never deletes. Offerings removed
+from `COURSE_OFFERINGS` are not pruned on reseed, because doing so would destroy
+admin curation. Clear the table manually when correcting seed data:
+
+```sql
+DELETE FROM course_offerings;
+```
+
+#### Empty schedule ≠ empty term
+
+`PlannerService.loadOfferings` omits a term with zero offerings from its lookup
+map entirely, so its courses report `offered: null`. An empty schedule means
+nobody has curated that term yet; reporting `false` would tell a student, with
+apparent authority, that every course in the catalog is unavailable.
+
 ---
 
 ## 13. Catalog Import Workflow

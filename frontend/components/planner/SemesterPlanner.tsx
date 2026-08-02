@@ -1,44 +1,76 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { api, type Course, type PlanEvaluation } from '../../lib/api';
+import { api, type Course, type PlanEvaluation, type TermSummary } from '../../lib/api';
 import { CompletedPanel } from './CompletedPanel';
 import { TermCard } from './TermCard';
 import { SuggestionsPanel } from './SuggestionsPanel';
 
 interface Props {
   courses: Course[];
+  /** Curated academic terms; empty when an admin hasn't set any up yet. */
+  academicTerms?: TermSummary[];
+}
+
+/** A planned semester. `termId` is null while the slot stays offering-agnostic. */
+interface PlannedTerm {
+  courseIds: string[];
+  termId: string | null;
 }
 
 interface PlanState {
   completedIds: string[];
-  terms: string[][];
+  terms: PlannedTerm[];
 }
 
-const STORAGE_KEY = 'semester-plan-v1';
-const EMPTY: PlanState = { completedIds: [], terms: [[]] };
+const STORAGE_KEY = 'semester-plan-v2';
+const LEGACY_STORAGE_KEY = 'semester-plan-v1';
+const EMPTY: PlanState = { completedIds: [], terms: [{ courseIds: [], termId: null }] };
 
+const toIdArray = (value: unknown): string[] =>
+  Array.isArray(value) ? value.filter((v): v is string => typeof v === 'string') : [];
+
+/**
+ * v1 stored terms as `string[][]`; v2 stores objects so a slot can bind to an
+ * academic term. Read v2 first, then migrate a v1 plan rather than discarding
+ * someone's saved work.
+ */
 function loadState(): PlanState {
   if (typeof window === 'undefined') return EMPTY;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return EMPTY;
-    const parsed = JSON.parse(raw) as Partial<PlanState>;
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<PlanState>;
+      const terms = Array.isArray(parsed.terms)
+        ? parsed.terms.map((t) => ({
+            courseIds: toIdArray(t?.courseIds),
+            termId: typeof t?.termId === 'string' ? t.termId : null,
+          }))
+        : [];
+      return {
+        completedIds: toIdArray(parsed.completedIds),
+        terms: terms.length > 0 ? terms : EMPTY.terms,
+      };
+    }
+
+    const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (!legacy) return EMPTY;
+    const parsed = JSON.parse(legacy) as { completedIds?: unknown; terms?: unknown };
+    const terms = Array.isArray(parsed.terms)
+      ? parsed.terms.map((t) => ({ courseIds: toIdArray(t), termId: null }))
+      : [];
     return {
-      completedIds: Array.isArray(parsed.completedIds) ? parsed.completedIds : [],
-      terms:
-        Array.isArray(parsed.terms) && parsed.terms.length > 0
-          ? parsed.terms.map((t) => (Array.isArray(t) ? t : []))
-          : [[]],
+      completedIds: toIdArray(parsed.completedIds),
+      terms: terms.length > 0 ? terms : EMPTY.terms,
     };
   } catch {
     return EMPTY;
   }
 }
 
-export function SemesterPlanner({ courses }: Props) {
+export function SemesterPlanner({ courses, academicTerms = [] }: Props) {
   const [completedIds, setCompletedIds] = useState<string[]>([]);
-  const [terms, setTerms] = useState<string[][]>([[]]);
+  const [terms, setTerms] = useState<PlannedTerm[]>(EMPTY.terms);
   const [evaluation, setEvaluation] = useState<PlanEvaluation | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
@@ -66,7 +98,12 @@ export function SemesterPlanner({ courses }: Props) {
       api.planner
         .evaluate({
           completedCourseIds: completedIds,
-          terms: terms.map((courseIds) => ({ courseIds })),
+          // Omit termId entirely when unbound — the API treats a missing
+          // termId as "no availability check", not as an unknown term.
+          terms: terms.map((t) => ({
+            courseIds: t.courseIds,
+            ...(t.termId ? { termId: t.termId } : {}),
+          })),
         })
         .then((result) => {
           if (id === reqId.current) {
@@ -94,27 +131,45 @@ export function SemesterPlanner({ courses }: Props) {
 
   const addToTerm = useCallback(
     (termIndex: number, id: string) =>
-      setTerms((prev) => prev.map((t, i) => (i === termIndex && !t.includes(id) ? [...t, id] : t))),
+      setTerms((prev) =>
+        prev.map((t, i) =>
+          i === termIndex && !t.courseIds.includes(id)
+            ? { ...t, courseIds: [...t.courseIds, id] }
+            : t,
+        ),
+      ),
     [],
   );
   const removeFromTerm = useCallback(
     (termIndex: number, id: string) =>
-      setTerms((prev) => prev.map((t, i) => (i === termIndex ? t.filter((x) => x !== id) : t))),
+      setTerms((prev) =>
+        prev.map((t, i) =>
+          i === termIndex ? { ...t, courseIds: t.courseIds.filter((x) => x !== id) } : t,
+        ),
+      ),
     [],
   );
-  const addTerm = useCallback(() => setTerms((prev) => [...prev, []]), []);
+  const setTermId = useCallback(
+    (termIndex: number, termId: string | null) =>
+      setTerms((prev) => prev.map((t, i) => (i === termIndex ? { ...t, termId } : t))),
+    [],
+  );
+  const addTerm = useCallback(
+    () => setTerms((prev) => [...prev, { courseIds: [], termId: null }]),
+    [],
+  );
   const removeTerm = useCallback(
     (termIndex: number) =>
       setTerms((prev) => {
         const next = prev.filter((_, i) => i !== termIndex);
-        return next.length > 0 ? next : [[]];
+        return next.length > 0 ? next : [{ courseIds: [], termId: null }];
       }),
     [],
   );
 
   const resetAll = useCallback(() => {
     setCompletedIds([]);
-    setTerms([[]]);
+    setTerms([{ courseIds: [], termId: null }]);
   }, []);
 
   // "Add suggestion" drops the course into the last term.
@@ -123,7 +178,7 @@ export function SemesterPlanner({ courses }: Props) {
     [addToTerm, terms.length],
   );
 
-  const plannedCount = terms.reduce((n, t) => n + t.length, 0);
+  const plannedCount = terms.reduce((n, t) => n + t.courseIds.length, 0);
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
@@ -143,13 +198,16 @@ export function SemesterPlanner({ courses }: Props) {
         )}
 
         <div className="space-y-4">
-          {terms.map((courseIds, i) => (
+          {terms.map((t, i) => (
             <TermCard
               key={i}
               index={i}
-              courseIds={courseIds}
+              courseIds={t.courseIds}
               courses={courses}
               evaluation={evaluation?.terms[i]}
+              academicTerms={academicTerms}
+              termId={t.termId}
+              onChangeTerm={(termId) => setTermId(i, termId)}
               onAddCourse={(id) => addToTerm(i, id)}
               onRemoveCourse={(id) => removeFromTerm(i, id)}
               onRemoveTerm={() => removeTerm(i)}
@@ -190,12 +248,18 @@ export function SemesterPlanner({ courses }: Props) {
           {evaluation && plannedCount > 0 && (
             <p
               className={`mt-3 rounded-lg px-3 py-2 text-xs font-medium ${
-                evaluation.allEligible ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'
+                !evaluation.allEligible
+                  ? 'bg-red-50 text-red-600'
+                  : !evaluation.allOffered
+                    ? 'bg-amber-50 text-amber-700'
+                    : 'bg-green-50 text-green-700'
               }`}
             >
-              {evaluation.allEligible
-                ? 'All planned courses are eligible. ✓'
-                : 'Some courses are blocked — check the details.'}
+              {!evaluation.allEligible
+                ? 'Some courses are blocked — check the details.'
+                : !evaluation.allOffered
+                  ? 'Prerequisites all check out, but some courses are not offered in the term you picked.'
+                  : 'All planned courses are eligible. ✓'}
             </p>
           )}
           {(completedIds.length > 0 || plannedCount > 0) && (

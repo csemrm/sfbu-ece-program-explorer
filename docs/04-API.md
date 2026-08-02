@@ -303,7 +303,7 @@ Request body
 {
   "completedCourseIds": ["<uuid>", "..."],
   "terms": [
-    { "courseIds": ["<uuid>", "..."] },
+    { "termId": "<uuid>", "courseIds": ["<uuid>", "..."] },
     { "courseIds": ["<uuid>"] }
   ]
 }
@@ -311,19 +311,40 @@ Request body
 
 * completedCourseIds — courses already finished before the plan begins.
 * terms — ordered list of planned semesters; each earlier term counts as completed for later terms.
+* terms[].termId — optional. Binds the slot to an academic term (see GET /terms), which additionally checks each course against that term's curated offerings. Omit it to keep the slot offering-agnostic.
 
 Response
 
 For each term, every course is returned with:
 
-* eligible — true when all prerequisites are satisfied and no corequisite is unmet.
+* eligible — true when all prerequisites are satisfied and no corequisite is unmet. Deliberately independent of availability.
+* offered — true/false when the term is bound to an academic term, null when it is not.
+* registrable — eligible && offered !== false; what a student can actually sign up for.
 * satisfiedPrerequisites / missingPrerequisites — the latter flags plannedInLaterTerm when a prerequisite is scheduled too late (an ordering conflict).
 * corequisites — each with status of completed, same-term, or unmet.
-* reason — a human-readable explanation of the verdict.
+* reason — a human-readable explanation of the verdict, covering both the prerequisite and availability outcomes.
 
-The response also includes suggestions (courses unlocked once the whole plan is complete), totalPlannedCredits, and allEligible.
+Each term also echoes termId and termName (both null when unbound).
 
-Returns 400 when any course ID does not exist.
+The response also includes suggestions, totalPlannedCredits, allEligible, and allOffered (vacuously true when no term is bound). Suggestions carry offeredInTerms — the bound terms in the plan that actually offer the course — and are ranked so offerable ones come first.
+
+Separating eligible from offered is intentional: "you are not ready for this course" and "the university is not running it" are different problems with different fixes, and collapsing them into one flag would misreport both.
+
+Returns 400 when any course ID or academic term ID does not exist.
+
+⸻
+
+Academic Terms
+
+GET /terms
+
+Public, read-only view of the academic terms and course offerings curated through the admin offerings tool. Exposed separately from /admin/offerings so the planner can read availability without a JWT.
+
+Returns an array (not paginated) ordered by sortOrder, each entry with id, name, sortOrder, courseCount, and offeredCourseIds.
+
+GET /terms/:id
+
+One term with its offered courses (id, courseCode, title, creditHours, level), ordered by course code. Returns 404 when the term does not exist.
 
 ⸻
 

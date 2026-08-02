@@ -1,6 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayMaxSize, IsArray, IsUUID, ValidateNested } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsOptional,
+  IsUUID,
+  ValidateNested,
+} from 'class-validator';
 import { CourseLevel } from '../../../database/entities/course.entity';
 
 /** One planned semester: the set of courses the user intends to register for. */
@@ -14,6 +20,14 @@ export class PlannerTermDto {
   @ArrayMaxSize(30)
   @IsUUID('4', { each: true })
   courseIds: string[];
+
+  @ApiPropertyOptional({
+    description:
+      "Optional academic term to bind this slot to. When supplied, each course is also checked against that term's curated offerings. When omitted the term stays offering-agnostic and every course reports offered = null.",
+  })
+  @IsOptional()
+  @IsUUID('4')
+  termId?: string;
 }
 
 /** Request body for POST /planner/evaluate. Stateless — nothing is persisted. */
@@ -79,9 +93,22 @@ export class EvaluatedCourseDto {
 
   @ApiProperty({
     description:
-      'True when every prerequisite is met and no corequisite is unmet',
+      'True when every prerequisite is met and no corequisite is unmet. Deliberately independent of course availability — see `offered`.',
   })
   eligible: boolean;
+
+  @ApiProperty({
+    nullable: true,
+    description:
+      'Whether this course is offered in the bound academic term. Null when the term has no termId, i.e. offering data does not apply.',
+  })
+  offered: boolean | null;
+
+  @ApiProperty({
+    description:
+      'True when the student could actually register: eligible AND not known to be unoffered (offered !== false).',
+  })
+  registrable: boolean;
 
   @ApiProperty({
     description:
@@ -104,19 +131,46 @@ export class EvaluatedCourseDto {
 
 export class EvaluatedTermDto {
   @ApiProperty({ description: '1-based term number' }) term: number;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'The academic term this slot was bound to, if any',
+  })
+  termId: string | null;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Display name of the bound academic term (e.g. "Fall 2026")',
+  })
+  termName: string | null;
+
   @ApiProperty() termCredits: number;
   @ApiProperty({ type: [EvaluatedCourseDto] }) courses: EvaluatedCourseDto[];
+}
+
+export class OfferedTermRefDto {
+  @ApiProperty() termId: string;
+  @ApiProperty() termName: string;
+}
+
+export class SuggestedCourseDto extends PlannerCourseRefDto {
+  @ApiProperty({
+    type: [OfferedTermRefDto],
+    description:
+      "Bound terms in this plan that actually offer the course. Empty when no term is bound, or when none of the plan's terms offer it.",
+  })
+  offeredInTerms: OfferedTermRefDto[];
 }
 
 export class PlanEvaluationDto {
   @ApiProperty({ type: [EvaluatedTermDto] }) terms: EvaluatedTermDto[];
 
   @ApiProperty({
-    type: [PlannerCourseRefDto],
+    type: [SuggestedCourseDto],
     description:
       'Courses not yet taken whose prerequisites are all satisfied once the whole plan is complete',
   })
-  suggestions: PlannerCourseRefDto[];
+  suggestions: SuggestedCourseDto[];
 
   @ApiProperty() totalPlannedCredits: number;
 
@@ -124,4 +178,10 @@ export class PlanEvaluationDto {
     description: 'True when every planned course in every term is eligible',
   })
   allEligible: boolean;
+
+  @ApiProperty({
+    description:
+      'True when no planned course is known to be unoffered in its bound term. Vacuously true when no term is bound.',
+  })
+  allOffered: boolean;
 }

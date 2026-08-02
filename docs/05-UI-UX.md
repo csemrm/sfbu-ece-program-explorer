@@ -293,15 +293,49 @@ Route: /plan
 
 Lets a user check prerequisite eligibility before registering, without any login or stored records.
 
-Displays
+Layout — two columns
 
-* Completed-courses panel (searchable picker + removable chips)
-* Ordered semester cards, each with a course picker and per-course eligibility verdict (eligible / blocked, with a plain-language reason)
-* Corequisite status per course (done / this term / not scheduled)
-* Plan summary (completed, semesters, planned courses, planned credits, overall eligibility)
-* Suggested next courses (unlocked once the plan is complete)
+| Column | Contents |
+| --- | --- |
+| Left | Courses the user has already completed (searchable picker + removable chips) |
+| Right | Courses actually offered next semester, each selectable, with pending prerequisites highlighted |
 
-State persists in browser localStorage only. Eligibility is computed by POST /planner/evaluate.
+A term selector above the columns chooses which semester the right column shows.
+
+The right column is scoped to the term's real offerings rather than the whole catalog, because the question the screen answers is "what can I register for next semester" — a catalog-wide search would surface courses that aren't running.
+
+Course states in the right column
+
+| State | Treatment |
+| --- | --- |
+| Ready | Neutral border; selecting it tints the row navy |
+| Prerequisites pending | Red row + "Prerequisites pending" badge + "Needs CS515" naming the missing courses |
+| Corequisite not selected | Amber note, shown only once the course itself is selected |
+| Already completed | Amber note (likely a mistake to re-take) |
+
+A blocked course stays **selectable**. The planner is advisory, not a registration gate, and a student may be resolving the prerequisite by other means (transfer credit, waiver, a course taken elsewhere). Disabling the checkbox would assert an authority this tool does not have. The selection summary counts how many picks are still blocked.
+
+Blocked rows carry a visually-hidden "Prerequisites pending:" prefix and an `aria-describedby` link from the checkbox to the reason, so the red highlight is never the only signal.
+
+Verdict states
+
+Three states, because "you aren't ready" and "the school isn't running it" are different problems:
+
+| State | Colour | Meaning |
+| --- | --- | --- |
+| Eligible | Green | Prerequisites satisfied and not known to be unoffered |
+| Not offered | Amber + "Not offered" badge | Prerequisites satisfied, but the course isn't scheduled in the selected term |
+| Blocked | Red | Prerequisites or corequisites unmet (wins the row treatment even if also unoffered, since it's the more actionable failure — the availability badge still shows) |
+
+Screen readers get a distinct visually-hidden prefix per state ("Eligible:", "Not offered this term:", "Not eligible:") so the colour is never the only signal.
+
+Academic term selector
+
+Each semester card offers "Any term (no availability check)" plus every curated term. Leaving it unset keeps the slot offering-agnostic, so a user can still sketch an abstract sequence. The selector is hidden entirely when no terms are curated, and the planner degrades to prerequisite-only checking if the terms endpoint is unavailable.
+
+A term whose schedule has not been published yet is labelled "— schedule not published yet" in the dropdown, and selecting it shows "No schedule published for this term yet, so availability isn't checked." Its courses report `offered: null` and stay green. Silently showing every course as unknown would look like a bug; claiming they are all unavailable would be a lie.
+
+State persists in browser localStorage only (`semester-plan-v3`; the completed-courses list is salvaged from v1/v2 plans on read). Eligibility is computed by POST /planner/evaluate — every offered course is evaluated, not just the selected ones, so the column can show what is blocked *before* the user commits. Terms come from GET /terms.
 
 ⸻
 
