@@ -348,13 +348,19 @@ Course states in the right column
 | Corequisite not selected | Amber note, shown only once the course itself is selected |
 | Already completed | Amber note (likely a mistake to re-take) |
 
-A **cancelled or closed** course is not selectable — its checkbox is disabled. This is deliberately different from the rule below: no waiver or transfer credit makes a cancelled course registerable, so there is nothing for the student to plan around.
+#### What can be added to a plan
+
+A course **cannot be added** while it is blocked by an unmet prerequisite, or cancelled, or closed to registration. Its checkbox is disabled and the reason is named beside it.
+
+It can always be **removed**, though. Gating only the "add" direction means a course that becomes blocked *after* it was chosen — the student unmarks its prerequisite, or the registrar cancels a section — is never stranded in the plan with no way to take it out.
+
+This reverses the planner's original rule, which left prerequisite-blocked courses selectable on the grounds that a student might hold a waiver or transfer credit. That escape route still exists and is better: the student marks the prerequisite as **completed** in the left column, which unblocks the row. Gating the checkbox therefore shuts nobody out, and it stops the planner offering a registration a student cannot make.
 
 The column has its own **filter box** — 96 offerings is too many to scan — and is ordered by what the student can act on: anything **closed or cancelled sinks to the end** regardless of degree, and among the rest **in-program courses lead**. The sort is applied before the scoped/full split, so the default view is ordered too.
 
-The **capstone** is flagged when taken too early: the catalog reserves it for "all or most coursework" completed, so it is offered once the current semester would carry the student to the degree's required credits, and below that it carries a "Final semester — N more credits needed" note and drops out of Suggested. It stays selectable — "most" is an advisor's judgement, not the planner's.
+The **capstone** is flagged when taken too early: the catalog reserves it for "all or most coursework" completed, so it is offered once the current semester would carry the student to the degree's required credits, and below that it carries a "Final semester — N more credits needed" note and drops out of Suggested. It **stays selectable**, unlike an unmet prerequisite: "most coursework" is a judgement an advisor makes on the whole record, not a fact the planner can check, so it advises rather than gates.
 
-A prerequisite-blocked course stays **selectable**. The planner is advisory, not a registration gate, and a student may be resolving the prerequisite by other means (transfer credit, waiver, a course taken elsewhere). Disabling the checkbox would assert an authority this tool does not have. The selection summary counts how many picks are still blocked.
+The selection summary still counts how many chosen courses are blocked, since a course can become blocked after it was picked.
 
 Blocked rows carry a visually-hidden "Prerequisites pending:" prefix and an `aria-describedby` link from the checkbox to the reason, so the red highlight is never the only signal.
 

@@ -35,6 +35,20 @@ export function OfferedCourseRow({
   const cancelled = closed && /cancel/i.test(course.statusNote ?? '');
   const reasonId = `offered-${course.courseId}-reason`;
 
+  /**
+   * A course cannot be added while it is blocked or closed — but it can always
+   * be removed.
+   *
+   * Gating only the "add" direction means a course that becomes blocked after
+   * it was chosen (the student unmarks its prerequisite, the registrar cancels
+   * a section) is never stranded in the plan with no way to take it out.
+   *
+   * A student holding a waiver or transfer credit for the prerequisite marks
+   * that prerequisite as completed on the left, which unblocks this row — so
+   * gating here does not shut them out.
+   */
+  const cannotAdd = (blocked || closed) && !selected;
+
   return (
     <li
       className={`rounded-lg border transition-colors ${
@@ -49,7 +63,7 @@ export function OfferedCourseRow({
     >
       <label
         className={`flex items-start gap-3 px-3 py-2.5 ${
-          closed ? 'cursor-not-allowed' : 'cursor-pointer'
+          cannotAdd ? 'cursor-not-allowed' : 'cursor-pointer'
         }`}
       >
         <input
@@ -57,13 +71,12 @@ export function OfferedCourseRow({
           checked={selected}
           // Guarded as well as disabled: the attribute stops a real user, this
           // stops any other path to the handler.
+          // Guarded as well as disabled: the attribute stops a real user, this
+          // stops any other path to the handler.
           onChange={() => {
-            if (!closed) onToggle();
+            if (!cannotAdd) onToggle();
           }}
-          // A cancelled or closed course cannot be registered for by any means,
-          // so unlike an unmet prerequisite — which a waiver or transfer credit
-          // can resolve — there is nothing for the student to plan around.
-          disabled={closed}
+          disabled={cannotAdd}
           aria-describedby={blocked || closed ? reasonId : undefined}
           className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-sfbu-navy focus:ring-sfbu-navy disabled:cursor-not-allowed disabled:opacity-50"
         />
