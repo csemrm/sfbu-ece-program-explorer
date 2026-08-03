@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# [1.7.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.6.0...v1.7.0) (2026-08-03)
+
+
+### Features
+
+* **planner:** order the columns by what the student needs first ([#11](https://github.com/csemrm/sfbu-ece-program-explorer/issues/11)) ([5199a0a](https://github.com/csemrm/sfbu-ece-program-explorer/commit/5199a0ae6a36630e5c80736e429d8e2515a2c84e))
+
 # [1.6.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.5.2...v1.6.0) (2026-08-03)
 
 
