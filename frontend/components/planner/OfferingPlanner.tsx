@@ -1,7 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { api, type Course, type PlanEvaluation, type TermSummary } from '../../lib/api';
+import {
+  api,
+  type Course,
+  type OfferedCourse,
+  type PlanEvaluation,
+  type TermSummary,
+} from '../../lib/api';
 import { scopeFor, type ProgramOption } from '../../lib/programScope';
 import { CompletedPanel } from './CompletedPanel';
 import { OfferedCourseRow } from './OfferedCourseRow';
@@ -30,6 +36,8 @@ interface PlanState {
 }
 
 const STORAGE_KEY = 'semester-plan-v3';
+/** The Suggested column is a shortlist, not a second copy of the schedule. */
+const MAX_RECOMMENDATIONS = 5;
 /** v1 stored `string[][]` terms, v2 `{courseIds, termId}[]`. Only completed courses carry over. */
 const LEGACY_KEYS = ['semester-plan-v2', 'semester-plan-v1'];
 
@@ -126,6 +134,8 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
 
   const term = academicTerms.find((t) => t.id === termId) ?? null;
   const program = programs.find((p) => p.id === programId) ?? null;
+  // Still used for the completed-courses column, which lists the whole degree
+  // rather than one term's offerings.
   const scope = useMemo(() => scopeFor(program), [program]);
 
   /** The catalog narrowed to the chosen degree. */
@@ -134,17 +144,41 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
     [courses, scope],
   );
 
+  /**
+   * The term's offerings, read from the database for this degree and semester
+   * rather than derived in the browser.
+   *
+   * The API returns the whole term with each course flagged `inProgram`, so the
+   * "N of M are outside <degree>" notice and its escape hatch still work from a
+   * single request.
+   */
+  const [offerings, setOfferings] = useState<OfferedCourse[]>([]);
+  useEffect(() => {
+    if (!hydrated || !termId) {
+      setOfferings([]);
+      return;
+    }
+    let current = true;
+    api.terms
+      .get(termId, programId ? { programId } : undefined)
+      .then((detail) => {
+        if (current) setOfferings(detail.courses);
+      })
+      .catch(() => {
+        if (current) setOfferings([]);
+      });
+    return () => {
+      current = false;
+    };
+  }, [termId, programId, hydrated]);
+
   // Every offered course is evaluated, not just the selected ones, so the
   // column can show what is blocked *before* the user commits to it.
-  const termOfferedIds = useMemo(() => {
-    if (!term) return [];
-    const known = new Set(courses.map((c) => c.id));
-    return term.offeredCourseIds.filter((id) => known.has(id));
-  }, [term, courses]);
+  const termOfferedIds = useMemo(() => offerings.map((o) => o.id), [offerings]);
 
   const inScopeOfferedIds = useMemo(
-    () => (scope ? termOfferedIds.filter((id) => scope.has(id)) : termOfferedIds),
-    [termOfferedIds, scope],
+    () => offerings.filter((o) => o.inProgram).map((o) => o.id),
+    [offerings],
   );
 
   const hiddenByDegree = termOfferedIds.length - inScopeOfferedIds.length;
@@ -214,10 +248,16 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
   const selectedCredits = Math.round(selected.reduce((sum, c) => sum + c.creditHours, 0) * 10) / 10;
   const blockedSelected = selected.filter((c) => !c.eligible).length;
 
-  /** Offered, registrable now, and not already chosen. */
-  const recommended = evaluated.filter(
-    (c) => c.registrable && !c.alreadyCompleted && !selectedSet.has(c.courseId),
-  );
+  /**
+   * Offered, registrable now, and not already chosen — capped at five.
+   *
+   * A recommendation list as long as the term's schedule is not a
+   * recommendation. Five is enough to fill a semester and short enough to read
+   * without scrolling; the full list is the Offered column beside it.
+   */
+  const recommended = evaluated
+    .filter((c) => c.registrable && !c.alreadyCompleted && !selectedSet.has(c.courseId))
+    .slice(0, MAX_RECOMMENDATIONS);
 
   const completedCodes = useMemo(() => {
     const byId = new Map(courses.map((c) => [c.id, c]));

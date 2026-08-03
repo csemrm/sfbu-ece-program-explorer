@@ -594,3 +594,17 @@ Each evaluated course also reports the offering's registration status:
 | `sectionCount` | Sections on the published schedule, or null. |
 | `statusNote` | The registrar's wording, verbatim (e.g. "Cancelled due to low enrollment"). |
 | `registrable` | `eligible && offered !== false && openForRegistration !== false`. |
+
+## Terms — offerings for a program and semester
+
+`GET /terms/:id` accepts an optional `programId`.
+
+Each offered course reports `openForRegistration`, `sectionCount`, `statusNote`
+and `inProgram`, plus `courseCount` (the whole term) and `inProgramCount`
+alongside it.
+
+The whole term is returned even when scoped, rather than the server filtering it
+away: the planner shows "N of M offered courses are outside `<degree>`" with an
+escape hatch to reveal them, and that needs both counts from one request. A
+program with no course-bearing requirement rows is treated as "no scope", so an
+unmodelled degree shows the whole term rather than an empty column.

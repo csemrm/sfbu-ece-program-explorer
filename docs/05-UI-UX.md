@@ -297,7 +297,7 @@ Layout — three columns
 
 | Column | Contents |
 | --- | --- |
-| Left | Courses the user has already completed — the catalog as a clickable checklist grouped by subject, plus removable chips |
+| Left | Courses the user has already completed — the degree's courses as a flat clickable checklist, plus removable chips |
 | Middle | Courses actually offered next semester, each selectable, with pending prerequisites highlighted |
 | Right | Courses ready to register, then the chosen plan with credits, blocked warnings and a PDF download |
 
@@ -305,9 +305,11 @@ Two selectors sit above the columns: **Degree** and **Next semester**.
 
 The middle column is scoped to the term's real offerings rather than the whole catalog, because the question the screen answers is "what can I register for next semester" — a catalog-wide search would surface courses that aren't running.
 
+Those offerings come from `GET /terms/:id?programId=…` — read from the database for that degree and that semester — rather than assembled in the browser from the full catalog. The response carries the whole term with each course flagged `inProgram`, which is what lets the notice below report both counts from one request.
+
 Degree scope
 
-The degree selector narrows both catalog columns to that program's courses, derived from `GET /programs/:id/roadmap` (there is no "courses in this program" endpoint, and the roadmap already carries them).
+The degree selector narrows both catalog columns. The offerings column is scoped server-side via `GET /terms/:id?programId=…`; the completed column is scoped in the browser from `GET /programs/:id/roadmap`, since it lists the whole degree rather than one term.
 
 Scoping the offerings can empty the middle column outright — Fall 2026 runs graduate CS only, so BSCS and MSEE match none of its 8 courses. That gap is stated in words ("None of Fall 2026's 8 courses are part of BSCS") with a **Show all N anyway** toggle, rather than rendering a blank panel that reads as a bug. When the overlap is partial the same notice reports how many were hidden.
 
@@ -315,13 +317,15 @@ A program whose roadmap returns no courses is treated as "do not scope" — filt
 
 Completed-courses column
 
-The whole catalog is listed as checkboxes grouped by subject prefix (CS, CE, EE, MATH, BUS), first section expanded and the rest collapsed. The search box **filters** the list rather than being the only way in: browsing suits recognition, which is how students recall what they have taken. While a filter is active every group expands, so a match can never hide inside a collapsed section.
+The degree's courses are listed as a single flat checklist ordered by course code, with a filter box above it. The list was originally grouped into collapsible subject sections; once the degree selector narrowed it, those sections mostly held one subject each and cost a click to open, so the grouping was dropped in favour of a list that scans in one pass.
 
 Courses completed under one degree stay marked when the user switches degree; the chips resolve against the unscoped catalog so their codes still render.
 
 Suggested column
 
 "Ready to register" is drawn from the term's own offerings — registrable, not already completed, not already chosen — rather than the planner API's `suggestions` feed, which answers the different question of what the *whole plan* would unlock later.
+
+It shows **at most five**. A recommendation list as long as the term's schedule is not a recommendation; five fills a semester and reads without scrolling, and the full list is the Offered column beside it.
 
 PDF download
 

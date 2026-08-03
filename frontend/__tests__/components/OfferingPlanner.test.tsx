@@ -4,7 +4,7 @@ import type { Course, TermSummary } from '../../lib/api';
 import type { ProgramOption } from '../../lib/programScope';
 
 jest.mock('../../lib/api', () => ({
-  api: { planner: { evaluate: jest.fn() } },
+  api: { planner: { evaluate: jest.fn() }, terms: { get: jest.fn() } },
 }));
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -31,6 +31,26 @@ const terms: TermSummary[] = [
 const programs: ProgramOption[] = [
   { id: 'p-1', abbreviation: 'BSCS', name: 'Bachelor of Science', courseIds: ['c-1'] },
 ];
+
+/** The term detail the API now serves: whole term, each course flagged inProgram. */
+const termDetail = (inProgram: string[] = []) => ({
+  id: 't-1',
+  name: 'Fall 2026',
+  sortOrder: 1,
+  courseCount: 2,
+  inProgramCount: inProgram.length,
+  courses: ['c-2', 'c-3'].map((id) => ({
+    id,
+    courseCode: courses.find((c) => c.id === id)!.courseCode,
+    title: courses.find((c) => c.id === id)!.title,
+    creditHours: 3,
+    level: 'graduate' as const,
+    openForRegistration: true,
+    sectionCount: null,
+    statusNote: null,
+    inProgram: inProgram.includes(id),
+  })),
+});
 
 const evaluationFor = (ids: string[], completed: string[] = []) => ({
   terms: [
@@ -69,6 +89,7 @@ const evaluationFor = (ids: string[], completed: string[] = []) => ({
 describe('OfferingPlanner — out-of-degree offerings', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    api.terms.get.mockResolvedValue(termDetail());
     api.planner.evaluate.mockImplementation(({ terms: t }: { terms: { courseIds: string[] }[] }) =>
       Promise.resolve(evaluationFor(t[0].courseIds)),
     );
@@ -186,5 +207,106 @@ describe('OfferingPlanner — completed courses in the offerings column', () => 
     expect(
       await screen.findByText(/already completed everything offered in Fall 2026/),
     ).toBeInTheDocument();
+  });
+});
+
+describe('OfferingPlanner — offerings come from the database', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.terms.get.mockResolvedValue(termDetail(['c-2']));
+    api.planner.evaluate.mockImplementation(({ terms: t }: { terms: { courseIds: string[] }[] }) =>
+      Promise.resolve(evaluationFor(t[0].courseIds)),
+    );
+  });
+
+  it('requests the term scoped to the selected degree', async () => {
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+    await waitFor(() => expect(api.terms.get).toHaveBeenCalledWith('t-1', { programId: 'p-1' }));
+  });
+
+  it("uses the API's inProgram flag for the scope notice", async () => {
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+    // 1 of the term's 2 offerings sits outside the degree.
+    expect(await screen.findByText(/1 of 2 offered courses are outside BSCS/)).toBeInTheDocument();
+  });
+
+  it('evaluates only the in-program offerings until the escape hatch is used', async () => {
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+    await waitFor(() =>
+      expect(api.planner.evaluate).toHaveBeenCalledWith(
+        expect.objectContaining({ terms: [{ termId: 't-1', courseIds: ['c-2'] }] }),
+      ),
+    );
+  });
+});
+
+describe('OfferingPlanner — the Suggested column is a shortlist', () => {
+  const many = Array.from({ length: 9 }, (_, i) => `m-${i}`);
+
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.terms.get.mockResolvedValue({
+      id: 't-1',
+      name: 'Fall 2026',
+      sortOrder: 1,
+      courseCount: many.length,
+      inProgramCount: many.length,
+      courses: many.map((id, i) => ({
+        id,
+        courseCode: `CS${600 + i}`,
+        title: `Course ${i}`,
+        creditHours: 3,
+        level: 'graduate' as const,
+        openForRegistration: true,
+        sectionCount: null,
+        statusNote: null,
+        inProgram: true,
+      })),
+    });
+    api.planner.evaluate.mockImplementation(({ terms: t }: { terms: { courseIds: string[] }[] }) =>
+      Promise.resolve({
+        terms: [
+          {
+            term: 1,
+            termId: 't-1',
+            termName: 'Fall 2026',
+            termCredits: 0,
+            courses: t[0].courseIds.map((id, i) => ({
+              courseId: id,
+              courseCode: `CS${600 + i}`,
+              title: `Course ${i}`,
+              creditHours: 3,
+              level: 'graduate' as const,
+              eligible: true,
+              offered: true,
+              openForRegistration: true,
+              sectionCount: null,
+              statusNote: null,
+              registrable: true,
+              alreadyCompleted: false,
+              satisfiedPrerequisites: [],
+              missingPrerequisites: [],
+              backgroundPrerequisites: [],
+              corequisites: [],
+              reason: 'Eligible',
+            })),
+          },
+        ],
+        suggestions: [],
+        totalPlannedCredits: 0,
+        allEligible: true,
+        allOffered: true,
+      }),
+    );
+  });
+
+  it('recommends at most five courses even when nine are registrable', async () => {
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+
+    const heading = await screen.findByText(/^Suggested for Fall 2026$/);
+    const column = heading.closest('div')!.parentElement as HTMLElement;
+    await waitFor(() =>
+      expect(within(column).getAllByRole('button', { name: /^Add CS/ })).toHaveLength(5),
+    );
   });
 });

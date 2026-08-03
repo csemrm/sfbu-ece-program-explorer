@@ -262,18 +262,28 @@ export interface TermSummary {
   offeredCourseIds: string[];
 }
 
+export interface OfferedCourse {
+  id: string;
+  courseCode: string;
+  title: string;
+  creditHours: number;
+  level: 'undergraduate' | 'graduate';
+  openForRegistration: boolean;
+  sectionCount: number | null;
+  statusNote: string | null;
+  /** False when the course is offered but sits outside the requested degree. */
+  inProgram: boolean;
+}
+
 export interface TermDetail {
   id: string;
   name: string;
   sortOrder: number;
+  /** Offerings in the term, before program scoping. */
   courseCount: number;
-  courses: Array<{
-    id: string;
-    courseCode: string;
-    title: string;
-    creditHours: number;
-    level: 'undergraduate' | 'graduate';
-  }>;
+  /** Offerings inside the requested degree; equals courseCount without one. */
+  inProgramCount: number;
+  courses: OfferedCourse[];
 }
 
 export interface KnowledgeAreaSummary {
@@ -353,6 +363,10 @@ export const api = {
   },
   terms: {
     list: () => get<TermSummary[]>('/terms'),
-    get: (id: string) => get<TermDetail>(`/terms/${id}`),
+    get: (id: string, params?: { programId?: string }) =>
+      get<TermDetail>(
+        `/terms/${id}`,
+        params?.programId ? { programId: params.programId } : undefined,
+      ),
   },
 };

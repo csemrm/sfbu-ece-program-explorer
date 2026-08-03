@@ -5,6 +5,7 @@ import { TermsService } from './terms.service';
 import { AcademicTerm } from '../../database/entities/academic-term.entity';
 import { CourseOffering } from '../../database/entities/course-offering.entity';
 import { Course, CourseLevel } from '../../database/entities/course.entity';
+import { ProgramRequirement } from '../../database/entities/program-requirement.entity';
 
 const course = (id: string, courseCode: string, creditHours = 3): Course =>
   ({
@@ -23,8 +24,11 @@ describe('TermsService', () => {
   let termRepo: { find: jest.Mock; findOne: jest.Mock };
   let offeringRepo: { find: jest.Mock };
   let courseRepo: { find: jest.Mock };
+  /** Course ids the mocked program "contains"; drives the scoping tests. */
+  let programCourseIds: string[];
 
   beforeEach(async () => {
+    programCourseIds = [];
     termRepo = { find: jest.fn(), findOne: jest.fn() };
     offeringRepo = { find: jest.fn() };
     courseRepo = { find: jest.fn() };
@@ -35,6 +39,24 @@ describe('TermsService', () => {
         { provide: getRepositoryToken(AcademicTerm), useValue: termRepo },
         { provide: getRepositoryToken(CourseOffering), useValue: offeringRepo },
         { provide: getRepositoryToken(Course), useValue: courseRepo },
+        {
+          provide: getRepositoryToken(ProgramRequirement),
+          useValue: {
+            createQueryBuilder: jest.fn(() => ({
+              innerJoin: jest.fn().mockReturnThis(),
+              where: jest.fn().mockReturnThis(),
+              andWhere: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              getRawMany: jest
+                .fn()
+                .mockImplementation(() =>
+                  Promise.resolve(
+                    programCourseIds.map((courseId) => ({ courseId })),
+                  ),
+                ),
+            })),
+          },
+        },
       ],
     }).compile();
 
@@ -145,6 +167,74 @@ describe('TermsService', () => {
       termRepo.findOne.mockResolvedValue(null);
 
       await expect(service.findOne('ghost')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('findOne() program scoping', () => {
+    const TERM = { id: 't1', name: 'Fall 2026', sortOrder: 1 };
+
+    beforeEach(() => {
+      termRepo.findOne.mockResolvedValue(TERM);
+      offeringRepo.find.mockResolvedValue([
+        {
+          termId: 't1',
+          courseId: 'c1',
+          openForRegistration: true,
+          sectionCount: 2,
+          statusNote: null,
+        },
+        {
+          termId: 't1',
+          courseId: 'c2',
+          openForRegistration: false,
+          sectionCount: 1,
+          statusNote: 'Cancelled due to low enrollment',
+        },
+      ]);
+      courseRepo.find.mockResolvedValue([
+        course('c1', 'CS500'),
+        course('c2', 'MGT510'),
+      ]);
+    });
+
+    it('carries the registration status published by the registrar', async () => {
+      const detail = await service.findOne('t1');
+      const [cs500, mgt510] = detail.courses;
+
+      expect(cs500.openForRegistration).toBe(true);
+      expect(cs500.sectionCount).toBe(2);
+      expect(mgt510.openForRegistration).toBe(false);
+      expect(mgt510.statusNote).toBe('Cancelled due to low enrollment');
+    });
+
+    it('treats every course as in-program when no degree is requested', async () => {
+      const detail = await service.findOne('t1');
+      expect(detail.courses.every((c) => c.inProgram)).toBe(true);
+      expect(detail.inProgramCount).toBe(2);
+      expect(detail.courseCount).toBe(2);
+    });
+
+    it('flags out-of-degree courses but still returns them', async () => {
+      programCourseIds = ['c1'];
+      const detail = await service.findOne('t1', 'p1');
+
+      // Both are returned: the planner reports how many fall outside the degree
+      // and offers to reveal them, which needs the whole term in one response.
+      expect(detail.courseCount).toBe(2);
+      expect(detail.inProgramCount).toBe(1);
+      expect(
+        detail.courses.find((c) => c.courseCode === 'CS500')?.inProgram,
+      ).toBe(true);
+      expect(
+        detail.courses.find((c) => c.courseCode === 'MGT510')?.inProgram,
+      ).toBe(false);
+    });
+
+    it('shows the whole term when the degree has no course requirements', async () => {
+      // An unmodelled programme must not blank the column.
+      programCourseIds = [];
+      const detail = await service.findOne('t1', 'p1');
+      expect(detail.inProgramCount).toBe(2);
     });
   });
 });
