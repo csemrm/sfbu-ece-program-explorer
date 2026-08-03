@@ -1,6 +1,14 @@
 import type { Metadata } from 'next';
 import { api, type Course, type TermSummary } from '../../../lib/api';
-import { courseIdsFromRoadmap, type ProgramOption } from '../../../lib/programScope';
+import {
+  courseIdsFromRoadmap,
+  capstoneCourseIdsFromRoadmap,
+  groupOrderFromRoadmap,
+  groupsFromRoadmap,
+  requiredCreditsFromRoadmap,
+  tiersFromRoadmap,
+  type ProgramOption,
+} from '../../../lib/programScope';
 import { Breadcrumb } from '../../../components/ui/Breadcrumb';
 import { OfferingPlanner } from '../../../components/planner/OfferingPlanner';
 
@@ -49,9 +57,26 @@ async function loadProgramOptions(): Promise<ProgramOption[]> {
       programs.data.map(async (p) => {
         const base = { id: p.id, abbreviation: p.abbreviation, name: p.name };
         try {
-          return { ...base, courseIds: courseIdsFromRoadmap(await api.programs.roadmap(p.id)) };
+          const roadmap = await api.programs.roadmap(p.id);
+          return {
+            ...base,
+            courseIds: courseIdsFromRoadmap(roadmap),
+            tiers: tiersFromRoadmap(roadmap),
+            groups: groupsFromRoadmap(roadmap),
+            groupOrder: groupOrderFromRoadmap(roadmap),
+            requiredCredits: requiredCreditsFromRoadmap(roadmap),
+            capstoneCourseIds: capstoneCourseIdsFromRoadmap(roadmap),
+          };
         } catch {
-          return { ...base, courseIds: [] };
+          return {
+            ...base,
+            courseIds: [],
+            tiers: {},
+            groups: {},
+            groupOrder: {},
+            requiredCredits: 0,
+            capstoneCourseIds: [],
+          };
         }
       }),
     );
@@ -60,7 +85,14 @@ async function loadProgramOptions(): Promise<ProgramOption[]> {
   }
 }
 
-export default async function PlanPage() {
+export default async function PlanPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ program?: string }>;
+}) {
+  // Linked from a program page, so the planner opens on that degree rather than
+  // whatever the browser last stored.
+  const { program: requestedProgramId } = await searchParams;
   let courses: Course[];
   try {
     courses = await loadAllCourses();
@@ -102,7 +134,12 @@ export default async function PlanPage() {
 
       {/* Wider than the rest of the site — three columns need the room. */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <OfferingPlanner courses={courses} academicTerms={academicTerms} programs={programs} />
+        <OfferingPlanner
+          courses={courses}
+          academicTerms={academicTerms}
+          programs={programs}
+          initialProgramId={requestedProgramId ?? null}
+        />
       </div>
     </div>
   );

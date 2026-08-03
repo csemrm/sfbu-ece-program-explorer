@@ -205,4 +205,42 @@ describe('catalog seed data', () => {
     }
     expect(checked).toBe(3); // BSCS Free, MSCS Graduate, MSEE Graduate
   });
+
+  /**
+   * Spot-checks against the printed catalog.
+   *
+   * PREREQUISITES is generated from the catalog PDF, so adding courses without
+   * regenerating it leaves them silently prerequisite-free — which is how CS547
+   * shipped with none while CS550, whose catalog entry states the same
+   * "Prerequisite: CS457", had one. Referential integrity cannot catch that: a
+   * missing row is perfectly consistent.
+   */
+  describe('prerequisites stated in the 2025-2026 catalog', () => {
+    const links = new Set(
+      PREREQUISITES.map((p) => `${p.courseCode}->${p.prerequisiteCode}`),
+    );
+
+    it.each([
+      ['CS547', 'CS457'],
+      ['CS550', 'CS457'],
+      ['CS570', 'CS500'],
+      ['CS571', 'CS500'],
+      ['CS483L', 'CS250L'],
+      ['DS500', 'MATH208'],
+      ['EE488G', 'EE461'],
+      ['EE504', 'EE461'],
+      ['EE553', 'EE488'],
+      ['FIN568', 'FIN501'],
+      ['FIN585', 'FIN501'],
+    ])('%s requires %s', (course, prerequisite) => {
+      expect(links.has(`${course}->${prerequisite}`)).toBe(true);
+    });
+
+    it('records a prerequisite for most graduate courses', () => {
+      // A blanket floor: if the block is ever regenerated from an empty or
+      // truncated extraction, the count collapses and this fails loudly.
+      const withPrereq = new Set(PREREQUISITES.map((p) => p.courseCode));
+      expect(withPrereq.size).toBeGreaterThanOrEqual(40);
+    });
+  });
 });

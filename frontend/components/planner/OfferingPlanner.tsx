@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   api,
@@ -8,7 +9,7 @@ import {
   type PlanEvaluation,
   type TermSummary,
 } from '../../lib/api';
-import { scopeFor, type ProgramOption } from '../../lib/programScope';
+import { scopeFor, tierRank, type ProgramOption } from '../../lib/programScope';
 import { CompletedPanel } from './CompletedPanel';
 import { OfferedCourseRow } from './OfferedCourseRow';
 import { PlanSummaryColumn } from './PlanSummaryColumn';
@@ -17,6 +18,12 @@ interface Props {
   courses: Course[];
   academicTerms: TermSummary[];
   programs: ProgramOption[];
+  /**
+   * Degree to open on, from `?program=` — set when the planner is linked from a
+   * program page. Takes precedence over the stored plan, because arriving from
+   * BSCS and landing on MSCS would be the wrong answer to a deliberate click.
+   */
+  initialProgramId?: string | null;
 }
 
 interface PlanState {
@@ -95,12 +102,18 @@ function loadState(): PlanState {
  * the gap is stated in words and an escape hatch shows the unscoped term
  * rather than leaving a blank panel that reads as a bug.
  */
-export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
+export function OfferingPlanner({
+  courses,
+  academicTerms,
+  programs,
+  initialProgramId = null,
+}: Props) {
   const [completedIds, setCompletedIds] = useState<string[]>([]);
   const [termId, setTermId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [programId, setProgramId] = useState<string | null>(null);
   const [showAllOfferings, setShowAllOfferings] = useState(false);
+  const [offeredQuery, setOfferedQuery] = useState('');
   const [evaluation, setEvaluation] = useState<PlanEvaluation | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
@@ -117,12 +130,17 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
     setCompletedIds(s.completedIds);
     setSelectedIds(s.selectedIds);
     setTermId(s.termId ?? defaultTermId);
+    const known = (id: string | null) => !!id && programs.some((p) => p.id === id);
     setProgramId(
-      s.programId && programs.some((p) => p.id === s.programId) ? s.programId : defaultProgramId,
+      known(initialProgramId)
+        ? initialProgramId
+        : known(s.programId)
+          ? s.programId
+          : defaultProgramId,
     );
     setShowAllOfferings(s.showAllOfferings);
     setHydrated(true);
-  }, [defaultTermId, defaultProgramId, programs]);
+  }, [defaultTermId, defaultProgramId, programs, initialProgramId]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -134,6 +152,14 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
 
   const term = academicTerms.find((t) => t.id === termId) ?? null;
   const program = programs.find((p) => p.id === programId) ?? null;
+
+  /**
+   * Arriving from a program page means the degree is already decided, so it is
+   * shown rather than offered as a choice — a selector there invites the user
+   * to undo the navigation they just made. It is still named, because the rest
+   * of the screen is scoped to it and that must not be invisible.
+   */
+  const degreeFixed = !!initialProgramId && programs.some((p) => p.id === initialProgramId);
   // Still used for the completed-courses column, which lists the whole degree
   // rather than one term's offerings.
   const scope = useMemo(() => scopeFor(program), [program]);
@@ -174,11 +200,30 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
 
   // Every offered course is evaluated, not just the selected ones, so the
   // column can show what is blocked *before* the user commits to it.
-  const termOfferedIds = useMemo(() => offerings.map((o) => o.id), [offerings]);
+  //
+  // Ordered by what the student can act on: anything closed or cancelled sinks
+  // to the end regardless of degree, because it cannot be registered for at
+  // all; among the rest the degree's own courses lead, so revealing the whole
+  // term does not bury them.
+  //
+  // Sorted once, before the split — sorting only the full list left the default
+  // scoped view in whatever order the API returned.
+  const sortedOfferings = useMemo(
+    () =>
+      [...offerings].sort(
+        (a, b) =>
+          Number(b.openForRegistration) - Number(a.openForRegistration) ||
+          Number(b.inProgram) - Number(a.inProgram) ||
+          a.courseCode.localeCompare(b.courseCode),
+      ),
+    [offerings],
+  );
+
+  const termOfferedIds = useMemo(() => sortedOfferings.map((o) => o.id), [sortedOfferings]);
 
   const inScopeOfferedIds = useMemo(
-    () => offerings.filter((o) => o.inProgram).map((o) => o.id),
-    [offerings],
+    () => sortedOfferings.filter((o) => o.inProgram).map((o) => o.id),
+    [sortedOfferings],
   );
 
   const hiddenByDegree = termOfferedIds.length - inScopeOfferedIds.length;
@@ -243,6 +288,15 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
    */
   const evaluated = (evaluation?.terms[0]?.courses ?? []).filter((c) => !c.alreadyCompleted);
   const completedHiddenCount = (evaluation?.terms[0]?.courses.length ?? 0) - evaluated.length;
+
+  /** The offerings column after its own filter — the term is long enough to need one. */
+  const visibleOffered = useMemo(() => {
+    const q = offeredQuery.trim().toLowerCase();
+    if (q === '') return evaluated;
+    return evaluated.filter(
+      (c) => c.courseCode.toLowerCase().includes(q) || c.title.toLowerCase().includes(q),
+    );
+  }, [evaluated, offeredQuery]);
   const selectedSet = new Set(selectedIds);
   const selected = evaluated.filter((c) => selectedSet.has(c.courseId));
   const selectedCredits = Math.round(selected.reduce((sum, c) => sum + c.creditHours, 0) * 10) / 10;
@@ -255,8 +309,56 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
    * recommendation. Five is enough to fill a semester and short enough to read
    * without scrolling; the full list is the Offered column beside it.
    */
+  /**
+   * Capstone courses the student is not yet ready for.
+   *
+   * The catalog reserves the capstone for "all or most coursework" completed, so
+   * it is offered once this semester would carry the student to the degree's
+   * required credits. Below that it is flagged with the shortfall rather than
+   * blocked: "most" is a judgement an advisor makes, and the planner does not
+   * hold that authority — the same reason an unmet prerequisite stays
+   * selectable.
+   */
+  const capstoneShortfall = useMemo(() => {
+    const required = program?.requiredCredits ?? 0;
+    const capstones = new Set(program?.capstoneCourseIds ?? []);
+    if (!required || capstones.size === 0) return new Map<string, number>();
+
+    const creditsOf = new Map(courses.map((c) => [c.id, Number(c.creditHours) || 0]));
+    const completedCredits = completedIds.reduce((sum, id) => sum + (creditsOf.get(id) ?? 0), 0);
+    const plannedCredits = selectedIds.reduce((sum, id) => sum + (creditsOf.get(id) ?? 0), 0);
+
+    const shortfall = new Map<string, number>();
+    for (const id of capstones) {
+      const withCapstone =
+        completedCredits +
+        plannedCredits +
+        (selectedIds.includes(id) ? 0 : (creditsOf.get(id) ?? 0));
+      const gap = Math.round((required - withCapstone) * 10) / 10;
+      if (gap > 0) shortfall.set(id, gap);
+    }
+    return shortfall;
+  }, [program, courses, completedIds, selectedIds]);
+
   const recommended = evaluated
-    .filter((c) => c.registrable && !c.alreadyCompleted && !selectedSet.has(c.courseId))
+    .filter(
+      (c) =>
+        c.registrable &&
+        !c.alreadyCompleted &&
+        !selectedSet.has(c.courseId) &&
+        // Recommending a capstone to a student who is not near the end would be
+        // advice they cannot act on.
+        !capstoneShortfall.has(c.courseId),
+    )
+    // Ranked by how firmly the degree requires the course: a Core or Foundation
+    // course outranks a specialization choice, which outranks a free elective.
+    // With only five slots, spending one on an elective while a required course
+    // is available would be the wrong advice.
+    .sort(
+      (a, b) =>
+        tierRank(program?.tiers[a.courseId]) - tierRank(program?.tiers[b.courseId]) ||
+        a.courseCode.localeCompare(b.courseCode),
+    )
     .slice(0, MAX_RECOMMENDATIONS);
 
   const completedCodes = useMemo(() => {
@@ -275,28 +377,42 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-        {programs.length > 0 && (
-          <div className="flex items-center gap-3">
-            <label htmlFor="planner-program" className="text-sm font-medium text-gray-600">
-              Degree
-            </label>
-            <select
-              id="planner-program"
-              value={programId ?? ''}
-              onChange={(e) => {
-                setProgramId(e.target.value || null);
-                setShowAllOfferings(false);
-              }}
-              className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 focus:border-sfbu-navy focus:outline-none"
-            >
-              {programs.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.abbreviation} — {p.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        {programs.length > 0 &&
+          (degreeFixed ? (
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-gray-600">Degree</span>
+              <span className="rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-800">
+                {program ? `${program.abbreviation} — ${program.name}` : '—'}
+              </span>
+              <Link
+                href={`/programs/${programId}`}
+                className="text-xs text-gray-400 underline hover:text-sfbu-navy"
+              >
+                back to programme
+              </Link>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <label htmlFor="planner-program" className="text-sm font-medium text-gray-600">
+                Degree
+              </label>
+              <select
+                id="planner-program"
+                value={programId ?? ''}
+                onChange={(e) => {
+                  setProgramId(e.target.value || null);
+                  setShowAllOfferings(false);
+                }}
+                className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 focus:border-sfbu-navy focus:outline-none"
+              >
+                {programs.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.abbreviation} — {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
 
         <div className="flex items-center gap-3">
           <label htmlFor="planner-term" className="text-sm font-medium text-gray-600">
@@ -333,6 +449,7 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
           <CompletedPanel
             courses={scopedCourses}
             allCourses={courses}
+            degreeLabel={program?.abbreviation ?? null}
             completedIds={completedIds}
             onAdd={addCompleted}
             onRemove={removeCompleted}
@@ -373,6 +490,19 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
             </div>
           )}
 
+          {offeredIds.length > 0 && (
+            <div className="border-b border-gray-100 px-4 py-2.5">
+              <input
+                type="search"
+                value={offeredQuery}
+                onChange={(e) => setOfferedQuery(e.target.value)}
+                placeholder="Filter offered courses…"
+                aria-label="Filter offered courses by code or title"
+                className="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:border-sfbu-navy focus:outline-none focus:ring-1 focus:ring-sfbu-navy"
+              />
+            </div>
+          )}
+
           <div className="px-4 py-3">
             {!term ? (
               <p className="py-6 text-center text-sm text-gray-400">
@@ -396,13 +526,19 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
               <p className="py-6 text-center text-sm text-gray-400">Checking eligibility…</p>
             ) : (
               <ul className="space-y-2">
-                {evaluated.map((c) => (
+                {visibleOffered.length === 0 && (
+                  <li className="py-4 text-center text-sm text-gray-400">
+                    No offered courses match &ldquo;{offeredQuery.trim()}&rdquo;.
+                  </li>
+                )}
+                {visibleOffered.map((c) => (
                   <OfferedCourseRow
                     key={c.courseId}
                     course={c}
                     selected={selectedSet.has(c.courseId)}
                     onToggle={() => toggleSelected(c.courseId)}
                     unselectedCorequisites={coreqsNotSelected(c.courseId)}
+                    capstoneShortfall={capstoneShortfall.get(c.courseId) ?? null}
                   />
                 ))}
               </ul>
@@ -437,7 +573,11 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
           programLabel={program ? `${program.abbreviation} — ${program.name}` : null}
           recommended={recommended}
           selected={selected}
+          offered={evaluated}
           completedCodes={completedCodes}
+          groups={program?.groups}
+          tiers={program?.tiers}
+          groupOrder={program?.groupOrder}
           onAdd={addSelected}
         />
       </div>

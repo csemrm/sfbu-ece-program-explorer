@@ -4,7 +4,12 @@ import { useMemo, useState } from 'react';
 import type { Course } from '../../lib/api';
 
 interface Props {
+  /** Courses in the selected degree. */
   courses: Course[];
+  /** The unscoped catalog, used only to explain an empty filter result. */
+  allCourses?: Course[];
+  /** Abbreviation of the selected degree, for that explanation. */
+  degreeLabel?: string | null;
   completedIds: string[];
   onToggle: (courseId: string) => void;
 }
@@ -27,20 +32,48 @@ const formatCredits = (value: string) => {
  * cost a click to open — a flat list is quicker to scan and the filter box does
  * the narrowing.
  */
-export function CompletedCourseList({ courses, completedIds, onToggle }: Props) {
+export function CompletedCourseList({
+  courses,
+  allCourses,
+  degreeLabel,
+  completedIds,
+  onToggle,
+}: Props) {
   const [query, setQuery] = useState('');
 
   const completed = useMemo(() => new Set(completedIds), [completedIds]);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return [...courses]
-      .sort((a, b) => a.courseCode.localeCompare(b.courseCode))
-      .filter(
-        (c) =>
-          q === '' || c.courseCode.toLowerCase().includes(q) || c.title.toLowerCase().includes(q),
-      );
-  }, [courses, query]);
+    return (
+      [...courses]
+        .filter(
+          (c) =>
+            q === '' || c.courseCode.toLowerCase().includes(q) || c.title.toLowerCase().includes(q),
+        )
+        // Marked courses float to the top: they are the answer the user has built,
+        // and hunting for them among a hundred unmarked rows to correct a mistake
+        // was the one thing this list made hard.
+        .sort((a, b) => {
+          const marked = Number(completed.has(b.id)) - Number(completed.has(a.id));
+          return marked !== 0 ? marked : a.courseCode.localeCompare(b.courseCode);
+        })
+    );
+  }, [courses, query, completed]);
+
+  const markedCount = visible.filter((c) => completed.has(c.id)).length;
+
+  /** Matches the filter but belongs to another degree — the usual reason for an empty list. */
+  const elsewhere = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (q === '' || visible.length > 0 || !allCourses) return [];
+    const inDegree = new Set(courses.map((c) => c.id));
+    return allCourses.filter(
+      (c) =>
+        !inDegree.has(c.id) &&
+        (c.courseCode.toLowerCase().includes(q) || c.title.toLowerCase().includes(q)),
+    );
+  }, [allCourses, courses, query, visible.length]);
 
   return (
     <div>
@@ -58,15 +91,32 @@ export function CompletedCourseList({ courses, completedIds, onToggle }: Props) 
       </p>
 
       {visible.length === 0 ? (
-        <p className="py-6 text-center text-sm text-gray-400">
-          No courses match &ldquo;{query.trim()}&rdquo;.
-        </p>
+        <div className="py-6 text-center text-sm text-gray-400">
+          <p>No courses match &ldquo;{query.trim()}&rdquo;.</p>
+          {/* An empty result is usually the degree filter, not a missing course.
+              Saying so beats leaving the user to wonder whether the catalog is
+              incomplete. */}
+          {elsewhere.length > 0 && (
+            <p className="mt-1 text-xs text-gray-500">
+              {elsewhere
+                .slice(0, 3)
+                .map((c) => c.courseCode)
+                .join(', ')}
+              {elsewhere.length > 3 && ` and ${elsewhere.length - 3} more`}{' '}
+              {elsewhere.length === 1 ? 'is' : 'are'} in the catalog but not part of{' '}
+              {degreeLabel ?? 'this degree'}.
+            </p>
+          )}
+        </div>
       ) : (
         <ul className="mt-3 max-h-[26rem] space-y-0.5 overflow-y-auto pr-1">
-          {visible.map((course) => {
+          {visible.map((course, index) => {
             const isMarked = completed.has(course.id);
+            // A rule under the last marked course, so the reordering reads as
+            // two groups rather than an arbitrary sort.
+            const firstUnmarked = !isMarked && index === markedCount && markedCount > 0;
             return (
-              <li key={course.id}>
+              <li key={course.id} className={firstUnmarked ? 'border-t border-gray-200 pt-1' : ''}>
                 <label
                   className={`flex cursor-pointer items-center gap-2.5 rounded-lg border px-2.5 py-1.5 text-sm transition-colors ${
                     isMarked

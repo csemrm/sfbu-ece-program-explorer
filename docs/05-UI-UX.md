@@ -317,21 +317,27 @@ A program whose roadmap returns no courses is treated as "do not scope" — filt
 
 Completed-courses column
 
-The degree's courses are listed as a single flat checklist ordered by course code, with a filter box above it. The list was originally grouped into collapsible subject sections; once the degree selector narrowed it, those sections mostly held one subject each and cost a click to open, so the grouping was dropped in favour of a list that scans in one pass.
+The degree's courses are listed as a single flat checklist with a filter box above it. **Marked courses sort to the top**, separated by a rule, with everything else following by course code — correcting a mistake meant hunting through a hundred unmarked rows otherwise. Order within each half is by course code. The list was originally grouped into collapsible subject sections; once the degree selector narrowed it, those sections mostly held one subject each and cost a click to open, so the grouping was dropped in favour of a list that scans in one pass.
 
 Courses completed under one degree stay marked when the user switches degree; the chips resolve against the unscoped catalog so their codes still render.
+
+When a filter matches nothing, the panel says whether the course exists **in another degree** — "CS483, CS483L are in the catalog but not part of MSCS". An empty result is usually the degree filter doing its job, and silence there reads as a missing course.
 
 Suggested column
 
 "Ready to register" is drawn from the term's own offerings — registrable, not already completed, not already chosen — rather than the planner API's `suggestions` feed, which answers the different question of what the *whole plan* would unlock later.
 
-It shows **at most five**. A recommendation list as long as the term's schedule is not a recommendation; five fills a semester and reads without scrolling, and the full list is the Offered column beside it.
+It shows **at most five**, ranked by how firmly the degree requires each course: Core/Foundation/Preparation/Capstone first, then a specialization or cluster choice, then a free elective. With only five slots, spending one on an elective while a required course is available would be the wrong advice. The tier comes from the requirement group's name in the roadmap, so it needs no extra data.
+
+A recommendation list as long as the term's schedule is not a recommendation; five fills a semester and reads without scrolling, and the full list is the Offered column beside it.
 
 PDF download
 
 The plan prints through a hidden `.plan-print` sheet revealed only under `@media print`, with `window.print()` behind a "Download as PDF" button; the user chooses "Save as PDF" in the browser dialog. No PDF library is bundled, keeping the client bundle unchanged.
 
-The sheet carries the term, degree, planned courses with per-course status, total credits, the completed-course list, and an "Advisory only — not a registration record" disclaimer. Suggestions are deliberately left off paper: the printed artefact is the registration sheet, not the recommendation.
+The sheet carries **every list on the screen**: the plan broken out by requirement group, the ready-to-register shortlist, the full term offering table with each course's registration status, and the completed-course list — plus the term, degree and an "Advisory only — not a registration record" disclaimer.
+
+**Your plan** is grouped by requirement group on screen and on paper — Foundation Courses, Capstone, Free Electives — with credits per group. A flat list of five codes does not tell a student whether they have covered their core requirements or stacked five electives, which is the question a registration plan exists to answer. Groups sort by requirement tier, then by the catalog's own sequence, so Foundation precedes Capstone rather than the alphabet deciding.
 
 Course states in the right column
 
@@ -342,7 +348,13 @@ Course states in the right column
 | Corequisite not selected | Amber note, shown only once the course itself is selected |
 | Already completed | Amber note (likely a mistake to re-take) |
 
-A blocked course stays **selectable**. The planner is advisory, not a registration gate, and a student may be resolving the prerequisite by other means (transfer credit, waiver, a course taken elsewhere). Disabling the checkbox would assert an authority this tool does not have. The selection summary counts how many picks are still blocked.
+A **cancelled or closed** course is not selectable — its checkbox is disabled. This is deliberately different from the rule below: no waiver or transfer credit makes a cancelled course registerable, so there is nothing for the student to plan around.
+
+The column has its own **filter box** — 96 offerings is too many to scan — and is ordered by what the student can act on: anything **closed or cancelled sinks to the end** regardless of degree, and among the rest **in-program courses lead**. The sort is applied before the scoped/full split, so the default view is ordered too.
+
+The **capstone** is flagged when taken too early: the catalog reserves it for "all or most coursework" completed, so it is offered once the current semester would carry the student to the degree's required credits, and below that it carries a "Final semester — N more credits needed" note and drops out of Suggested. It stays selectable — "most" is an advisor's judgement, not the planner's.
+
+A prerequisite-blocked course stays **selectable**. The planner is advisory, not a registration gate, and a student may be resolving the prerequisite by other means (transfer credit, waiver, a course taken elsewhere). Disabling the checkbox would assert an authority this tool does not have. The selection summary counts how many picks are still blocked.
 
 Blocked rows carry a visually-hidden "Prerequisites pending:" prefix and an `aria-describedby` link from the checkbox to the reason, so the red highlight is never the only signal.
 

@@ -8,6 +8,8 @@ interface Props {
   onToggle: () => void;
   /** Corequisite codes that are offered but not currently selected. */
   unselectedCorequisites: string[];
+  /** Credits still short of the degree total; set only for a capstone taken too early. */
+  capstoneShortfall?: number | null;
 }
 
 /**
@@ -19,7 +21,13 @@ interface Props {
  * other means (transfer credit, waiver, a course taken elsewhere). Blocking the
  * checkbox would assert an authority this tool does not have.
  */
-export function OfferedCourseRow({ course, selected, onToggle, unselectedCorequisites }: Props) {
+export function OfferedCourseRow({
+  course,
+  selected,
+  onToggle,
+  unselectedCorequisites,
+  capstoneShortfall = null,
+}: Props) {
   const blocked = !course.eligible;
   // A course that runs but is closed to registration is a different problem
   // from an unmet prerequisite: the student is ready, the registrar is not.
@@ -39,13 +47,25 @@ export function OfferedCourseRow({ course, selected, onToggle, unselectedCorequi
               : 'border-gray-200 bg-white hover:border-gray-300'
       }`}
     >
-      <label className="flex cursor-pointer items-start gap-3 px-3 py-2.5">
+      <label
+        className={`flex items-start gap-3 px-3 py-2.5 ${
+          closed ? 'cursor-not-allowed' : 'cursor-pointer'
+        }`}
+      >
         <input
           type="checkbox"
           checked={selected}
-          onChange={onToggle}
+          // Guarded as well as disabled: the attribute stops a real user, this
+          // stops any other path to the handler.
+          onChange={() => {
+            if (!closed) onToggle();
+          }}
+          // A cancelled or closed course cannot be registered for by any means,
+          // so unlike an unmet prerequisite — which a waiver or transfer credit
+          // can resolve — there is nothing for the student to plan around.
+          disabled={closed}
           aria-describedby={blocked || closed ? reasonId : undefined}
-          className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-sfbu-navy focus:ring-sfbu-navy"
+          className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-sfbu-navy focus:ring-sfbu-navy disabled:cursor-not-allowed disabled:opacity-50"
         />
 
         <span className="min-w-0 flex-1">
@@ -57,6 +77,11 @@ export function OfferedCourseRow({ course, selected, onToggle, unselectedCorequi
             {blocked && (
               <span className="shrink-0 rounded bg-red-100 px-1.5 py-0.5 text-[11px] font-semibold text-red-800">
                 Prerequisites pending
+              </span>
+            )}
+            {capstoneShortfall !== null && !closed && (
+              <span className="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[11px] font-semibold text-amber-800">
+                Final semester
               </span>
             )}
             {closed && (
@@ -102,6 +127,14 @@ export function OfferedCourseRow({ course, selected, onToggle, unselectedCorequi
             <span id={reasonId} className="mt-1 block text-xs text-amber-700">
               <span className="sr-only">{cancelled ? 'Cancelled: ' : 'Registration closed: '}</span>
               {course.statusNote ?? 'Not open for registration this term.'}
+            </span>
+          )}
+
+          {capstoneShortfall !== null && !closed && (
+            <span className="mt-1 block text-xs text-amber-700">
+              <span className="sr-only">Final semester only: </span>
+              The capstone is taken in your final semester — {capstoneShortfall} more credits needed
+              first.
             </span>
           )}
 

@@ -190,4 +190,58 @@ describe('OfferedCourseRow', () => {
     });
     expect(await axe(container)).toHaveNoViolations();
   });
+
+  it('makes a cancelled course unselectable — no waiver revives it', () => {
+    const onToggle = jest.fn();
+    renderRow({
+      course: {
+        ...eligible,
+        openForRegistration: false,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+      onToggle,
+    });
+    const box = screen.getByRole('checkbox');
+    expect(box).toBeDisabled();
+    fireEvent.click(box);
+    expect(onToggle).not.toHaveBeenCalled();
+  });
+
+  it('still lets a prerequisite-blocked course be selected', () => {
+    // Deliberately different from a cancelled course: a student may be
+    // resolving the prerequisite by transfer credit or a waiver.
+    const onToggle = jest.fn();
+    renderRow({ course: blocked, onToggle });
+    const box = screen.getByRole('checkbox');
+    expect(box).not.toBeDisabled();
+    fireEvent.click(box);
+    expect(onToggle).toHaveBeenCalled();
+  });
+
+  it('flags a capstone taken before the final semester, naming the shortfall', () => {
+    renderRow({ course: eligible, capstoneShortfall: 21 });
+    expect(screen.getByText('Final semester')).toBeInTheDocument();
+    expect(screen.getByText(/21 more credits needed/)).toBeInTheDocument();
+  });
+
+  it('leaves an early capstone selectable — "most coursework" is an advisor call', () => {
+    // Unlike a cancelled section, this is a soft catalog rule the planner has no
+    // authority to enforce.
+    const onToggle = jest.fn();
+    renderRow({ course: eligible, capstoneShortfall: 21, onToggle });
+    const box = screen.getByRole('checkbox');
+    expect(box).not.toBeDisabled();
+    fireEvent.click(box);
+    expect(onToggle).toHaveBeenCalled();
+  });
+
+  it('says nothing once the student has the credits', () => {
+    renderRow({ course: eligible, capstoneShortfall: null });
+    expect(screen.queryByText('Final semester')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations when flagged for the final semester', async () => {
+    const { container } = renderRow({ course: eligible, capstoneShortfall: 21 });
+    expect(await axe(container)).toHaveNoViolations();
+  });
 });

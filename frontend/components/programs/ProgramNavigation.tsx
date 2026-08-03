@@ -11,7 +11,7 @@ export function ProgramNavigation({ programId, abbreviation }: Props) {
       <h2 id="nav-heading" className="text-xl font-bold text-gray-900 mb-4">
         Explore Further
       </h2>
-      <div className="grid sm:grid-cols-2 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Link
           href={`/programs/${programId}/roadmap`}
           className="group rounded-xl border border-gray-200 bg-white p-5 hover:shadow-md transition-all"
@@ -70,6 +70,37 @@ export function ProgramNavigation({ programId, abbreviation }: Props) {
           </h3>
           <p className="text-sm text-gray-500">
             Interactive dependency graph for all {abbreviation} courses.
+          </p>
+        </Link>
+        {/* Carries the program so the planner opens on this degree rather than
+            whatever the browser last stored. */}
+        <Link
+          href={`/plan?program=${programId}`}
+          className="group rounded-xl border border-gray-200 bg-white p-5 hover:shadow-md transition-all"
+        >
+          <div
+            className="w-10 h-10 rounded-lg flex items-center justify-center text-white mb-3"
+            style={{ backgroundColor: 'var(--sfbu-navy)' }}
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4" />
+            </svg>
+          </div>
+          <h3 className="font-semibold text-gray-900 mb-1 transition-colors">
+            <span className="group-hover:text-sfbu-navy">Semester Planner</span>
+          </h3>
+          <p className="text-sm text-gray-500">
+            Check what you can register for next semester as a {abbreviation} student.
           </p>
         </Link>
       </div>
