@@ -90,12 +90,36 @@ describe('OfferedCourseRow', () => {
     expect(screen.getByText('Prerequisites pending:')).toBeInTheDocument();
   });
 
-  it('leaves a blocked course selectable — the planner advises, it does not gate', () => {
+  it('does not let a blocked course be added to the plan', () => {
     const onToggle = jest.fn();
     renderRow({ course: blocked, onToggle });
     const box = screen.getByRole('checkbox');
+    expect(box).toBeDisabled();
+    fireEvent.click(box);
+    expect(onToggle).not.toHaveBeenCalled();
+  });
+
+  it('still lets a blocked course be removed once chosen', () => {
+    // A course can become blocked after it was picked — the student unmarks its
+    // prerequisite, or the registrar cancels it — and must not be stranded in
+    // the plan with no way to take it out.
+    const onToggle = jest.fn();
+    renderRow({ course: blocked, selected: true, onToggle });
+    const box = screen.getByRole('checkbox');
     expect(box).not.toBeDisabled();
     fireEvent.click(box);
+    expect(onToggle).toHaveBeenCalled();
+  });
+
+  it('still lets a cancelled course be removed once chosen', () => {
+    const onToggle = jest.fn();
+    renderRow({
+      course: { ...eligible, openForRegistration: false, statusNote: 'Cancelled' },
+      selected: true,
+      onToggle,
+    });
+    expect(screen.getByRole('checkbox')).not.toBeDisabled();
+    fireEvent.click(screen.getByRole('checkbox'));
     expect(onToggle).toHaveBeenCalled();
   });
 
@@ -207,15 +231,12 @@ describe('OfferedCourseRow', () => {
     expect(onToggle).not.toHaveBeenCalled();
   });
 
-  it('still lets a prerequisite-blocked course be selected', () => {
-    // Deliberately different from a cancelled course: a student may be
-    // resolving the prerequisite by transfer credit or a waiver.
-    const onToggle = jest.fn();
-    renderRow({ course: blocked, onToggle });
-    const box = screen.getByRole('checkbox');
-    expect(box).not.toBeDisabled();
-    fireEvent.click(box);
-    expect(onToggle).toHaveBeenCalled();
+  it('names what is missing rather than only disabling the row', () => {
+    // Gating without saying why would leave the student with no route forward;
+    // marking the named prerequisite as completed unblocks this row.
+    renderRow({ course: blocked });
+    expect(screen.getByText('Prerequisites pending')).toBeInTheDocument();
+    expect(screen.getByText('CS515')).toBeInTheDocument();
   });
 
   it('flags a capstone taken before the final semester, naming the shortfall', () => {
