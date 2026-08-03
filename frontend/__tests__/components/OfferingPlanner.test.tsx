@@ -711,3 +711,133 @@ describe('OfferingPlanner — where to begin when nothing is completed', () => {
     await waitFor(() => expect(order()[0]).toBe('GATE'));
   });
 });
+
+describe('OfferingPlanner — offerings grouped into requirement cards', () => {
+  const ids = ['found', 'spec', 'elec', 'stray'];
+
+  const progs: ProgramOption[] = [
+    {
+      id: 'p-1',
+      abbreviation: 'BSCS',
+      name: 'Bachelor',
+      courseIds: ['found', 'spec', 'elec'],
+      tiers: { found: 'required', spec: 'specialization', elec: 'elective' },
+      groups: {
+        found: 'Foundation Courses',
+        spec: 'Specialization — Data Science',
+        elec: 'Free Electives',
+      },
+      // Deliberately out of alphabetical order: Capstone-like groups must not
+      // float to the front just because of their name.
+      groupOrder: { found: 1, spec: 2, elec: 3 },
+      requiredCredits: 36,
+      capstoneCourseIds: [],
+    },
+  ];
+
+  beforeEach(() => {
+    window.localStorage.clear();
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        completedIds: [],
+        termId: 't-1',
+        selectedIds: [],
+        programId: 'p-1',
+        // 'stray' has no group in this degree; revealing it is what surfaces
+        // the trailing card.
+        showAllOfferings: true,
+      }),
+    );
+    api.terms.get.mockResolvedValue({
+      id: 't-1',
+      name: 'Fall 2026',
+      sortOrder: 1,
+      courseCount: ids.length,
+      inProgramCount: 3,
+      courses: ids.map((id) => ({
+        id,
+        courseCode: id.toUpperCase(),
+        title: id,
+        creditHours: 3,
+        level: 'graduate' as const,
+        openForRegistration: true,
+        sectionCount: null,
+        statusNote: null,
+        inProgram: id !== 'stray',
+      })),
+    });
+    // Its own evaluation: the shared helper resolves ids against the module's
+    // `courses` fixture, which does not contain these.
+    api.planner.evaluate.mockImplementation(({ terms: t }: { terms: { courseIds: string[] }[] }) =>
+      Promise.resolve({
+        terms: [
+          {
+            term: 1,
+            termId: 't-1',
+            termName: 'Fall 2026',
+            termCredits: 0,
+            courses: t[0].courseIds.map((id) => ({
+              courseId: id,
+              courseCode: id.toUpperCase(),
+              title: id,
+              creditHours: 3,
+              level: 'graduate' as const,
+              eligible: true,
+              offered: true,
+              openForRegistration: true,
+              sectionCount: null,
+              statusNote: null,
+              registrable: true,
+              alreadyCompleted: false,
+              satisfiedPrerequisites: [],
+              missingPrerequisites: [],
+              backgroundPrerequisites: [],
+              corequisites: [],
+              reason: 'Eligible',
+            })),
+          },
+        ],
+        suggestions: [],
+        totalPlannedCredits: 0,
+        allEligible: true,
+        allOffered: true,
+      }),
+    );
+  });
+
+  /** Card headings in the offerings column only — "Your plan" is also an h3. */
+  const cardTitles = () => {
+    const heading = screen.getByText(/^Offered in Fall 2026$/);
+    const column = heading.closest('div')!.parentElement as HTMLElement;
+    return within(column)
+      .getAllByRole('heading', { level: 3 })
+      .map((h) => h.textContent!.replace(/\d+$/, '').trim());
+  };
+
+  it('renders one card per requirement group, in catalog order', async () => {
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={progs} />);
+    await waitFor(() =>
+      expect(cardTitles()).toEqual([
+        'Foundation Courses',
+        'Specialization — Data Science',
+        'Free Electives',
+        'Not part of this degree',
+      ]),
+    );
+  });
+
+  it('counts the courses in each card', async () => {
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={progs} />);
+    await waitFor(() => expect(cardTitles()).toContain('Foundation Courses'));
+    expect(
+      screen.getByRole('heading', { level: 3, name: /Foundation Courses/ }),
+    ).toHaveTextContent('1');
+  });
+
+  it('files a course the degree has no group for under one trailing card', async () => {
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={progs} />);
+    // Last, so the degree's own groups are read first.
+    await waitFor(() => expect(cardTitles().at(-1)).toBe('Not part of this degree'));
+  });
+});

@@ -9,7 +9,7 @@ import {
   type PlanEvaluation,
   type TermSummary,
 } from '../../lib/api';
-import { scopeFor, tierRank, type ProgramOption } from '../../lib/programScope';
+import { groupColor, scopeFor, tierRank, type ProgramOption } from '../../lib/programScope';
 import { CompletedPanel } from './CompletedPanel';
 import { OfferedCourseRow } from './OfferedCourseRow';
 import { PlanSummaryColumn } from './PlanSummaryColumn';
@@ -45,6 +45,8 @@ interface PlanState {
 const STORAGE_KEY = 'semester-plan-v3';
 /** The Suggested column is a shortlist, not a second copy of the schedule. */
 const MAX_RECOMMENDATIONS = 5;
+/** Heading for offerings the selected degree has no requirement group for. */
+const OUTSIDE_DEGREE = 'Not part of this degree';
 /** v1 stored `string[][]` terms, v2 `{courseIds, termId}[]`. Only completed courses carry over. */
 const LEGACY_KEYS = ['semester-plan-v2', 'semester-plan-v1'];
 
@@ -297,6 +299,26 @@ export function OfferingPlanner({
       (c) => c.courseCode.toLowerCase().includes(q) || c.title.toLowerCase().includes(q),
     );
   }, [evaluated, offeredQuery]);
+
+  /**
+   * The offerings split into one card per requirement group.
+   *
+   * Cards follow the catalog's own sequence — Foundation before Capstone —
+   * rather than the alphabet. Courses the selected degree has no group for come
+   * last under one heading; that set is only non-empty once the escape hatch
+   * reveals the rest of the term.
+   */
+  const offeredGroups = useMemo(() => {
+    const buckets = new Map<string, { name: string; order: number; courses: typeof visibleOffered }>();
+    for (const course of visibleOffered) {
+      const name = program?.groups[course.courseId] ?? OUTSIDE_DEGREE;
+      const order = program?.groupOrder[course.courseId] ?? Number.MAX_SAFE_INTEGER;
+      const bucket = buckets.get(name);
+      if (bucket) bucket.courses.push(course);
+      else buckets.set(name, { name, order, courses: [course] });
+    }
+    return [...buckets.values()].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+  }, [visibleOffered, program]);
   const selectedSet = new Set(selectedIds);
   const selected = evaluated.filter((c) => selectedSet.has(c.courseId));
   const selectedCredits = Math.round(selected.reduce((sum, c) => sum + c.creditHours, 0) * 10) / 10;
@@ -557,15 +579,33 @@ export function OfferingPlanner({
                     No offered courses match &ldquo;{offeredQuery.trim()}&rdquo;.
                   </li>
                 )}
-                {visibleOffered.map((c) => (
-                  <OfferedCourseRow
-                    key={c.courseId}
-                    course={c}
-                    selected={selectedSet.has(c.courseId)}
-                    onToggle={() => toggleSelected(c.courseId)}
-                    unselectedCorequisites={coreqsNotSelected(c.courseId)}
-                    capstoneShortfall={capstoneShortfall.get(c.courseId) ?? null}
-                  />
+                {offeredGroups.map((group) => (
+                  <li key={group.name}>
+                    <section className="overflow-hidden rounded-xl border border-gray-200">
+                      <h3
+                        className={`flex items-center justify-between gap-2 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-white ${groupColor(
+                          group.order,
+                        )}`}
+                      >
+                        <span className="truncate">{group.name}</span>
+                        <span className="shrink-0 font-normal opacity-90">
+                          {group.courses.length}
+                        </span>
+                      </h3>
+                      <ul className="space-y-2 p-2">
+                        {group.courses.map((c) => (
+                          <OfferedCourseRow
+                            key={c.courseId}
+                            course={c}
+                            selected={selectedSet.has(c.courseId)}
+                            onToggle={() => toggleSelected(c.courseId)}
+                            unselectedCorequisites={coreqsNotSelected(c.courseId)}
+                            capstoneShortfall={capstoneShortfall.get(c.courseId) ?? null}
+                          />
+                        ))}
+                      </ul>
+                    </section>
+                  </li>
                 ))}
               </ul>
             )}

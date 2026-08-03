@@ -274,6 +274,12 @@ Displays
 * Course Cards
 * Credit Totals
 
+Choosing a specialization track
+
+A programme's alternative groups — named concentrations and the catalog's example clusters — are all shown side by side so a student can compare them. MSCS has six.
+
+Selecting one **hides the others**; selecting it again brings them back, and Reset clears the choice along with the zoom. Non-alternative groups (Foundation, Electives, Capstone) are never hidden — they are not a choice. The phase count reports "4 phases of 9" so the narrowing is stated rather than silent, and the required credit total is unchanged, because the requirement is the same whichever track is chosen.
+
 ⸻
 
 Prerequisite Graph
@@ -355,6 +361,12 @@ A course **cannot be added** while it is blocked by an unmet prerequisite, or ca
 It can always be **removed**, though. Gating only the "add" direction means a course that becomes blocked *after* it was chosen — the student unmarks its prerequisite, or the registrar cancels a section — is never stranded in the plan with no way to take it out.
 
 This reverses the planner's original rule, which left prerequisite-blocked courses selectable on the grounds that a student might hold a waiver or transfer credit. That escape route still exists and is better: the student marks the prerequisite as **completed** in the left column, which unblocks the row. Gating the checkbox therefore shuts nobody out, and it stops the planner offering a registration a student cannot make.
+
+The offerings are split into **one card per requirement group** — Foundation Courses, Specialization — Data Science, Graduate Electives — each with a coloured header naming the group and counting its courses. Cards follow the catalog's own sequence, so Foundation precedes Capstone rather than the alphabet deciding.
+
+The header carries the colour, not the rows: a row's own colour is already spoken for by status (blocked, closed, selected), and the two must not compete. The group's name is always shown, so colour is never the only signal.
+
+Courses the selected degree has no group for are collected under a single trailing **"Not part of this degree"** card. That card is empty until the escape hatch reveals the rest of the term.
 
 The column has its own **filter box** — 96 offerings is too many to scan — and is ordered by what the student can act on: anything **closed or cancelled sinks to the end** regardless of degree, and among the rest **in-program courses lead**. The sort is applied before the scoped/full split, so the default view is ordered too.
 

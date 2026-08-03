@@ -122,6 +122,29 @@ export function requiredCreditsFromRoadmap(roadmap: ProgramRoadmap): number {
   return total;
 }
 
+/**
+ * A stable colour per requirement group, for tinting rows that belong to it.
+ *
+ * Keyed by the group's position in the catalog sequence rather than by name, so
+ * a programme's groups get distinct colours in the order the catalog lists them
+ * and a renamed group keeps its place. Colour is never the only signal — the
+ * group's name is shown alongside it.
+ */
+const GROUP_COLORS = [
+  'bg-blue-500',
+  'bg-amber-500',
+  'bg-violet-500',
+  'bg-emerald-500',
+  'bg-rose-500',
+  'bg-cyan-500',
+  'bg-orange-500',
+  'bg-fuchsia-500',
+  'bg-lime-600',
+];
+
+export const groupColor = (sortOrder: number | undefined): string =>
+  GROUP_COLORS[(sortOrder ?? 0) % GROUP_COLORS.length];
+
 /** Course ids in a capstone group — the catalog reserves these for the final term. */
 export function capstoneCourseIdsFromRoadmap(roadmap: ProgramRoadmap): string[] {
   return roadmap.phases
