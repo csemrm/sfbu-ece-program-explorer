@@ -48,8 +48,32 @@ Follow-on UX pass. `/plan` becomes three columns behind a degree selector.
 - [x] Fix: persist the "show all offerings" escape hatch. It was component state while `selectedIds` was persisted, so a plan built through it evaluated to nothing after a reload — "Your plan" read empty and the PDF button vanished while the selections were still in storage. Found by testing the merged v1.5.0 build in a browser.
 - [ ] A program whose roadmap has no courses is treated as "do not scope". Correct for a data gap, but indistinguishable from a genuinely empty program — revisit if a real program ever has zero roadmap courses
 - [ ] The print sheet is not covered by an automated visual check; only its DOM content is asserted
-- [ ] Catalog gap: CS521, CS522, CS547, CS582, CS583, CS587 are on the official Fall 2026 list but have no catalog entry (need title, credits, prerequisites, requirement-group placement, knowledge areas)
-- [ ] **Catalog titles are wrong for the seeded graduate CS courses.** Codes match the real catalog but map to different courses — e.g. CS500 is seeded as "Advanced Algorithms" but is really "Object-Oriented Design in Python"; CS571 is seeded as "Advanced Cryptography" but is really "Cloud Computing Infrastructure". 7 of the 8 Fall 2026 offerings are affected. This predates the planner work and invalidates the prerequisite chains and knowledge-area mappings built on top of those records. Needs reconciliation against `docs/sfbu-2025-2026-university-catalog-10.27.pdf`.
+- [x] Catalog gap, partly closed: CS521 and CS522 **are** in the catalog (Software Project Management; Software Quality Assurance and Test Automation) and are now seeded. CS547, CS582, CS583 and CS587 appear on the Fall 2026 registration list but genuinely have no catalog entry — still outstanding below.
+- [ ] Catalog gap: CS547, CS582, CS583, CS587 are on the official Fall 2026 list but have no entry in the 2025-2026 catalog (need title, credits, prerequisites, requirement-group placement, knowledge areas — none of which the registration list carries)
+### Catalog reconciliation (closed)
+
+The mistitling was not limited to graduate CS: **59 of 66 seeded courses carried
+the wrong title**. Only MATH201 and MATH202 matched. The codes and requirement-group
+membership were correct throughout — the seed had the right skeleton with labels
+from a generic CS curriculum rather than SFBU's catalog.
+
+- [x] All 81 course titles, credit hours and descriptions transcribed from `docs/sfbu-2025-2026-university-catalog-10.27.pdf` (71 catalog-backed titles verified to match exactly; the 10 APP courses come from the GE tables, which carry no prose description)
+- [x] Prerequisites and corequisites rebuilt from the catalog's own stated links, replacing chains inferred from the wrong identities
+- [x] Knowledge-area mappings re-derived from the corrected identities
+- [x] BSCS General Education populated with the 10 Agility Praxis Pathway courses (APP101–APP302); the group previously held only an unenumerated 30-credit placeholder
+- [x] MSCS gains CS501 in Foundation (the catalog's alternative to CS455G — it was wrongly noted against CS500) and the three cluster-course groups: Cloud Computing and Big Data, Mobile Application Technologies, QA Engineering
+- [x] MSEE concentration groups renamed to the catalog's wording (Cluster — Internet of Things (IoT) and Embedded Systems / Multicore Computing / Modern IC Technologies)
+- [x] `CatalogReconciliation1719446404000` migration clears the derived relationship tables so a reseed rebuilds them; seeding alone could not, being insert-only
+- [x] Seed bug: placeholder requirements (`course_id IS NULL`) matched only on course id, so every reseed inserted another copy
+- [x] Seed bug: existing requirement groups were never updated, so inserting a group mid-program left the others on stale `sortOrder` and the sequence interleaved
+- [x] `catalog-data.spec.ts` — 12 referential-integrity checks (dangling codes, duplicate mappings, prerequisite cycles, group ordering). The seeder logs and skips what it cannot resolve, which is how 59 wrong titles survived to v1.5.1 unnoticed
+
+Follow-ups this surfaced:
+
+- [ ] **Disjunctive prerequisites are unmodeled.** The catalog states 8 as alternatives ("CS250 or CS360"); `Prerequisite` is a hard AND, so recording both would wrongly block a student who took either. They are omitted, which makes CS480, CS480L and CS556 look prerequisite-free. Needs a schema change to express "or".
+- [ ] **Source-catalog defect:** CS200 "Discrete Logic" is printed with a Linux/shell description duplicating CS230 — no mention of logic anywhere in it. The title is seeded and the description replaced with a flagged placeholder; needs departmental confirmation.
+- [ ] The catalog's own numbering typo — Calculus I is headed `MATH20`, not `MATH201`, in the Mathematics section — is worked around in the extraction. Worth reporting upstream.
+- [ ] The catalog documents an MSDS program (DS500–DS595) and BSBA/MBA business programs that this app does not model. Out of scope per CLAUDE.md, but the course codes now visibly exist in the source.
 - [ ] Decide the fate of `SemesterPlanner` / `TermCard` — the multi-semester planner they implement is no longer rendered by any route now that `/plan` is the two-column screen. Still tested; kept rather than deleted pending that decision.
 - [ ] Model `Open For Registration` and section counts (on the official list, not in the schema — a seeded offering currently means "runs this term", not "registration is open")
 - [ ] Spring 2027 offerings once a real schedule is published
