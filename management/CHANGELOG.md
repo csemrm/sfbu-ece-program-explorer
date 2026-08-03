@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.9.1](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.9.0...v1.9.1) (2026-08-03)
+
+
+### Bug Fixes
+
+* **planner:** fall back when the stored term no longer exists ([#15](https://github.com/csemrm/sfbu-ece-program-explorer/issues/15)) ([c370551](https://github.com/csemrm/sfbu-ece-program-explorer/commit/c3705518dd50084fb33687c53f4b8aae78ed770f))
+
 # [1.9.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.8.0...v1.9.0) (2026-08-03)
 
 
