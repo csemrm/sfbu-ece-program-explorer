@@ -56,7 +56,12 @@ export function PhaseColumn({ phase, colorClass, isSpecialization = false }: Pro
           </span>
           {(creditTotal > 0 || phase.minCredits) && (
             <span className="text-xs font-semibold text-white bg-white/20 rounded-full px-2 py-0.5">
-              {creditTotal > 0 ? creditTotal : phase.minCredits} cr
+              {/* The stated requirement wins over the sum of the listed courses.
+                  An open-ended group enumerates what is on the schedule, not what
+                  must be taken — Free Electives lists 22 courses against a
+                  15-credit requirement, and summing them would demand 60.
+                  RoadmapCanvas already totals the programme this way. */}
+              {phase.minCredits ? phase.minCredits : creditTotal} cr
             </span>
           )}
         </div>

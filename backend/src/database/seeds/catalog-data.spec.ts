@@ -165,4 +165,44 @@ describe('catalog seed data', () => {
     // was how the program page came to show no general education at all.
     expect(ge?.requirements.filter((r) => r.courseCode).length).toBe(10);
   });
+
+  it('places every seeded course in at least one requirement group', () => {
+    // A course belonging to no group exists in /courses and in the offerings
+    // column with no programme context — findable, but unexplained.
+    const grouped = new Set(
+      PROGRAMS.flatMap((p) =>
+        p.requirementGroups.flatMap((g) =>
+          g.requirements
+            .map((r) => r.courseCode)
+            .filter((c): c is string => !!c),
+        ),
+      ),
+    );
+    const orphans = COURSES.map((c) => c.courseCode).filter(
+      (c) => !grouped.has(c),
+    );
+    expect(orphans).toEqual([]);
+  });
+
+  it('keeps an unenumerated credit placeholder on the open-ended elective groups', () => {
+    // Free and Graduate Electives are open-ended in the catalog — "any
+    // discipline", "any graduate-level course" — so the enumerated courses are
+    // what is on the schedule, not the whole rule, and the credit requirement
+    // must survive alongside the list. Specialization Electives is different:
+    // the catalog enumerates it exactly, so it carries no placeholder.
+    const openEnded = ['Free Electives', 'Graduate Electives'];
+    let checked = 0;
+    for (const program of PROGRAMS) {
+      for (const group of program.requirementGroups) {
+        if (!openEnded.includes(group.name)) continue;
+        const placeholder = group.requirements.find(
+          (r) => r.courseCode === null,
+        );
+        expect(placeholder?.minCredits).toBeGreaterThan(0);
+        expect(group.requirements.some((r) => r.courseCode)).toBe(true);
+        checked++;
+      }
+    }
+    expect(checked).toBe(3); // BSCS Free, MSCS Graduate, MSEE Graduate
+  });
 });

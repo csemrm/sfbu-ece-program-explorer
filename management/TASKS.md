@@ -63,9 +63,14 @@ Follow-on UX pass. `/plan` becomes three columns behind a degree selector.
 Follow-ups this surfaced:
 
 - [ ] **The source list contradicts itself on CS500 and FIN310** — both carry a cancellation note *and* `Open For Registration: true`. The seed treats cancelled as decisive. Worth confirming with the registrar which is right.
-- [ ] The 34 Business and 3 Psychology courses are seeded as courses and offerings but belong to **no requirement group**, because this app models only BSCS/MSCS/MSEE. They appear in `/courses` and in the unscoped Offered column with no programme context.
+- [x] Every course now belongs to a requirement group. The catalog's own elective rules place them: BSCS electives are "courses in any discipline" (22 undergraduate non-major courses → Free Electives), and MSCS/MSEE electives are "any graduate-level course, including those outside of software engineering / even outside of engineering" (26 graduate courses → both Graduate Electives groups). CS483L joins its lecture CS483 in BSCS Specialization Electives, as CS480/CS480L are paired.
+- [x] Open-ended elective groups keep their unenumerated credit placeholder alongside the course list — the catalog allows any discipline, so the enumerated courses are what is on the current schedule, not the whole rule. Group descriptions say so.
+- [x] Roadmap fix: a phase badge summed its listed courses, so Free Electives showed 60 cr against a 15-credit requirement. The stated `minCredits` now wins, matching how `RoadmapCanvas` already totals the programme.
+- [x] `catalog-data.spec.ts` guards both: no course may be orphaned from every requirement group, and the three open-ended elective groups must keep a credit placeholder.
+- [ ] Business and Psychology courses are placed as **electives only**. None was added to a named Specialization or Cluster: the catalog enumerates those groups course by course and does not list any Business or Psychology course among them, so thematic placement (e.g. the AI5xx courses under Data Science) would be inventing curriculum structure rather than transcribing it. Needs departmental direction before any such mapping.
 - [ ] `CS587` and `BUS587` carry flexible credit (1;2;3) and `SEMINAR100`/`SEMINAR200` state none at all. `credit_hours` is a single non-null number, so they are seeded at the minimum and say so in the description; planned credit totals understate rather than overstate.
 - [ ] The registration list titles `EE461L` "Verilog HDL Lab" where the catalog calls it "Digital Design and HDL Lab", and lists 400G courses under their base code (EE461, EE488) while the catalog also defines G-suffixed graduate variants. Both are seeded; the relationship between the pairs is not modelled.
+
 ### Catalog reconciliation (closed)
 
 The mistitling was not limited to graduate CS: **59 of 66 seeded courses carried
