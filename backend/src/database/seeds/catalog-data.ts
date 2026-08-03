@@ -1743,6 +1743,107 @@ export const COURSES: CourseSeed[] = [
       'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
       'list; the 2025-2026 catalog carries no description for this course code.',
   },
+
+  // ── MSDS (School of Engineering) ──
+  {
+    courseCode: 'DS501',
+    title: 'Python Programming for Data Science',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'In this foundation course, students will embark on a journey to master the fundamental ' +
+      'programming skills required for effective data analysis and manipulation using the ' +
+      'Python programming language. Throughout the course, the instructor will engage ' +
+      'students in hands-on coding exercises and projects to reinforce their learning. ' +
+      'Students will be equipped with the skills necessary to tackle data science challenges ' +
+      'and develop programs to perform data analysis using Python.',
+  },
+  {
+    courseCode: 'DS512',
+    title: 'Data Engineering',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'This course is designed to provide students with a comprehensive understanding of the ' +
+      'key principles, techniques, and tools involved in data engineering. As organizations ' +
+      'increasingly rely on data-driven decision-making, the role of data engineers has ' +
+      'become critical in managing, processing, and transforming raw data into valuable ' +
+      'insights. Students will explore various data storage solutions, data processing and ' +
+      'integration, data warehousing, data security, and scalability/performance ' +
+      'optimization.',
+  },
+  {
+    courseCode: 'DS535',
+    title: 'Large Language Models (LLM)',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Large language models for data science. The 2025-2026 catalog lists this course in the ' +
+      'MSDS specialization curriculum but prints no course description or credit hours for ' +
+      'it; 3 credits is taken from its siblings in the same 12-credit requirement.',
+  },
+  {
+    courseCode: 'DS540',
+    title: 'Natural Language Processing (NLP)',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Natural language processing (NLP) is the subfield within data science involving ' +
+      'supervised and unsupervised learning of textual data. This course presents the ' +
+      'fundamental concepts, methods, and applications of NLP. It covers tokenization, ' +
+      'syntactic and semantic analysis, named entity recognition, part-of-speech tagging, ' +
+      'text classification, machine translation, sentiment analysis, and language models. It ' +
+      'also covers different models and algorithms, such as n-grams, Hidden Markov Models, ' +
+      'text classifiers, and recurrent neural networks. Practical assignments and projects ' +
+      'allow students to apply their knowledge to real-world applications and use cases such ' +
+      'as sentiment analysis, chatbot development, and search engine relevance.',
+  },
+  {
+    courseCode: 'DS565',
+    title: 'Generative AI-Driven Intelligent Apps Development',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'In the fast-changing world of technology, the demand for intelligent applications ' +
+      'powered by AI and ML is rapidly increasing. This course aims to provide students with ' +
+      'the necessary expertise to develop cutting-edge applications and harness the potential ' +
+      'of generative AI technology. Intelligent apps using generative AI technology stand ' +
+      'apart from traditional apps by offering enhanced creativity, adaptive learning, ' +
+      'personalized user experiences, automation, and decision- making capabilities, and ' +
+      'human-like conversational abilities. This course equips students with the skills to ' +
+      'develop innovative apps that leverage the power of AI. Topics include an introduction ' +
+      'to generative AI, deep learning, and machine learning techniques; implementing ' +
+      'generative models for various domains; ethical considerations; and deploying AI-driven ' +
+      'apps. Through hands-on projects and real-world case studies, students gain practical ' +
+      'experience in designing and deploying generative AI models within a development ' +
+      'framework. By the end of the course, students are prepared to contribute to the field ' +
+      'of intelligent app development with a strong understanding of AI ethics.',
+  },
+  {
+    courseCode: 'DS589',
+    title: 'Special Topics',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Special topics courses are offered to graduate students in the Data Science program by ' +
+      'current faculty members or invited guest speakers to expose the students to emerging ' +
+      'technologies related to their studies. These courses are conducted the same way as ' +
+      'regular courses.',
+  },
+  {
+    courseCode: 'DS595',
+    title: 'Data Science Capstone Course',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Under the guidance of the course instructor, the capstone course is intended to ' +
+      'integrate the knowledge and hands-on experience that the student has acquired from the ' +
+      'foundation, core, and elective coursework required for the program in the course. The ' +
+      'instructor determines the course objectives and scope based on the data science ' +
+      'curriculum and technology trend and guides the students to develop their integration ' +
+      'ability. The student shall take the capstone course near the end of their program of ' +
+      'study.',
+  },
 ];
 
 // ──────────────────────────────────────────────────────────────
@@ -1798,6 +1899,8 @@ export const PREREQUISITES: PrerequisiteSeed[] = [
   { courseCode: 'CS571', prerequisiteCode: 'CS500' },
   { courseCode: 'CS575', prerequisiteCode: 'CS250' },
   { courseCode: 'DS500', prerequisiteCode: 'MATH208' },
+  { courseCode: 'DS501', prerequisiteCode: 'CS250' },
+  { courseCode: 'DS540', prerequisiteCode: 'DS500' },
   { courseCode: 'EE488G', prerequisiteCode: 'CS250' },
   { courseCode: 'EE488G', prerequisiteCode: 'EE461' },
   { courseCode: 'EE504', prerequisiteCode: 'EE461' },
@@ -2100,6 +2203,28 @@ export const COURSE_KNOWLEDGE_AREAS: CourseKnowledgeAreaSeed[] = [
   { courseCode: 'MATH202', knowledgeAreaNames: ['Mathematical Foundations'] },
   { courseCode: 'MATH203', knowledgeAreaNames: ['Mathematical Foundations'] },
   { courseCode: 'MATH208', knowledgeAreaNames: ['Mathematical Foundations'] },
+  { courseCode: 'DS501', knowledgeAreaNames: ['Programming Foundations'] },
+  { courseCode: 'DS512', knowledgeAreaNames: ['Data Management & Analytics'] },
+  {
+    courseCode: 'DS535',
+    knowledgeAreaNames: ['Artificial Intelligence & Machine Learning'],
+  },
+  {
+    courseCode: 'DS540',
+    knowledgeAreaNames: ['Artificial Intelligence & Machine Learning'],
+  },
+  {
+    courseCode: 'DS565',
+    knowledgeAreaNames: [
+      'Artificial Intelligence & Machine Learning',
+      'Software Engineering',
+    ],
+  },
+  { courseCode: 'DS589', knowledgeAreaNames: ['Data Management & Analytics'] },
+  {
+    courseCode: 'DS595',
+    knowledgeAreaNames: ['Capstone & Professional Practice'],
+  },
 ];
 
 // ──────────────────────────────────────────────────────────────
@@ -2981,6 +3106,13 @@ export const PROGRAMS: ProgramSeed[] = [
             description: null,
             sortOrder: 27,
           },
+          { courseCode: 'DS501', minCredits: null, description: null, sortOrder: 28 },
+          { courseCode: 'DS512', minCredits: null, description: null, sortOrder: 29 },
+          { courseCode: 'DS535', minCredits: null, description: null, sortOrder: 30 },
+          { courseCode: 'DS540', minCredits: null, description: null, sortOrder: 31 },
+          { courseCode: 'DS565', minCredits: null, description: null, sortOrder: 32 },
+          { courseCode: 'DS589', minCredits: null, description: null, sortOrder: 33 },
+          { courseCode: 'DS595', minCredits: null, description: null, sortOrder: 34 },
         ],
       },
       {
@@ -3310,6 +3442,13 @@ export const PROGRAMS: ProgramSeed[] = [
             description: null,
             sortOrder: 27,
           },
+          { courseCode: 'DS501', minCredits: null, description: null, sortOrder: 28 },
+          { courseCode: 'DS512', minCredits: null, description: null, sortOrder: 29 },
+          { courseCode: 'DS535', minCredits: null, description: null, sortOrder: 30 },
+          { courseCode: 'DS540', minCredits: null, description: null, sortOrder: 31 },
+          { courseCode: 'DS565', minCredits: null, description: null, sortOrder: 32 },
+          { courseCode: 'DS589', minCredits: null, description: null, sortOrder: 33 },
+          { courseCode: 'DS595', minCredits: null, description: null, sortOrder: 34 },
         ],
       },
       {
@@ -3320,6 +3459,191 @@ export const PROGRAMS: ProgramSeed[] = [
         requirements: [
           {
             courseCode: 'EE595',
+            minCredits: null,
+            description: null,
+            sortOrder: 1,
+          },
+        ],
+      },
+    ],
+  },
+  // ── MSDS ──────────────────────────────────────────────────
+  {
+    name: 'Master of Science in Data Science',
+    abbreviation: 'MSDS',
+    description:
+      'A 30-credit graduate program in the School of Engineering covering the exploration, processing and analysis of large-scale data — algorithm development, data management, machine learning, and visualization.',
+    academicYear: '2025-2026',
+    effectiveDate: '2025-08-01',
+    requirementGroups: [
+      {
+        name: 'Foundation Courses',
+        description: 'Required foundation for the MSDS program.',
+        minCredits: 9,
+        sortOrder: 1,
+        requirements: [
+          {
+            courseCode: 'CS481G',
+            minCredits: null,
+            description: null,
+            sortOrder: 1,
+          },
+          {
+            courseCode: 'DS500',
+            minCredits: null,
+            description: null,
+            sortOrder: 2,
+          },
+          {
+            courseCode: 'DS501',
+            minCredits: null,
+            description: null,
+            sortOrder: 3,
+          },
+        ],
+      },
+      {
+        name: 'Specialization — Data Science',
+        description:
+          'Any four of these cluster courses satisfy the 12-credit specialization requirement.',
+        minCredits: 12,
+        sortOrder: 2,
+        requirements: [
+          {
+            courseCode: 'CS550',
+            minCredits: null,
+            description: null,
+            sortOrder: 1,
+          },
+          {
+            courseCode: 'CS570',
+            minCredits: null,
+            description: null,
+            sortOrder: 2,
+          },
+          {
+            courseCode: 'DS512',
+            minCredits: null,
+            description: null,
+            sortOrder: 3,
+          },
+          {
+            courseCode: 'DS520',
+            minCredits: null,
+            description: null,
+            sortOrder: 4,
+          },
+          {
+            courseCode: 'DS535',
+            minCredits: null,
+            description: null,
+            sortOrder: 5,
+          },
+          {
+            courseCode: 'DS540',
+            minCredits: null,
+            description: null,
+            sortOrder: 6,
+          },
+          {
+            courseCode: 'DS565',
+            minCredits: null,
+            description: null,
+            sortOrder: 7,
+          },
+          {
+            courseCode: 'DS589',
+            minCredits: null,
+            description: null,
+            sortOrder: 8,
+          },
+        ],
+      },
+      {
+        name: 'Graduate Electives',
+        description:
+          'Any graduate-level course, in data science or another major, to total 30 credits. Courses listed are those on the current schedule.',
+        minCredits: 6,
+        sortOrder: 3,
+        requirements: [
+          {
+            courseCode: null,
+            minCredits: 6,
+            description:
+              'Graduate-level courses in data science or another major.',
+            sortOrder: 1,
+          },
+          { courseCode: 'AI501', minCredits: null, description: null, sortOrder: 2 },
+          { courseCode: 'AI510', minCredits: null, description: null, sortOrder: 3 },
+          { courseCode: 'AI511', minCredits: null, description: null, sortOrder: 4 },
+          { courseCode: 'AI520', minCredits: null, description: null, sortOrder: 5 },
+          { courseCode: 'BAN501', minCredits: null, description: null, sortOrder: 6 },
+          { courseCode: 'BUS587', minCredits: null, description: null, sortOrder: 7 },
+          { courseCode: 'BUS595', minCredits: null, description: null, sortOrder: 8 },
+          { courseCode: 'CE450G', minCredits: null, description: null, sortOrder: 9 },
+          { courseCode: 'CE450LG', minCredits: null, description: null, sortOrder: 10 },
+          { courseCode: 'CE521', minCredits: null, description: null, sortOrder: 11 },
+          { courseCode: 'CE522', minCredits: null, description: null, sortOrder: 12 },
+          { courseCode: 'CE523', minCredits: null, description: null, sortOrder: 13 },
+          { courseCode: 'CE530', minCredits: null, description: null, sortOrder: 14 },
+          { courseCode: 'CS455G', minCredits: null, description: null, sortOrder: 15 },
+          { courseCode: 'CS457G', minCredits: null, description: null, sortOrder: 16 },
+          { courseCode: 'CS457LG', minCredits: null, description: null, sortOrder: 17 },
+          { courseCode: 'CS477G', minCredits: null, description: null, sortOrder: 18 },
+          { courseCode: 'CS500', minCredits: null, description: null, sortOrder: 19 },
+          { courseCode: 'CS500L', minCredits: null, description: null, sortOrder: 20 },
+          { courseCode: 'CS501', minCredits: null, description: null, sortOrder: 21 },
+          { courseCode: 'CS515', minCredits: null, description: null, sortOrder: 22 },
+          { courseCode: 'CS521', minCredits: null, description: null, sortOrder: 23 },
+          { courseCode: 'CS522', minCredits: null, description: null, sortOrder: 24 },
+          { courseCode: 'CS535', minCredits: null, description: null, sortOrder: 25 },
+          { courseCode: 'CS547', minCredits: null, description: null, sortOrder: 26 },
+          { courseCode: 'CS548', minCredits: null, description: null, sortOrder: 27 },
+          { courseCode: 'CS551', minCredits: null, description: null, sortOrder: 28 },
+          { courseCode: 'CS556', minCredits: null, description: null, sortOrder: 29 },
+          { courseCode: 'CS565', minCredits: null, description: null, sortOrder: 30 },
+          { courseCode: 'CS571', minCredits: null, description: null, sortOrder: 31 },
+          { courseCode: 'CS575', minCredits: null, description: null, sortOrder: 32 },
+          { courseCode: 'CS581', minCredits: null, description: null, sortOrder: 33 },
+          { courseCode: 'CS582', minCredits: null, description: null, sortOrder: 34 },
+          { courseCode: 'CS583', minCredits: null, description: null, sortOrder: 35 },
+          { courseCode: 'CS587', minCredits: null, description: null, sortOrder: 36 },
+          { courseCode: 'CS589', minCredits: null, description: null, sortOrder: 37 },
+          { courseCode: 'CS595', minCredits: null, description: null, sortOrder: 38 },
+          { courseCode: 'EE461G', minCredits: null, description: null, sortOrder: 39 },
+          { courseCode: 'EE461LG', minCredits: null, description: null, sortOrder: 40 },
+          { courseCode: 'EE488G', minCredits: null, description: null, sortOrder: 41 },
+          { courseCode: 'EE504', minCredits: null, description: null, sortOrder: 42 },
+          { courseCode: 'EE505', minCredits: null, description: null, sortOrder: 43 },
+          { courseCode: 'EE511', minCredits: null, description: null, sortOrder: 44 },
+          { courseCode: 'EE517', minCredits: null, description: null, sortOrder: 45 },
+          { courseCode: 'EE520', minCredits: null, description: null, sortOrder: 46 },
+          { courseCode: 'EE553', minCredits: null, description: null, sortOrder: 47 },
+          { courseCode: 'EE577', minCredits: null, description: null, sortOrder: 48 },
+          { courseCode: 'EE595', minCredits: null, description: null, sortOrder: 49 },
+          { courseCode: 'FIN501', minCredits: null, description: null, sortOrder: 50 },
+          { courseCode: 'FIN522', minCredits: null, description: null, sortOrder: 51 },
+          { courseCode: 'FIN568', minCredits: null, description: null, sortOrder: 52 },
+          { courseCode: 'FIN585', minCredits: null, description: null, sortOrder: 53 },
+          { courseCode: 'HRM531', minCredits: null, description: null, sortOrder: 54 },
+          { courseCode: 'MGT500', minCredits: null, description: null, sortOrder: 55 },
+          { courseCode: 'MGT510', minCredits: null, description: null, sortOrder: 56 },
+          { courseCode: 'MGT538', minCredits: null, description: null, sortOrder: 57 },
+          { courseCode: 'MGT542', minCredits: null, description: null, sortOrder: 58 },
+          { courseCode: 'MKT541', minCredits: null, description: null, sortOrder: 59 },
+          { courseCode: 'MKT551', minCredits: null, description: null, sortOrder: 60 },
+          { courseCode: 'MKT553', minCredits: null, description: null, sortOrder: 61 },
+          { courseCode: 'SOC501', minCredits: null, description: null, sortOrder: 62 },
+        ],
+      },
+      {
+        name: 'Capstone',
+        description: 'Required graduate capstone.',
+        minCredits: 3,
+        sortOrder: 4,
+        requirements: [
+          {
+            courseCode: 'DS595',
             minCredits: null,
             description: null,
             sortOrder: 1,

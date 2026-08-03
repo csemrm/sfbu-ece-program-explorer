@@ -48,7 +48,8 @@ export default async function ProgramsPage() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Academic Programs</h1>
               <p className="text-gray-500 mt-1.5 text-base">
-                Undergraduate and graduate programs in Computer Science and Electrical Engineering.
+                Undergraduate and graduate programs in Computer Science, Data Science and Electrical
+                Engineering.
               </p>
             </div>
             <div className="hidden sm:flex flex-col items-end gap-1.5 pb-0.5 shrink-0">
@@ -69,7 +70,9 @@ export default async function ProgramsPage() {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Two across at every size above mobile: four degrees make a clean 2x2,
+            and three columns left the fourth card stranded on its own row. */}
+        <div className="grid gap-6 sm:grid-cols-2">
           {programs.map((program) => (
             <ProgramCard key={program.id} program={program} />
           ))}

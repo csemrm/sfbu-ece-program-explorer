@@ -203,7 +203,7 @@ describe('catalog seed data', () => {
         checked++;
       }
     }
-    expect(checked).toBe(3); // BSCS Free, MSCS Graduate, MSEE Graduate
+    expect(checked).toBe(4); // BSCS Free, and Graduate Electives for MSCS, MSEE, MSDS
   });
 
   /**

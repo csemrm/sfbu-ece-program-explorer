@@ -340,6 +340,22 @@ export function OfferingPlanner({
     return shortfall;
   }, [program, courses, completedIds, selectedIds]);
 
+  /**
+   * How many other offered courses each course would unlock.
+   *
+   * Built from what the term itself reports as blocked: a course named in
+   * another's missing prerequisites is a gateway into the rest of the schedule.
+   */
+  const unlockCount = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const course of evaluated) {
+      for (const missing of course.missingPrerequisites) {
+        counts.set(missing.id, (counts.get(missing.id) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }, [evaluated]);
+
   const recommended = evaluated
     .filter(
       (c) =>
@@ -354,9 +370,19 @@ export function OfferingPlanner({
     // course outranks a specialization choice, which outranks a free elective.
     // With only five slots, spending one on an elective while a required course
     // is available would be the wrong advice.
+    // Requirement tier first, then how much each course unlocks. A student with
+    // nothing completed therefore sees the entry points to their degree — the
+    // required courses that gate the most of the rest.
+    //
+    // Unlocks are deliberately not the leading key: ranked on unlock count
+    // alone, FIN501 led the MSCS and MSDS lists because it gates two business
+    // electives, ahead of the Foundation courses those degrees actually start
+    // with. Gating many courses is only useful advice among courses the student
+    // is otherwise required to take.
     .sort(
       (a, b) =>
         tierRank(program?.tiers[a.courseId]) - tierRank(program?.tiers[b.courseId]) ||
+        (unlockCount.get(b.courseId) ?? 0) - (unlockCount.get(a.courseId) ?? 0) ||
         a.courseCode.localeCompare(b.courseCode),
     )
     .slice(0, MAX_RECOMMENDATIONS);
