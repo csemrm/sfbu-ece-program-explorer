@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# [1.10.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.9.1...v1.10.0) (2026-08-03)
+
+
+### Features
+
+* **planner:** model disjunctive prerequisites ([#16](https://github.com/csemrm/sfbu-ece-program-explorer/issues/16)) ([6c40aca](https://github.com/csemrm/sfbu-ece-program-explorer/commit/6c40acaeec6be76c5596658b7e27402b79586633))
+
 ## [1.9.1](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.9.0...v1.9.1) (2026-08-03)
 
 
