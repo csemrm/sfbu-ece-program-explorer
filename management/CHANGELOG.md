@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# [1.8.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.7.1...v1.8.0) (2026-08-03)
+
+
+### Features
+
+* **programs:** model the MS in Data Science ([#13](https://github.com/csemrm/sfbu-ece-program-explorer/issues/13)) ([3db3131](https://github.com/csemrm/sfbu-ece-program-explorer/commit/3db3131334ad3b5dd5391eeec9321afeb0cd827d))
+
 ## [1.7.1](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.7.0...v1.7.1) (2026-08-03)
 
 
