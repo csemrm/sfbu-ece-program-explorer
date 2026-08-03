@@ -17,7 +17,11 @@ export function PhaseColumn({ phase, colorClass, isSpecialization = false }: Pro
 
   return (
     <div
-      className={`flex-shrink-0 w-56 flex flex-col${isSpecialization ? ' ring-2 ring-amber-400 ring-offset-1 rounded-xl' : ''}`}
+      // Grows to share the width when the columns fit, with a floor so that a
+      // programme with many phases still overflows into a horizontal scroll
+      // rather than squeezing every column unreadably thin. Fixed-width columns
+      // left a quarter of the page empty once a specialization was chosen.
+      className={`flex-1 min-w-[14rem] flex flex-col${isSpecialization ? ' ring-2 ring-amber-400 ring-offset-1 rounded-xl' : ''}`}
     >
       {/* Header */}
       <div className={`rounded-t-xl px-3 py-3 ${colorClass}`}>

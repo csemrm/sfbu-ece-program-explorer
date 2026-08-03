@@ -62,15 +62,15 @@ export function OfferedCourseRow({
       }`}
     >
       <label
-        className={`flex items-start gap-3 px-3 py-2.5 ${
+        // min-w-0 so the flex child may shrink below its content width;
+        // without it a long title pushed the credits past the column edge.
+        className={`flex min-w-0 flex-1 items-start gap-3 px-3 py-2.5 ${
           cannotAdd ? 'cursor-not-allowed' : 'cursor-pointer'
         }`}
       >
         <input
           type="checkbox"
           checked={selected}
-          // Guarded as well as disabled: the attribute stops a real user, this
-          // stops any other path to the handler.
           // Guarded as well as disabled: the attribute stops a real user, this
           // stops any other path to the handler.
           onChange={() => {
@@ -82,7 +82,10 @@ export function OfferedCourseRow({
         />
 
         <span className="min-w-0 flex-1">
-          <span className="flex items-center gap-2">
+          {/* Wraps rather than overflows: the status badges must stay legible, so
+                they cannot shrink, and a long title alongside one pushed the
+                credits past the column edge. */}
+          <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
             <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs font-bold text-gray-700">
               {course.courseCode}
             </span>
