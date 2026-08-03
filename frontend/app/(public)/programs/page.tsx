@@ -70,7 +70,9 @@ export default async function ProgramsPage() {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Two across at every size above mobile: four degrees make a clean 2x2,
+            and three columns left the fourth card stranded on its own row. */}
+        <div className="grid gap-6 sm:grid-cols-2">
           {programs.map((program) => (
             <ProgramCard key={program.id} program={program} />
           ))}

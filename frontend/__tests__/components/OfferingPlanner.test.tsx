@@ -581,3 +581,133 @@ describe('OfferingPlanner — opening from a program page', () => {
     );
   });
 });
+
+describe('OfferingPlanner — where to begin when nothing is completed', () => {
+  const progs: ProgramOption[] = [
+    {
+      id: 'p-1',
+      abbreviation: 'BSCS',
+      name: 'Bachelor',
+      courseIds: ['gate', 'elec', 'blocked'],
+      // Both open courses are required, so what separates them is how much each
+      // unlocks — GATE gates the rest of the term, ELEC gates nothing.
+      tiers: { gate: 'required', elec: 'required', blocked: 'elective' },
+      groups: {},
+      groupOrder: {},
+      requiredCredits: 36,
+      capstoneCourseIds: [],
+    },
+  ];
+
+  const detail = {
+    id: 't-1',
+    name: 'Fall 2026',
+    sortOrder: 1,
+    courseCount: 3,
+    inProgramCount: 3,
+    courses: ['gate', 'elec', 'blocked'].map((id) => ({
+      id,
+      courseCode: id.toUpperCase(),
+      title: id,
+      creditHours: 3,
+      level: 'graduate' as const,
+      openForRegistration: true,
+      sectionCount: null,
+      statusNote: null,
+      inProgram: true,
+    })),
+  };
+
+  const evaluation = (completed: string[]) => ({
+    terms: [
+      {
+        term: 1,
+        termId: 't-1',
+        termName: 'Fall 2026',
+        termCredits: 9,
+        courses: ['gate', 'elec', 'blocked'].map((id) => ({
+          courseId: id,
+          courseCode: id.toUpperCase(),
+          title: id,
+          creditHours: 3,
+          level: 'graduate' as const,
+          eligible: id !== 'blocked',
+          offered: true,
+          openForRegistration: true,
+          sectionCount: null,
+          statusNote: null,
+          registrable: id !== 'blocked',
+          alreadyCompleted: completed.includes(id),
+          satisfiedPrerequisites: [],
+          // BLOCKED waits on GATE, which makes GATE the way into the term.
+          missingPrerequisites:
+            id === 'blocked'
+              ? [
+                  {
+                    id: 'gate',
+                    courseCode: 'GATE',
+                    title: 'gate',
+                    creditHours: 3,
+                    level: 'graduate' as const,
+                    plannedInLaterTerm: null,
+                  },
+                ]
+              : [],
+          backgroundPrerequisites: [],
+          corequisites: [],
+          reason: 'r',
+        })),
+      },
+    ],
+    suggestions: [],
+    totalPlannedCredits: 0,
+    allEligible: false,
+    allOffered: true,
+  });
+
+  const order = () => {
+    const heading = screen.getByText(/^Suggested for Fall 2026$/);
+    const column = heading.closest('div')!.parentElement as HTMLElement;
+    return within(column)
+      .getAllByRole('button', { name: /^Add / })
+      .map((b) => b.getAttribute('aria-label')!.replace(' to your plan', '').replace('Add ', ''));
+  };
+
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.terms.get.mockResolvedValue(detail);
+  });
+
+  it('leads with the course that unlocks the rest', async () => {
+    api.planner.evaluate.mockResolvedValue(evaluation([]));
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={progs} />);
+    await waitFor(() => expect(order()[0]).toBe('GATE'));
+  });
+
+  it('does not let unlock count outrank requirement tier', async () => {
+    // Ranked on unlocks alone, a business elective that gates two other
+    // electives led the MSCS list ahead of its Foundation courses.
+    const demoted: ProgramOption[] = [
+      { ...progs[0], tiers: { gate: 'elective', elec: 'required', blocked: 'elective' } },
+    ];
+    api.planner.evaluate.mockResolvedValue(evaluation([]));
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={demoted} />);
+    await waitFor(() => expect(order()[0]).toBe('ELEC'));
+  });
+
+  it('keeps tier ahead of unlocks once something is completed too', async () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        completedIds: ['c-1'],
+        termId: 't-1',
+        selectedIds: [],
+        programId: 'p-1',
+        showAllOfferings: false,
+      }),
+    );
+    api.planner.evaluate.mockResolvedValue(evaluation([]));
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={progs} />);
+    await waitFor(() => expect(order()[0]).toBe('GATE'));
+  });
+});
