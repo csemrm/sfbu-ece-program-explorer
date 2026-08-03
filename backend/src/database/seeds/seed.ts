@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import * as dotenv from 'dotenv';
 import * as bcrypt from 'bcryptjs';
-import { DataSource } from 'typeorm';
+import { DataSource, IsNull } from 'typeorm';
 import { AppDataSource } from '../data-source';
 import {
   CATALOG_IMPORT_STATUS,
@@ -221,6 +221,15 @@ async function seed(dataSource: DataSource): Promise<void> {
           sortOrder: rgs.sortOrder,
         });
         await rgRepo.save(rg);
+      } else {
+        // Existing groups were created but never refreshed, so inserting a group
+        // in the middle of a program left the older ones on their original
+        // sortOrder and the sequence interleaved. Update in place, as courses do.
+        await rgRepo.update(rg.id, {
+          description: rgs.description,
+          minCredits: rgs.minCredits,
+          sortOrder: rgs.sortOrder,
+        });
       }
 
       let sortOrder = 1;
@@ -234,11 +243,20 @@ async function seed(dataSource: DataSource): Promise<void> {
           );
           continue;
         }
+        // A placeholder requirement carries no course, so matching on courseId
+        // alone never finds it and every reseed inserted another copy. Fall back
+        // to matching the description within the group.
         const exists = courseId
           ? await prRepo.findOne({
               where: { requirementGroupId: rg.id, courseId },
             })
-          : null;
+          : await prRepo.findOne({
+              where: {
+                requirementGroupId: rg.id,
+                courseId: IsNull(),
+                description: req.description ?? IsNull(),
+              },
+            });
         if (!exists) {
           await prRepo.save(
             prRepo.create({

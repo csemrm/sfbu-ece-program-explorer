@@ -58,547 +58,1073 @@ export interface ProgramSeed {
 // ──────────────────────────────────────────────────────────────
 
 export const COURSES: CourseSeed[] = [
-  // ── Undergraduate Math (Preparation) ──
+  // Titles, credit hours and descriptions transcribed from
+  // docs/sfbu-2025-2026-university-catalog-10.27.pdf.
   {
     courseCode: 'MATH201',
-    title: 'Calculus I',
+    title: 'Calculus – I',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Limits, derivatives, and integrals of functions of one variable, with applications.',
+      'This course is the first of a series in calculus designed for students to build a ' +
+      'fundamental background in calculus and to learn its applications to basic problems. ' +
+      'Topics include functions, limits, continuous functions, derivatives and applications, ' +
+      'antiderivatives, composite functions and chain rules, graphing techniques using ' +
+      'derivatives, implicit differentiation, finite integrals, and fundamental theorems of ' +
+      'calculus.',
   },
   {
     courseCode: 'MATH202',
-    title: 'Calculus II',
+    title: 'Calculus – II',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Techniques of integration, sequences and series, and introduction to differential equations.',
+      'This course is the second of the calculus series designed for students to understand ' +
+      'integration techniques and extend the differentiation notion and methods to functions of ' +
+      'multiple variables. Topics include logarithmic and exponential functions and their ' +
+      'derivatives, inverse trigonometric functions, derivatives, as well as L’Hopital’s rule, ' +
+      'integration techniques and their applications, sequence, series, partial derivatives, ' +
+      'and improper integrals.',
   },
   {
     courseCode: 'MATH203',
-    title: 'Discrete Mathematics',
-    creditHours: 3,
-    level: CourseLevel.UNDERGRADUATE,
-    description:
-      'Logic, sets, relations, functions, combinatorics, graph theory, and proofs for computing.',
-  },
-  {
-    courseCode: 'MATH208',
     title: 'Linear Algebra',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Vectors, matrices, determinants, linear transformations, eigenvalues, and eigenvectors.',
+      'Linear algebra is one of the topics necessary to prepare students for higher-level math ' +
+      'courses such as differential equations. It is also relevant to computer science and ' +
+      'business students interested in data science since linear problems are often the ' +
+      'simplest models of the natural world. In this course, students will learn the language, ' +
+      'concepts, and techniques from the ground up, beginning with the geometric representation ' +
+      'of systems by equations and progressing to the manipulation of abstract ideas such as ' +
+      'singular value decomposition.',
   },
-
-  // ── BSCS Core ──
   {
-    courseCode: 'CS200',
-    title: 'Introduction to Computer Science',
+    courseCode: 'MATH208',
+    title: 'Probability and Statistics',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Fundamental concepts of programming and problem solving using Python.',
+      'This course is designed for students to understand the concepts, theory, and ' +
+      'applications of probability and statistics. Topics include permutation, combination, ' +
+      'random variables, distribution, means and variance, normal distribution, random ' +
+      'sampling, estimation, confidence interval, hypothesis testing, linear correlation, and ' +
+      'regression.',
+  },
+  {
+    courseCode: 'CS200',
+    title: 'Discrete Logic',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Discrete logic for computing. (The 2025-2026 catalog prints a Linux and shell-scripting ' +
+      'description under this course code, duplicating CS230; the description here is a ' +
+      'placeholder pending departmental confirmation.)',
   },
   {
     courseCode: 'CS230',
-    title: 'Object-Oriented Programming',
+    title: 'Linux & Shell Scripting',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
-    description: 'Object-oriented design principles and programming in Java.',
+    description:
+      'This course is designed to familiarize the students with the Linux environment. Topics ' +
+      'include concepts of the Linux operating system, Shell commands, Visual editor, file ' +
+      'manipulation and securities, Linux utility commands, shell features and shell ' +
+      'environment, online manual, controlling user processes and managing jobs, the ' +
+      'introduction of regular expression and its usage with grep, sed, and awk power ' +
+      'utilities, basic shell programming techniques, large file management, and the user ' +
+      'programming environment customization. Students are also introduced to Linux shells ' +
+      '(bash, Bourne, and Korn), shell programming, basic Linux file systems, and resource ' +
+      'management. The students will be able to write shell scripts to accomplish routine tasks ' +
+      'for software development and testing. Hands-on exercises are required. Corequisite: ' +
+      'CS230L',
   },
   {
     courseCode: 'CS230L',
-    title: 'Object-Oriented Programming Lab',
+    title: 'Linux & Shell Scripting Lab',
     creditHours: 1,
     level: CourseLevel.UNDERGRADUATE,
-    description: 'Laboratory component for CS230.',
+    description:
+      'This course is designed to be taken concurrently with the CS230 Linux & Shell Scripting ' +
+      'course. The students gain hands-on experience with Unix/Linux commands, vi editor, Linux ' +
+      'utility, shell scripting/programming, security issues, managing long files, and ' +
+      'customization of user environment. Corequisite: CS230',
   },
   {
     courseCode: 'CS250',
+    title: 'Introduction to Programming',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'This course is an introduction to computer science using Python programming language. ' +
+      'Major topics covered include defining and analyzing problems, developing algorithms, ' +
+      'implementation, debugging, documentation of programs, coverage of basic algorithms, ' +
+      'programming concepts, and data types. Students will write computer programs that include ' +
+      'control structures, iteration, methods, argument passing, and classes. Corequisite: ' +
+      'CS250L',
+  },
+  {
+    courseCode: 'CS250L',
+    title: 'Introduction to Programming Lab',
+    creditHours: 1,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'This course is designed to be taken concurrently with the CS250 Introduction to ' +
+      'Programming course. It is aimed at students new to the Python language who may or may ' +
+      'not have experience with other programming languages. Students will learn (a) how Python ' +
+      'works and its place in the world of programming languages, (b) to work with and ' +
+      'manipulate strings, (c) to perform math operations, (d) to work with Python sequences, ' +
+      '(e) to collect user input and output results, (f) flow control processing, (g) to write ' +
+      'to, and read from files, (h) to write functions, and (i) to handle exceptions. ' +
+      'Corequisite: CS250',
+  },
+  {
+    courseCode: 'CE305',
+    title: 'Computer Organization',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'This course is designed to provide a fundamental understanding of the issues and ' +
+      'challenges involved in designing and implementing modern computer systems. The primary ' +
+      'goal is to help students become more skilled in their understanding of computer systems, ' +
+      'including how the hardware and software interact with each other. This course will also ' +
+      'provide an understanding of where computers come from and where they are going, as well ' +
+      'as an understanding of their strengths and weaknesses, such as why compiled code will ' +
+      'always execute faster than JAVA code. Subjects will include RISC vs. CISC CPU design ' +
+      'approach, instruction sets, pipelining, instruction scheduling (branch prediction, ' +
+      'speculative and out-of-order execution, etc.), cache, and storage hierarchy design. ' +
+      'Additional key focuses will be on modern I/O architectures such as PCI, PCI-X, SATA, ' +
+      'SCSI, and USB, among others, and their importance for performance and compatibility.',
+  },
+  {
+    courseCode: 'CS350',
     title: 'Data Structures',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Arrays, linked lists, stacks, queues, trees, and graphs with algorithm analysis.',
+      'This course is designed to teach efficient use of data structures and algorithms to ' +
+      'solve problems. Students study the logical relationship between data structures ' +
+      'associated with a problem and physical representation. Topics include introduction to ' +
+      'algorithms and data organization, arrays, stacks, queues, trees, graphs, sorting, ' +
+      'hashing, and heap structures. Hands-on exercises are required.',
   },
   {
-    courseCode: 'CS250L',
+    courseCode: 'CS350L',
     title: 'Data Structures Lab',
     creditHours: 1,
     level: CourseLevel.UNDERGRADUATE,
-    description: 'Laboratory component for CS250.',
+    description:
+      'This course is designed to be taken concurrently with the CS350 Data Structures course. ' +
+      'C language, a structured programming language, is further investigated. Topics include ' +
+      'pointer structure, structure and union, stack, queue, linked list, sort, binary tree, ' +
+      'and heaps.',
   },
   {
-    courseCode: 'CE305',
-    title: 'Digital Logic Design',
+    courseCode: 'CS360',
+    title: 'Programming in C and C++',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Boolean algebra, combinational and sequential logic circuits, and digital system design.',
+      "This course is designed to develop students' skills in designing, coding, and " +
+      'documenting application programs using the C and C++ programming languages. Emphasis is ' +
+      'placed on defining design objectives, criteria, and specifications, as well as the ' +
+      'processes of synthesis, analysis, construction, testing, and evaluation of open-ended ' +
+      'programming problem Topics include an introduction to procedural programming in C and ' +
+      'object-oriented programming in C++. Key concepts covered are data types, expressions, ' +
+      'statements, functions, program scope, run-time memory allocation, function overloading, ' +
+      'template functions, class mechanisms, inheritance, and transitioning from C to C++.',
   },
   {
-    courseCode: 'CS350',
+    courseCode: 'CS360L',
+    title: 'Programming in C and C++ Lab',
+    creditHours: 1,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'This course is designed to be taken concurrently with the CS360 Programming in C and C++ ' +
+      'course to practice and develop programming skills in both C and C++.',
+  },
+  {
+    courseCode: 'CS380',
     title: 'Operating Systems',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Process management, memory management, file systems, and concurrent programming.',
-  },
-  {
-    courseCode: 'CS350L',
-    title: 'Operating Systems Lab',
-    creditHours: 1,
-    level: CourseLevel.UNDERGRADUATE,
-    description: 'Laboratory component for CS350.',
-  },
-  {
-    courseCode: 'CS360',
-    title: 'Computer Networks',
-    creditHours: 3,
-    level: CourseLevel.UNDERGRADUATE,
-    description:
-      'Network architecture, protocols, routing, transport, and application layers.',
-  },
-  {
-    courseCode: 'CS360L',
-    title: 'Computer Networks Lab',
-    creditHours: 1,
-    level: CourseLevel.UNDERGRADUATE,
-    description: 'Laboratory component for CS360.',
-  },
-  {
-    courseCode: 'CS380',
-    title: 'Analysis of Algorithms',
-    creditHours: 3,
-    level: CourseLevel.UNDERGRADUATE,
-    description:
-      'Algorithm design paradigms: divide-and-conquer, dynamic programming, greedy, and complexity theory.',
+      'This course covers the fundamental concepts and implementation techniques of modern ' +
+      'operating systems. Topics include processes, threads, concurrency, memory management, ' +
+      'file systems, I/O systems, security, and OS virtualization. Popular operating systems ' +
+      'will be selected for case studies, including Linux/UNIX, Windows, Android, and VMWare ' +
+      'hypervisors. Hands-on exercises and projects are required.',
   },
   {
     courseCode: 'BUS450',
-    title: 'Technology Entrepreneurship',
+    title: 'Professional and Technical Writing',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Business planning, intellectual property, and launching technology ventures.',
+      'This course presents students with practical instructions about communicating in ' +
+      'different kinds of academic and workplace environments, as well as ' +
+      'professional/technical communities. Students will learn how to organize and produce ' +
+      'common professional writing work, such as technical reports, white papers, proposals, ' +
+      'and theses. The course also covers different forms of effective writing, writing styles, ' +
+      'approaches, formats, and citations of referenced materials. Computer Systems Engineering',
   },
   {
     courseCode: 'CS455',
-    title: 'Database Systems',
+    title: 'Algorithms & Structured Programming',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Relational model, SQL, normalization, transaction management, and database design.',
+      'This course introduces students to the design, analysis, and implementation of ' +
+      'algorithms to solve engineering problems using an object-oriented programming language. ' +
+      'It covers the common algorithms, algorithmic complexity, and data structures used to ' +
+      'solve these problems. The course concentrates on the design of algorithms and the ' +
+      'analysis of their efficiency.',
   },
   {
     courseCode: 'CS457',
-    title: 'Software Engineering',
+    title: 'Data Modeling and Implementation Techniques',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Software lifecycle, requirements, design patterns, testing, and project management.',
+      'This is the first of a series of courses designed to teach relational database concepts, ' +
+      'design, and applications. Topics include database architecture, relational model, ' +
+      'structured query language (SQL), data manipulation language (DML), data definition ' +
+      'language (DDL), database design, ER modeling, database normalization, denormalization, ' +
+      'and physical database design. Popular database systems, such as Oracle and Microsoft SQL ' +
+      'servers, are used for hands-on exercises and projects.',
   },
   {
     courseCode: 'CS457L',
-    title: 'Software Engineering Lab',
+    title: 'Database Technologies Lab',
     creditHours: 1,
     level: CourseLevel.UNDERGRADUATE,
-    description: 'Laboratory component for CS457.',
+    description:
+      'This is a drill course designed to be taken concurrently with the CS457 Data Modeling ' +
+      'and Implementation Techniques course. The students gain hands-on experience in database ' +
+      'applications using popular database systems, including Oracle and Microsoft SQL servers. ' +
+      'They are also guided in working on database design projects.',
   },
   {
     courseCode: 'CS480',
-    title: 'Artificial Intelligence',
+    title: 'Java and Internet Applications',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Search, knowledge representation, machine learning, and natural language processing.',
+      'This course introduces students to programming in Java, with an emphasis on object- ' +
+      'oriented concepts, graphical user interface (GUI) design, and the use of core Java ' +
+      'libraries. Students will learn fundamental Java language features, including syntax, ' +
+      'classes, inheritance, interfaces, and reflection. Additional topics include graphics ' +
+      'programming, event handling, Swing-based UI components, Java applets, exception ' +
+      'handling, and working with streams and files.',
   },
   {
     courseCode: 'CS480L',
-    title: 'Artificial Intelligence Lab',
+    title: 'Java Programming Lab',
     creditHours: 1,
     level: CourseLevel.UNDERGRADUATE,
-    description: 'Laboratory component for CS480.',
+    description:
+      'This is a drill course designed to be taken concurrently with the CS480 Java and ' +
+      'Internet Applications course. The students gain Java programming skills in this weekly ' +
+      'lab course through hands-on exercises that normally correspond with the lecture material ' +
+      'offered each week.',
   },
   {
     courseCode: 'CS481',
-    title: 'Machine Learning',
+    title: 'Introduction to Machine Learning and Data Science',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Supervised and unsupervised learning, neural networks, and deep learning fundamentals.',
+      'Data science is an interdisciplinary field that combines mathematics, statistics, ' +
+      'programming languages, and specific domain knowledge. This course describes (1) the ' +
+      'process of gaining knowledge and insights from data in both a structured and an ' +
+      'unstructured way and (2) scientific methods, processes, algorithms, and systems that can ' +
+      'be employed to analyze, design, develop, and implement solutions to challenging novel ' +
+      'and existing data science problems.',
   },
   {
     courseCode: 'CS487',
-    title: 'Capstone Project I',
+    title: 'Object-Oriented Design and Implementations',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'First semester of senior capstone; project definition, design, and proposal.',
+      'This course is designed to use an object-oriented programming language to achieve the ' +
+      'goal of teaching the students the design methodology for algorithm development. The ' +
+      'objective is to develop the students’ programming ability with proper logical and ' +
+      'object-oriented thinking processes, as well as basic design patterns. The course covers ' +
+      'two main topics: (1) problem specification and analysis: understand the problem, analyze ' +
+      'it, and translate human thinking into a computer program, and (2) object-oriented design ' +
+      'and analysis: understand data abstraction, encapsulation, aggregation, and inheritance. ' +
+      'These concepts are the foundation for object- oriented programming languages such as ' +
+      'Python, Java, C++, and C#. Hands-on practice using Python is required. Corequisite: ' +
+      'CS250',
   },
   {
     courseCode: 'CS494',
-    title: 'Capstone Project II',
+    title: 'Senior Capstone Project – I',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Second semester of senior capstone; implementation and final presentation.',
+      'This is the first part of the senior capstone project series. The senior capstone ' +
+      'project course is designed to develop the creativity of every senior graduating in ' +
+      'computer science through the exercise of the design effort and implementation skills of ' +
+      'a self-selected project. The design approach must employ modern design techniques and ' +
+      'methodologies in the related fields that were acquired during the course of the program ' +
+      'study. Completion of the project entails (1) proper research on relevant topics, (2) ' +
+      'formulation of a design problem statement, (3) design specifications, (4) consideration ' +
+      'of alternative solutions, (5) a development plan, (6) actual implementation, and (7) ' +
+      'submission of a final report. The student must discuss with and follow the guidelines ' +
+      'provided by the instructor through the period of research, implementation, testing, ' +
+      'report writing, and related procedures.',
   },
-
-  // ── BSCS Specialization Electives ──
   {
     courseCode: 'CE450',
-    title: 'Computer Architecture',
+    title: 'Fundamentals of Embedded Engineering',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Instruction set architecture, pipelining, memory hierarchy, and parallel computing.',
+      'This is the first in a series of embedded systems courses designed for students who are ' +
+      'interested in learning real-time embedded systems and practicing real-time programming ' +
+      'of embedded systems. Topics include hardware issues such as platform, microprocessors ' +
+      'commonly used in these systems and how a microprocessor works in such systems; the ' +
+      'concept of memory, registers, I/O; interrupt generation and handling in an embedded ' +
+      'system; the concept of real-time programming, multitasking, concurrency, mutual ' +
+      'exclusion; overview of real-time kernel/OS, drivers; system initialization and startup, ' +
+      'and debug issues. Hands-on exercises are required.',
   },
   {
     courseCode: 'CS453',
-    title: 'Theory of Computation',
+    title: 'Compiler Design',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Automata, formal languages, Turing machines, computability, and NP-completeness.',
+      'This course is designed to give students a fundamental knowledge of compilers and ' +
+      'interpreters for modern computer languages. Topics include a study of modern computer ' +
+      'languages, regular expressions, lexical analysis, parsing techniques, context-free ' +
+      'grammar, and syntax-directed translation. Hands-on exercises and semester projects are ' +
+      'required.',
   },
   {
     courseCode: 'CS470',
-    title: 'Cybersecurity Fundamentals',
+    title: 'Network Engineering and Management',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Cryptography, network security, authentication, and security policy frameworks.',
+      'This course is designed to introduce network communications. Topics include network- ' +
+      'layered models (OSI, TCP/IP), architecture, principles, service models and protocols, ' +
+      'data communication basics, switching, routing, security, network management, and ' +
+      'wireless and mobile networks. Modern Internet technologies and implementations are ' +
+      'presented in case studies. Hands-on exercises are required.',
   },
   {
     courseCode: 'CS477',
-    title: 'Wireless Networks',
+    title: 'Ethical Hacking and Penetration Testing',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Wireless protocols, mobile computing, IoT connectivity, and 5G fundamentals.',
+      'An ethical hacker is usually employed by an organization that trusts him or her to ' +
+      'attempt to penetrate networks or computer systems, using the same methods as a hacker, ' +
+      'for the purpose of finding and fixing computer security vulnerabilities. This course ' +
+      'goes into computer hacking techniques in depth. The students leave with the ability to ' +
+      'quantitatively assess and measure threats to information assets and discover where the ' +
+      'organization is most vulnerable to hacking. This knowledge allows system administrators ' +
+      'to deploy proactive countermeasures, stay ahead of information security developments, ' +
+      'and exploit vulnerabilities.',
   },
   {
     courseCode: 'CS478',
-    title: 'Cloud Computing',
+    title: 'Blockchain Technology and Applications',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Virtualization, cloud service models, distributed systems, and container orchestration.',
+      'This course explores the fundamentals and applications of blockchain technology, which ' +
+      'is the transparent, secure, immutable, and distributed database used currently as the ' +
+      'underlying technology for cryptocurrency. Types of blockchain will be introduced and ' +
+      'studied with real-life cases. Through practical cases and research assignments, this ' +
+      'course will introduce students to the workings and applications of this potentially ' +
+      'disruptive technology and its potential impact on all aspects of the business world and ' +
+      'society.',
   },
   {
     courseCode: 'CS483',
-    title: 'Computer Vision',
+    title: 'Fundamentals of Artificial Intelligence',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Image processing, feature extraction, object detection, and deep learning for vision.',
+      'This course covers artificial intelligence (AI) applications in problem-solving, ' +
+      'reasoning, planning, natural language understanding, computer vision, autonomous car ' +
+      'navigation, machine learning, business intelligence, robot design, and so on. In order ' +
+      'to solve AI problems, the major algorithms include machine learning, search, Markov ' +
+      'decision processes, constraint satisfaction, graphical models, and logic. The main goal ' +
+      'of this course is to equip students with the tools in the Python library to tackle a ' +
+      'variety of AI problems in industries.',
   },
   {
     courseCode: 'CS485',
-    title: 'Natural Language Processing',
+    title: 'JavaScript and Internet Programming',
     creditHours: 3,
     level: CourseLevel.UNDERGRADUATE,
     description:
-      'Text processing, language models, sentiment analysis, and transformer architectures.',
+      'This course is designed to provide students with advanced programming knowledge and ' +
+      'skills for application development on the Internet. Students study both client-side and ' +
+      'server-side scripting, including HTML, JavaScript, and CSS, to develop interactive and ' +
+      'responsive websites. Other topics covered include jQuery, Bootstrap, Node.js Express ' +
+      'Framework, RESTful API, MongoDB (NoSQL), and various JavaScript frameworks such as ' +
+      'Angular and React. Hands-on exercises are required.',
   },
-
-  // ── MSCS Foundation ──
   {
     courseCode: 'CS455G',
-    title: 'Database Systems (Graduate)',
+    title: 'Algorithms & Structured Programming',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Graduate-level database systems: advanced SQL, NoSQL, query optimization, and concurrency.',
+      'This course introduces students to the design, analysis, and implementation of ' +
+      'algorithms to solve engineering problems using an object-oriented programming language. ' +
+      'It covers the common algorithms, algorithmic complexity, and data structures used to ' +
+      'solve these problems. The course concentrates on the design of algorithms and the ' +
+      'analysis of their efficiency.',
   },
   {
     courseCode: 'CS457G',
-    title: 'Software Engineering (Graduate)',
+    title: 'Data Modeling and Implementation Techniques',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Graduate-level software engineering: agile methods, software architecture, and quality assurance.',
+      'This is the first of a series of courses designed to teach relational database concepts, ' +
+      'design, and applications. Topics include database architecture, relational models, ' +
+      'structured query language (SQL), data manipulation language (DML), data definition ' +
+      'language (DDL), database design, ER modeling, database normalization, denormalization, ' +
+      'and physical database design. Popular database systems, such as Oracle and Microsoft SQL ' +
+      'servers, are used for hands-on exercises and projects.',
   },
   {
     courseCode: 'CS457LG',
-    title: 'Software Engineering Lab (Graduate)',
+    title: 'Database Technologies Lab',
     creditHours: 1,
     level: CourseLevel.GRADUATE,
-    description: 'Graduate laboratory component for CS457G.',
+    description:
+      'This drill course is designed to be taken concurrently with the CS457 Data Modeling and ' +
+      'Implementation Techniques course. The students gain hands-on experience in database ' +
+      'applications using popular database systems, including Oracle and Microsoft SQL servers. ' +
+      'They are also guided to work on database design projects.',
   },
   {
     courseCode: 'CS500',
-    title: 'Advanced Algorithms',
+    title: 'Object-Oriented Design in Python',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Advanced algorithm design: approximation, randomized algorithms, and computational complexity.',
+      'This course is designed to use object-oriented programming language to achieve the goal ' +
+      'of teaching the students the object-oriented design methodology for software ' +
+      'development. The objective is to develop the students’ programming ability with proper ' +
+      'logical and object-oriented thinking processes, as well as software design patterns. The ' +
+      'course covers three main topics: (1) object-oriented design and analysis: requirement ' +
+      'analysis, design process, data abstraction, encapsulation, aggregation, and inheritance; ' +
+      '(2) design patterns: reusable solutions to commonly occurring problems such as Abstract ' +
+      'Factory, Observer, Command, Decorator, Adaptor, Iterator, and State; and (3) Python ' +
+      'language: data types, control structures, functions, parameter passing, library ' +
+      'functions, lists, tuples and dictionaries, I/O, modules, functional programming, and ' +
+      'advanced python syntax. Hands-on practices are required.',
   },
   {
     courseCode: 'CS500L',
-    title: 'Advanced Algorithms Lab',
+    title: 'Object-Oriented Design in Python Lab',
     creditHours: 1,
     level: CourseLevel.GRADUATE,
-    description: 'Laboratory component for CS500.',
+    description:
+      'This course is designed to be taken concurrently with the CS500 Object-oriented Analysis ' +
+      'and Design in Python course to practice object-oriented design and develop programming ' +
+      'skills in Python.',
   },
   {
     courseCode: 'CS501',
-    title: 'Advanced Operating Systems',
+    title: 'Practical Application of Algorithms',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Advanced operating system design: kernel internals, distributed OS, and real-time systems.',
+      'This course is designed to expand a student’s knowledge of algorithms by concentrating ' +
+      'on the practical application to solve real-world computational problems. Students will ' +
+      'be trained in the process of “Algorithmic Thinking,” allowing them to develop a good ' +
+      'conceptual understanding and improve their ability to solve challenging problems. ' +
+      'Students will learn how to implement abstract algorithmic thoughts in programs, explain ' +
+      'them to others, and formulate simpler, more efficient solutions to real-life problems ' +
+      'faced during an interview or in the workplace.',
   },
-
-  // ── MSCS Specialization — Cybersecurity ──
   {
     courseCode: 'CS535',
-    title: 'Network Security',
+    title: 'Network Security Fundamentals',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Firewalls, intrusion detection, VPNs, and secure protocol design.',
+      'This course deals with security issues on the Internet and the web. Major topics include ' +
+      'issues related to Internet infrastructure and applications running on the Internet, ' +
+      'techniques to reduce security risks, and an introduction to the role of security as an ' +
+      'enabling technology for electronic commerce. The course includes an overview of Internet ' +
+      'and web security, its applications and legal issues, encryption and cryptography, SSL ' +
+      'and browsers, web servers, and Java security.',
   },
   {
     courseCode: 'CS571',
-    title: 'Advanced Cryptography',
+    title: 'Cloud Computing Infrastructure',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Public-key cryptography, zero-knowledge proofs, and applied cryptographic protocols.',
+      'This course provides a comprehensive introduction to cloud computing infrastructure, ' +
+      'covering key concepts such as cloud frameworks, design patterns, virtualization, and ' +
+      'cloud-based applications. It then explores modern container technologies, with a focus ' +
+      'on Docker and its role in application deployment. Building on this foundation, the ' +
+      'course delves into Kubernetes, a leading open-source container orchestration platform ' +
+      'that has transformed how applications are built, deployed, and managed in the cloud. ' +
+      'Students will examine how Kubernetes supports scalable, resilient application ' +
+      'development and why it has become a critical tool in cloud-native computing.',
   },
   {
     courseCode: 'CS581',
-    title: 'Secure Software Development',
+    title: 'Cloud Security',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Secure coding practices, vulnerability analysis, penetration testing, and threat modeling.',
+      'This course covers the basics of cloud infrastructure technologies such as computers, ' +
+      'storage, containers, serverless, IAM, asset management, and more. Challenges of ' +
+      'scalability and security in multi-cloud and hybrid-cloud environments are examined. ' +
+      'Students will learn how various cybersecurity principles apply to cloud technology, such ' +
+      'as Least Privilege, Defense in Depth, Attack Vector, Trust Boundaries, and Shared ' +
+      'Responsibility Model, among others.',
   },
   {
     courseCode: 'CS589',
-    title: 'Special Topics in Computer Science',
+    title: 'Special Topics',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Rotating advanced topics in current areas of computer science research.',
+      'Special topics courses are offered to graduate students in the Computer Science program ' +
+      'by current faculty members or invited guest speakers to expose the students to emerging ' +
+      'technologies related to their studies. These courses are conducted the same way as ' +
+      'regular courses.',
   },
   {
     courseCode: 'CS477G',
-    title: 'Wireless Networks (Graduate)',
+    title: 'Ethical Hacking and Penetration Testing',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Graduate-level wireless networking: advanced protocols, security, and 5G architectures.',
+      'An ethical hacker is usually employed by an organization that trusts him or her to ' +
+      'attempt to penetrate networks or computer systems, using the same methods as a hacker, ' +
+      'for the purpose of finding and fixing computer security vulnerabilities. This course ' +
+      'goes into computer hacking techniques in depth. The students leave with the ability to ' +
+      'quantitatively assess and measure threats to information assets and discover where the ' +
+      'organization is most vulnerable to hacking. This knowledge allows system administrators ' +
+      'to deploy proactive countermeasures, stay ahead of information security developments, ' +
+      'and exploit vulnerabilities.',
   },
-
-  // ── MSCS Specialization — Data Science ──
   {
     courseCode: 'CS550',
-    title: 'Big Data Systems',
+    title: 'Machine Learning and Business Intelligence',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Hadoop, Spark, distributed storage, and large-scale data processing pipelines.',
+      'This course introduces methods and techniques for using stored business data to make ' +
+      'business decisions. The student will learn data types, including operational or ' +
+      'transactional data, such as data for sales, cost, and inventory; nonoperational data, ' +
+      'such as forecast data and macroeconomic data; and metadata, as well as learn their ' +
+      'patterns, associations, or relationships, and how to use this information for decision- ' +
+      'making. Modern data warehouse concepts will also be introduced. Specific examples of ' +
+      'businesses using data mining techniques will be given in the course. The student is ' +
+      'required to work on course projects by using modern data analysis software and referring ' +
+      'to cases studied.',
   },
   {
     courseCode: 'CS570',
-    title: 'Deep Learning',
+    title: 'Big Data Processing & Analytics',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Convolutional networks, recurrent networks, attention mechanisms, and large language models.',
+      'This course aims to provide students with an understanding of the operating principles ' +
+      'and hands- on experience with mainstream big data computing systems such as MapReduce, ' +
+      'Hadoop, and, most recently, Apache Spark, a fast, in-memory distributed collections ' +
+      'framework written in Scala. Applying these techniques to big data processing and ' +
+      'analytic problems, such as PageRank, machining learning, and social network graph ' +
+      'mining, will be discussed.',
   },
   {
     courseCode: 'CS481G',
-    title: 'Machine Learning (Graduate)',
+    title: 'Introduction to Machine Learning and Data Science',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Graduate-level machine learning: advanced methods, probabilistic models, and scalable learning.',
+      'Data science is an interdisciplinary field that combines mathematics, statistics, ' +
+      'programming languages, and specific domain knowledge. This course describes (1) the ' +
+      'process of gaining knowledge and insights from data in both a structured and an ' +
+      'unstructured way and (2) scientific methods, processes, algorithms, and systems that can ' +
+      'be employed to design, develop, and implement solutions to challenging novel and ' +
+      'existing data science problems.',
   },
-
-  // ── MSCS Specialization — Network Engineering ──
   {
     courseCode: 'CS515',
-    title: 'Advanced Computer Networks',
+    title: 'UNIX/Linux Network Programming',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Software-defined networking, network function virtualization, and cloud networking.',
+      'This course is designed for graduate students to gain hands-on experience in UNIX/Linux ' +
+      'network programming. The students will learn to develop UNIX/Linux network applications ' +
+      'using a number of UNIX/Linux network programming interface techniques including Sockets, ' +
+      'XTI, and RPC. Topics include an overview of transport layer (TCP/UDP), TCP sockets, UDP ' +
+      'sockets, threads, and client- server design, XTI, RPC, and Streams. Hands-on exercises ' +
+      'and projects are required.',
   },
   {
     courseCode: 'CS565',
-    title: 'Distributed Systems',
+    title: 'Advanced Network Management',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Consistency models, consensus algorithms, fault tolerance, and distributed transactions.',
+      'This course is designed to give graduate students an in-depth understanding of and ' +
+      'hands-on experience in the management of network systems and applications. Emphases are ' +
+      'on simple network management protocol (SNMP) management, MIB, management tools, systems, ' +
+      'and applications. Current widely used industry applications will be used to demonstrate ' +
+      'management concepts. Computer-based training software will be used to check/verify the ' +
+      'students’ network management skills in order to ensure they are prepared for the ' +
+      'industry challenges. Topics include Network Management fundamentals; OSIMAN, SNMP, and ' +
+      'TMN standards; RMON and ITU TMN architecture; inside structure and practical ' +
+      'applications of SNMP, SNMP2, SNMP3, RMON, RMON2, and MIBs. Hands-on exercises are ' +
+      'required.',
   },
   {
     courseCode: 'CS575',
-    title: 'Internet of Things',
+    title: 'Network Analysis and Testing',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'IoT architectures, edge computing, sensor networks, and IoT security.',
+      'This course covers computer network analysis, testing techniques, and experience-based ' +
+      'strategies to isolate and solve network problems. Topics include wiring and cable ' +
+      'testing issues, transmission encoding techniques, dissecting the IEEE 48-bit MAC ' +
+      'address, the impact of different types of broadcast traffic, operational details and ' +
+      'analysis considerations for switches, Ethernet and Token Ring operational details and ' +
+      'analysis, the IEEE 802.2 LLC protocol, datagrams and routing, IP specifics, protocol ' +
+      'analysis and troubleshooting, baselining throughput, and latency. Hands-on exercises ' +
+      'using a protocol analyzer are required to reinforce the topics.',
   },
-
-  // ── MSCS Capstone ──
   {
     courseCode: 'CS595',
-    title: 'Computer Science Capstone',
+    title: 'Computer Science Capstone Course',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Graduate capstone project integrating advanced CS topics with research or industry application.',
+      'Under the guidance of the course instructor, the capstone course is intended to ' +
+      'integrate the knowledge and hands-on experience that the student has acquired from the ' +
+      'foundation, core, and elective coursework required for the program in the course. The ' +
+      'instructor determines the course objectives and scope based on the computer science ' +
+      'curriculum and technology trend and guides the students to develop their integration ' +
+      'ability. The student shall take the capstone course near the end of their program of ' +
+      'study.',
   },
-
-  // ── MSEE Foundation ──
   {
     courseCode: 'CE450G',
-    title: 'Computer Architecture (Graduate)',
+    title: 'Fundamentals of Embedded Engineering',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Graduate-level computer architecture: advanced pipelining, cache design, and multicore systems.',
+      'This is the first in a series of embedded systems courses designed for students who are ' +
+      'interested in learning real-time embedded systems and practicing real-time programming ' +
+      'of embedded systems. Topics include hardware issues such as platform, microprocessors ' +
+      'commonly used in these systems and how a microprocessor works in such systems; the ' +
+      'concept of memory, registers, I/O; interrupt generation and handling in an embedded ' +
+      'system; the concept of real-time programming, multitasking, concurrency, mutual ' +
+      'exclusion; overview of real-time kernel/OS, drivers; system initialization and startup, ' +
+      'and debug issues. Hands-on exercises are required.',
   },
   {
     courseCode: 'CE450LG',
-    title: 'Computer Architecture Lab (Graduate)',
+    title: 'Embedded Engineering Lab',
     creditHours: 1,
     level: CourseLevel.GRADUATE,
-    description: 'Graduate laboratory component for CE450G.',
+    description:
+      'This is a drill course designed to be taken concurrently with the CE450G Fundamentals of ' +
+      'Embedded Engineering course. The students gain hands-on experience with embedded systems ' +
+      'programming and design. They are also guided to work on projects involving control ' +
+      'systems.',
   },
   {
     courseCode: 'EE461G',
-    title: 'Digital Signal Processing (Graduate)',
+    title: 'Digital Design and HDL',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Graduate DSP: Z-transform, FIR/IIR filters, FFT, and spectral estimation.',
+      'This course develops the student’s ability to design commonly used basic building blocks ' +
+      'of modern digital systems and provides them with a fundamental knowledge of state-of- ' +
+      'the-art design methodology, design considerations, and verification strategies for ' +
+      'complicated digital hardware design. Topics include Verilog HDL basics, logic modeling, ' +
+      'state machine design, and memory modeling using Verilog HDL. Additional topics on FPGA ' +
+      'architecture, device vendors, FPGA design tools, FPGA applications, and the latest ' +
+      'trends in the programmable logic industry are also covered. Students can use Verilog ' +
+      'tools such as Synopsys VCS, Mentor Modelsim, Cadence NC Verilog, and Silo III Verilog ' +
+      'Simulator from SimuCAD for their homework and design projects. Hands-on practice is ' +
+      'required. Students are encouraged to take the HDL-based sequence of courses EE461 and ' +
+      'EE512 to gain knowledge and experience in semicustom IC design using industry-grade EDA ' +
+      'design tools.',
   },
   {
     courseCode: 'EE461LG',
-    title: 'Digital Signal Processing Lab (Graduate)',
+    title: 'Digital Design and HDL Lab',
     creditHours: 1,
     level: CourseLevel.GRADUATE,
-    description: 'Graduate laboratory component for EE461G.',
+    description:
+      'This is a drill course designed to be taken concurrently with the EE461G Digital Design ' +
+      'and HDL course. The students gain hands-on experience with Verilog simulation tools to ' +
+      'learn logic design. They will have the chance to work on several design projects. They ' +
+      'will also learn the essentials of several popular scripting languages: Perl, Python, and ' +
+      'Unix/Linux Shell.',
   },
   {
     courseCode: 'EE488G',
-    title: 'Embedded Systems (Graduate)',
+    title: 'Computer Architecture',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Graduate embedded systems: RTOS, hardware-software co-design, and IoT integration.',
+      'This course introduces the organization, design, and applications of modern computer ' +
+      'architecture from both the hardware and software perspectives. Topics include ' +
+      'performance benchmarks, instruction sets (for both RISC and CISC), computer arithmetic, ' +
+      'memory, parallelism (instruction, data, and thread levels), I/O and storage, multicore ' +
+      'processors and programming, and GPU (graphics processing unit). Hands-on labs involving ' +
+      'HDL and SPIM simulations, assemblers, linkers, and multithread programming are required ' +
+      'to enhance classroom learning.',
   },
-
-  // ── MSEE Specialization — IoT and Embedded Systems ──
   {
     courseCode: 'EE517',
-    title: 'Advanced Embedded System Design',
+    title: 'Introduction to the Internet of Things (IoT)',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Advanced microcontroller programming, peripheral interfacing, and real-time design patterns.',
+      'The Internet of Things (IoT) promises to make “things,” including consumer electronic ' +
+      'devices or home appliances, such as refrigerators, security cameras, and temperature ' +
+      'sensors, part of the Internet environment. To realize the full potential of the IoT ' +
+      'paradigm, this introductory course will address challenges and the various solutions ' +
+      'available. The course content will cover IoT concepts and architecture, IoT enablers and ' +
+      'solutions, IoT data and knowledge management, and IoT security and reliability. The ' +
+      'students will need to complete a term project to demonstrate the concept of IoT for a ' +
+      'chosen application based on an embedded system or a development platform.',
   },
   {
     courseCode: 'CE521',
-    title: 'Field Programmable Gate Arrays',
+    title: 'Real-Time Systems and Programming',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'FPGA architecture, HDL design, timing analysis, and hardware accelerator implementation.',
+      'This is the second in the embedded systems series designed for students who are ' +
+      'interested in learning real-time embedded systems and practicing real-time programming ' +
+      'of embedded systems. By examining an off-the-shelf real-time operating system, students ' +
+      'will gain hands-on experience in real-time operating system programming and ' +
+      'implementations. Specific topics include a review of embedded system design, the concept ' +
+      'of real-time systems, real-time specification and design techniques, real-time kernels, ' +
+      'system performance analysis, memory management, task management, time management, ' +
+      'synchronization of inter-task communication, queuing models, real-time operating system ' +
+      'tools for embedded systems, and real-time programming examples. Hands-on exercises are ' +
+      'required.',
   },
   {
     courseCode: 'CE522',
-    title: 'System-on-Chip Design',
+    title: 'Embedded Design in Networking Environment',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'SoC integration, bus architectures, IP core integration, and verification.',
+      'This course is designed for the students to learn protocol stack implementation/porting ' +
+      'in a real- time operating system (RTOS) kernel environment. Students learn the concept ' +
+      'of network protocol stack implementation/porting, embedded real-time system software ' +
+      'architecture, and real-time operating systems. They also learn to design and write ' +
+      'programs as a collection of independent and concurrent tasks, non-preemptive and ' +
+      'preemptive multitasking, task scheduling, and task synchronization and intertask ' +
+      'communication, including semaphores and message queues. Industry-standard RTOS will be ' +
+      'used for practice and projects.',
   },
   {
     courseCode: 'CE523',
-    title: 'Computer Architecture II',
+    title: 'Embedded Design in Device Driver Environment',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Out-of-order execution, branch prediction, memory consistency, and heterogeneous computing.',
+      'This course investigates the operating system (Windows NT, Linux, or Unix) components ' +
+      'that interact with device drivers, the device driver building and debugging process, ' +
+      'device driver architecture, functionality, and the relevant kernel APIs. Topics include ' +
+      'operating system architecture; I/O API; operating system kernel; building, loading, and ' +
+      'debugging device drivers; device driver entry points; device driver data structures; I/O ' +
+      'request processing; plug, play and power management; interrupt-timers; memory ' +
+      'management; direct memory access; and timing. The goal of the course is to present ' +
+      'comprehensive coverage of the operating system kernel, HAL, device drivers, and the ' +
+      'related APIs. On completion of the course, the student should be able to develop, build, ' +
+      'install, and test basic device drivers, as well as to port existing drivers from one ' +
+      'operating system to another. Hands-on practice is required.',
   },
   {
     courseCode: 'CE530',
-    title: 'IoT System Architecture',
+    title: 'Embedded Software Design in Linux',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'End-to-end IoT design: sensors, gateways, cloud integration, and edge analytics.',
+      'This course prepares students to enter the challenging world of embedded Linux. It ' +
+      'covers the following key topics: comparing Linux and traditional embedded environments, ' +
+      'comparing leading embedded Linux processors, understanding the details of the Linux ' +
+      'kernel initialization process, learning the basic concepts about Linux drivers, learning ' +
+      'about the special role of bootloaders in embedded Linux systems with specific emphasis ' +
+      'on U-Boot, using embedded Linux file systems, understanding the Memory Technology ' +
+      'Devices subsystem for flash (and other) memory devices, mastering debugging tools such ' +
+      'as gdb, KGDB, learning many tips and techniques for debugging within the Linux kernel, ' +
+      'learning how to maximize productivity in cross-development environments, learning to ' +
+      'prepare an entire development environment (including TFTP, DHCP, and NFS target ' +
+      'servers), and learning to configure, build, and initialize BusyBox to support a set of ' +
+      'unique requirements. Hands-on exercises are required.',
   },
-
-  // ── MSEE Specialization — Multicore and Parallel Computing ──
   {
     courseCode: 'EE504',
-    title: 'Parallel Computing',
+    title: 'Advanced Computer Architecture',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Parallel programming models, GPU computing, and distributed memory architectures.',
+      'This course is designed to further investigate modern computer design introduced in ' +
+      'course EE488G. Topics include an in-depth study of multiprocessor architecture and ' +
+      'interconnection networks, pipelines, data flow, algorithm structures, memory system ' +
+      'design, cache memory design, and a comparison of the performance and design among ' +
+      'various computer architectures. Hands-on project experience is required.',
   },
   {
     courseCode: 'EE553',
-    title: 'High Performance Computing',
+    title: 'System on Chip (SoC) Design',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'HPC cluster design, MPI/OpenMP, performance profiling, and scientific computing.',
+      'System on Chip (SoC) is composed of many functional modules such as processor, memory, ' +
+      'digital IPs, analog/mixed-signal modules, RF, and interfaces on a single chip. This ' +
+      'course will focus on ARM-based on-chip bus platforms, digital IP verification, and the ' +
+      'trend and integration of SoC.',
   },
-
-  // ── MSEE Specialization — Modern Integrated Circuits ──
   {
     courseCode: 'EE505',
-    title: 'VLSI Design',
+    title: 'Advanced Digital IC Design',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'CMOS circuit design, layout, timing, and physical verification methodologies.',
+      'This advanced course in digital circuit design applies the knowledge of advanced circuit ' +
+      'design concepts to digital IC in state-of-the-art CMOS technologies. It emphasizes the ' +
+      'design and optimization of circuits/layouts for combinational logic gates, sequential ' +
+      'logic circuits, arithmetic building blocks, and memory circuits. The challenges of ' +
+      'today’s digital integrated circuit design, such as scaling, process variation, signal ' +
+      'integrity, timing issues, interconnectivity, and power consumption, will be addressed ' +
+      'specially. The circuit simulation tool (HSPICE), layout design tool (Virtuoso), and ' +
+      'schematic entry tool (Composer) are used for homework assignments and projects.',
   },
   {
     courseCode: 'EE511',
-    title: 'Advanced VLSI Design',
+    title: 'Advanced Analog IC Design',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'High-speed CMOS, low-power design techniques, and mixed-signal integration.',
+      'This course offers students extensive exposure to concepts and techniques in the ' +
+      'analysis and design of analog IC, including device modeling, basic circuit building ' +
+      'blocks, feedback system, frequency response, and noise. EDA tools may be used in ' +
+      'homework assignments and projects.',
   },
   {
     courseCode: 'EE520',
-    title: 'Digital IC Design',
+    title: 'Advanced FPGA Design and Implementations',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'RTL design methodologies, synthesis, static timing analysis, and sign-off.',
+      'Digital design using FPGAs is a particularly important activity in industries due to ' +
+      'reduced costs, compared with ASIC design, and faster time-to-market. To design a digital ' +
+      'system using FPGA, the designers must understand the architecture of the FPGA as well as ' +
+      'the accompanying CAD tools. The course will cover two major Xilinx FPGA architectures in ' +
+      'detail. The student will learn to build various digital blocks such as combinational ' +
+      'logic, sequential logic, finite state machines, RAM, and DSP by studying the ' +
+      'architectures of the FPGAs. Hands-on exercises are required.',
   },
   {
     courseCode: 'EE577',
-    title: 'RF Circuit Design',
+    title: 'Design Verification with System Verilog',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'RF amplifiers, filters, oscillators, and transceiver design for wireless applications.',
+      'This course is designed to cover the design verification methodologies commonly used in ' +
+      'system- on-chip (SoC) design. Topics include design verification basics, introduction of ' +
+      'various verification strategies, verification of soft and hard IP blocks, verification ' +
+      'for networking/communication ASIC, verification for audio/video signal processing ASIC, ' +
+      'how to build an efficient and effective verification platform, automation of ' +
+      'verification flow, test case coverage, how to create design models using PLI routine, ' +
+      'formal verification, and more. The students will also be informed that design ' +
+      'verification is becoming the bottleneck in modern ASIC design cycles, especially in ' +
+      'system- on-chip (SoC) design. The verification cycle could consume 70% of the design ' +
+      'cycle.',
   },
-
-  // ── MSEE Capstone ──
   {
     courseCode: 'EE595',
-    title: 'Electrical Engineering Capstone',
+    title: 'Electrical Engineering Capstone Course',
     creditHours: 3,
     level: CourseLevel.GRADUATE,
     description:
-      'Graduate capstone project applying EE specialization to a substantial engineering problem.',
+      'Under the guidance of the course instructor, the capstone course is intended to ' +
+      'integrate the knowledge and hands-on experience that the student has acquired from the ' +
+      'foundation, core, and elective coursework required for the program. The instructor ' +
+      'determines the course objectives and scope based on the electrical engineering ' +
+      'curriculum and technology trend and guides the students to develop their integration ' +
+      'ability. The student shall take the capstone course near the end of their program of ' +
+      'study.',
+  },
+  {
+    courseCode: 'CS521',
+    title: 'Software Project Management',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'This course teaches students to apply current software development approaches to ' +
+      'managing complex modern software projects. Practical strategies, tactics, and designs ' +
+      'are discussed together with realistic exercises. Topics include software development ' +
+      'process, project planning, requirements definition, design specification, usability ' +
+      'engineering, verification and validation, project and change management, and process ' +
+      'quality improvement. Students are required to participate in all course activities to ' +
+      'develop a real-world software product.',
+  },
+  {
+    courseCode: 'CS522',
+    title: 'Software Quality Assurance and Test Automation',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'This course teaches students to learn practical static and dynamic techniques that allow ' +
+      'software development teams to engineer high-quality products. The course begins with an ' +
+      'overview of modern software development approaches. It then introduces quality ' +
+      'management and test development based on preventive and agile principles as well as ' +
+      'quality risk analysis. It covers system, integration, performance, and automated testing ' +
+      'techniques. Quality improvement models for software development and testing are ' +
+      'discussed. Several test automation tools are demonstrated in class. Students gain hands- ' +
+      'on experience through assignments and exercises and learn to evaluate real-world ' +
+      'applications.',
+  },
+  {
+    courseCode: 'CS548',
+    title: 'Web Services Techniques and REST Technologies',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'This course covers the fundamental concepts of the 3-tier model commonly used in ' +
+      'Enterprise Application development. Topics include the Spring Framework, JDBC with ' +
+      'database applications, JPA (Java Persistence API), Hibernate, Spring MVC, Java Servlets, ' +
+      'and JavaBeans. In addition, the students will learn the best-practice development ' +
+      'approach using the Sprint Framework with JDBC or ORM (Object Relational Mapping) tools ' +
+      'to map business domain object models to the underlying relational database. At the end ' +
+      'of this course, the students shall have a fresh view of both the fundamental and ' +
+      'advanced skills needed to implement large-scale enterprise systems. Hands-on exercises ' +
+      'are an integral part of the course.',
+  },
+  {
+    courseCode: 'CS551',
+    title: 'Mobile Computing for Android Mobile Devices',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Google’s Android mobile phone software platform may be the next major opportunity for ' +
+      'application software developers. Android has the potential to remove the barriers to ' +
+      'successful development and sales of a new generation of mobile phone application ' +
+      'software. Just as PCs have created the markets for desktop and server software, Android ' +
+      'will create a new market for mobile applications by providing a standard mobile phone ' +
+      'application environment. This hands-on course focuses on developing applications for ' +
+      'Android, including map-based applications, camera-based applications, SMS, and the like. ' +
+      'Advanced development topics are also covered, including security, IPC, and certain ' +
+      'advanced graphics and user interface techniques.',
+  },
+  {
+    courseCode: 'CS556',
+    title: 'Mobile Applications on iPhone Platform',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'This course provides an in-depth study of the design, development, and publication of ' +
+      'object- oriented applications for the iPhone platform using Apple SDK. Students will ' +
+      'learn to utilize Xcode, SwiftUI, and UIKit to create iOS apps for iPhones.',
+  },
+  {
+    courseCode: 'APP101',
+    title: 'How to Tell Your Story',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'SFBU Agility Praxis Pathway general-education course, Area A: English Language ' +
+      'Communication and Critical Thinking.',
+  },
+  {
+    courseCode: 'APP102',
+    title: 'How to Design Your Life',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'SFBU Agility Praxis Pathway general-education course, Area C: Arts and Humanities.',
+  },
+  {
+    courseCode: 'APP103',
+    title: 'How to Communicate in a Global Context',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'SFBU Agility Praxis Pathway general-education course, Area A: English Language ' +
+      'Communication and Critical Thinking.',
+  },
+  {
+    courseCode: 'APP104',
+    title: 'How to Lead',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'SFBU Agility Praxis Pathway general-education course, Area D: Social Sciences.',
+  },
+  {
+    courseCode: 'APP201',
+    title: 'How to Use Math in Real Life',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'SFBU Agility Praxis Pathway general-education course, Area B: Mathematics and Natural ' +
+      'Sciences.',
+  },
+  {
+    courseCode: 'APP202',
+    title: 'How Your Brain Works',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'SFBU Agility Praxis Pathway general-education course, Area B: Mathematics and Natural ' +
+      'Sciences.',
+  },
+  {
+    courseCode: 'APP203',
+    title:
+      'How to "Be Creative" in Partnership with Computation and Machine Learning',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'SFBU Agility Praxis Pathway general-education course, Area C: Arts and Humanities.',
+  },
+  {
+    courseCode: 'APP204',
+    title: 'How to Use Data Science and Game Thinking for Social Impact',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'SFBU Agility Praxis Pathway general-education course, Area D: Social Sciences.',
+  },
+  {
+    courseCode: 'APP301',
+    title:
+      'How Can We Thrive? Scientific Inquiry & The Future of Sustainability',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'SFBU Agility Praxis Pathway general-education course, Area B: Mathematics and Natural ' +
+      'Sciences.',
+  },
+  {
+    courseCode: 'APP302',
+    title: 'How to Design Social Innovation/Impact Solutions to Thrive',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'SFBU Agility Praxis Pathway general-education course, Area D: Social Sciences.',
   },
 ];
 
@@ -607,50 +1133,57 @@ export const COURSES: CourseSeed[] = [
 // ──────────────────────────────────────────────────────────────
 
 export const PREREQUISITES: PrerequisiteSeed[] = [
-  // CS chain
-  { courseCode: 'CS230', prerequisiteCode: 'CS200' },
-  { courseCode: 'CS250', prerequisiteCode: 'CS230' },
-  { courseCode: 'CS380', prerequisiteCode: 'CS250' },
-  { courseCode: 'CS380', prerequisiteCode: 'MATH203' },
+  // Every link below is stated in the catalog's own course descriptions.
+  // Disjunctive prerequisites ("CS250 or CS360") are deliberately absent: this
+  // model is a hard AND, so recording both would block a student who satisfied
+  // either one. Tracked in TASKS.md.
+  { courseCode: 'CE450', prerequisiteCode: 'CS250' },
+  { courseCode: 'CE450G', prerequisiteCode: 'CS250' },
+  { courseCode: 'CE450LG', prerequisiteCode: 'CS250L' },
+  { courseCode: 'CE521', prerequisiteCode: 'CE450' },
+  { courseCode: 'CE522', prerequisiteCode: 'CE450' },
+  { courseCode: 'CE523', prerequisiteCode: 'CE450' },
+  { courseCode: 'CE530', prerequisiteCode: 'CE450' },
   { courseCode: 'CS350', prerequisiteCode: 'CS250' },
+  { courseCode: 'CS350L', prerequisiteCode: 'CS250L' },
   { courseCode: 'CS360', prerequisiteCode: 'CS250' },
-  { courseCode: 'CS455', prerequisiteCode: 'CS250' },
+  { courseCode: 'CS360L', prerequisiteCode: 'CS250L' },
+  { courseCode: 'CS380', prerequisiteCode: 'CS250' },
+  { courseCode: 'CS453', prerequisiteCode: 'CS350' },
+  { courseCode: 'CS455', prerequisiteCode: 'CS350' },
+  { courseCode: 'CS455G', prerequisiteCode: 'CS350' },
   { courseCode: 'CS457', prerequisiteCode: 'CS250' },
-  { courseCode: 'CS480', prerequisiteCode: 'CS380' },
-  { courseCode: 'CS481', prerequisiteCode: 'CS380' },
+  { courseCode: 'CS457G', prerequisiteCode: 'CS250' },
+  { courseCode: 'CS457L', prerequisiteCode: 'CS250L' },
+  { courseCode: 'CS457LG', prerequisiteCode: 'CS250L' },
+  { courseCode: 'CS470', prerequisiteCode: 'CS250' },
+  { courseCode: 'CS477', prerequisiteCode: 'CS250' },
+  { courseCode: 'CS477G', prerequisiteCode: 'CS250' },
   { courseCode: 'CS481', prerequisiteCode: 'MATH208' },
-  { courseCode: 'CS453', prerequisiteCode: 'CS380' },
-  { courseCode: 'CS453', prerequisiteCode: 'MATH203' },
-  { courseCode: 'CS470', prerequisiteCode: 'CS360' },
-  { courseCode: 'CS477', prerequisiteCode: 'CS360' },
-  { courseCode: 'CS478', prerequisiteCode: 'CS360' },
-  { courseCode: 'CS483', prerequisiteCode: 'CS481' },
-  { courseCode: 'CS485', prerequisiteCode: 'CS481' },
-  { courseCode: 'CE450', prerequisiteCode: 'CE305' },
-  { courseCode: 'CS487', prerequisiteCode: 'CS457' },
-  { courseCode: 'CS494', prerequisiteCode: 'CS487' },
-  // Math chain
+  { courseCode: 'CS481G', prerequisiteCode: 'MATH208' },
+  { courseCode: 'CS483', prerequisiteCode: 'CS250' },
+  { courseCode: 'CS485', prerequisiteCode: 'CS250' },
+  { courseCode: 'CS500', prerequisiteCode: 'CS250' },
+  { courseCode: 'CS500L', prerequisiteCode: 'CS250' },
+  { courseCode: 'CS501', prerequisiteCode: 'CS250' },
+  { courseCode: 'CS515', prerequisiteCode: 'CS230' },
+  { courseCode: 'CS515', prerequisiteCode: 'CS250' },
+  { courseCode: 'CS521', prerequisiteCode: 'CS250' },
+  { courseCode: 'CS522', prerequisiteCode: 'CS250' },
+  { courseCode: 'CS535', prerequisiteCode: 'CS250' },
+  { courseCode: 'CS548', prerequisiteCode: 'CS480' },
+  { courseCode: 'CS550', prerequisiteCode: 'CS457' },
+  { courseCode: 'CS551', prerequisiteCode: 'CS500' },
+  { courseCode: 'CS565', prerequisiteCode: 'CS470' },
+  { courseCode: 'CS570', prerequisiteCode: 'CS500' },
+  { courseCode: 'CS571', prerequisiteCode: 'CS500' },
+  { courseCode: 'CS575', prerequisiteCode: 'CS250' },
+  { courseCode: 'EE488G', prerequisiteCode: 'CS250' },
+  { courseCode: 'EE517', prerequisiteCode: 'CS230' },
+  { courseCode: 'EE517', prerequisiteCode: 'CS250' },
   { courseCode: 'MATH202', prerequisiteCode: 'MATH201' },
+  { courseCode: 'MATH203', prerequisiteCode: 'MATH201' },
   { courseCode: 'MATH208', prerequisiteCode: 'MATH201' },
-  // Graduate CS
-  { courseCode: 'CS500', prerequisiteCode: 'CS380' },
-  { courseCode: 'CS535', prerequisiteCode: 'CS360' },
-  { courseCode: 'CS550', prerequisiteCode: 'CS455G' },
-  { courseCode: 'CS565', prerequisiteCode: 'CS515' },
-  { courseCode: 'CS570', prerequisiteCode: 'CS481G' },
-  { courseCode: 'CS571', prerequisiteCode: 'CS535' },
-  { courseCode: 'CS581', prerequisiteCode: 'CS535' },
-  // Graduate EE
-  { courseCode: 'CE521', prerequisiteCode: 'CE450G' },
-  { courseCode: 'CE522', prerequisiteCode: 'CE521' },
-  { courseCode: 'CE523', prerequisiteCode: 'CE450G' },
-  { courseCode: 'EE504', prerequisiteCode: 'CE450G' },
-  { courseCode: 'EE505', prerequisiteCode: 'CE450G' },
-  { courseCode: 'EE511', prerequisiteCode: 'EE505' },
-  { courseCode: 'EE517', prerequisiteCode: 'EE488G' },
-  { courseCode: 'EE520', prerequisiteCode: 'EE505' },
-  { courseCode: 'EE553', prerequisiteCode: 'EE504' },
-  { courseCode: 'EE577', prerequisiteCode: 'CE450G' },
 ];
 
 // ──────────────────────────────────────────────────────────────
@@ -658,15 +1191,17 @@ export const PREREQUISITES: PrerequisiteSeed[] = [
 // ──────────────────────────────────────────────────────────────
 
 export const COREQUISITES: CorequisiteSeed[] = [
+  // Direction follows the catalog: the course that states the corequisite is the subject.
+  { courseCode: 'CE450G', corequisiteCode: 'CE450LG' },
   { courseCode: 'CS230', corequisiteCode: 'CS230L' },
   { courseCode: 'CS250', corequisiteCode: 'CS250L' },
   { courseCode: 'CS350', corequisiteCode: 'CS350L' },
   { courseCode: 'CS360', corequisiteCode: 'CS360L' },
   { courseCode: 'CS457', corequisiteCode: 'CS457L' },
-  { courseCode: 'CS480', corequisiteCode: 'CS480L' },
   { courseCode: 'CS457G', corequisiteCode: 'CS457LG' },
+  { courseCode: 'CS480', corequisiteCode: 'CS480L' },
+  { courseCode: 'CS487', corequisiteCode: 'CS250' },
   { courseCode: 'CS500', corequisiteCode: 'CS500L' },
-  { courseCode: 'CE450G', corequisiteCode: 'CE450LG' },
   { courseCode: 'EE461G', corequisiteCode: 'EE461LG' },
 ];
 
@@ -760,93 +1295,81 @@ export const KNOWLEDGE_AREAS: KnowledgeAreaSeed[] = [
 // ──────────────────────────────────────────────────────────────
 
 export const COURSE_KNOWLEDGE_AREAS: CourseKnowledgeAreaSeed[] = [
-  // ── Undergraduate Math ──
-  { courseCode: 'MATH201', knowledgeAreaNames: ['Mathematical Foundations'] },
-  { courseCode: 'MATH202', knowledgeAreaNames: ['Mathematical Foundations'] },
+  // Re-derived from the corrected course identities. The ten APP general-education
+  // courses are deliberately unmapped — they are university-wide breadth requirements,
+  // not ECE knowledge areas, and forcing them into this taxonomy would distort coverage.
   {
-    courseCode: 'MATH203',
-    knowledgeAreaNames: [
-      'Mathematical Foundations',
-      'Data Structures & Algorithms',
-    ],
-  },
-  { courseCode: 'MATH208', knowledgeAreaNames: ['Mathematical Foundations'] },
-
-  // ── BSCS Core ──
-  { courseCode: 'CS200', knowledgeAreaNames: ['Programming Foundations'] },
-  { courseCode: 'CS230', knowledgeAreaNames: ['Programming Foundations'] },
-  { courseCode: 'CS230L', knowledgeAreaNames: ['Programming Foundations'] },
-  {
-    courseCode: 'CS250',
-    knowledgeAreaNames: [
-      'Programming Foundations',
-      'Data Structures & Algorithms',
-    ],
-  },
-  {
-    courseCode: 'CS250L',
-    knowledgeAreaNames: ['Data Structures & Algorithms'],
+    courseCode: 'BUS450',
+    knowledgeAreaNames: ['Capstone & Professional Practice'],
   },
   {
     courseCode: 'CE305',
     knowledgeAreaNames: ['Computer Architecture & Digital Design'],
   },
+  { courseCode: 'CE450', knowledgeAreaNames: ['Embedded Systems & IoT'] },
+  { courseCode: 'CE450G', knowledgeAreaNames: ['Embedded Systems & IoT'] },
+  { courseCode: 'CE450LG', knowledgeAreaNames: ['Embedded Systems & IoT'] },
+  { courseCode: 'CE521', knowledgeAreaNames: ['Embedded Systems & IoT'] },
+  { courseCode: 'CE522', knowledgeAreaNames: ['Embedded Systems & IoT'] },
+  { courseCode: 'CE523', knowledgeAreaNames: ['Embedded Systems & IoT'] },
+  { courseCode: 'CE530', knowledgeAreaNames: ['Embedded Systems & IoT'] },
   {
-    courseCode: 'CS350',
-    knowledgeAreaNames: ['Operating Systems & Distributed Computing'],
+    courseCode: 'CS200',
+    knowledgeAreaNames: ['Mathematical Foundations', 'Programming Foundations'],
   },
+  { courseCode: 'CS230', knowledgeAreaNames: ['Programming Foundations'] },
+  { courseCode: 'CS230L', knowledgeAreaNames: ['Programming Foundations'] },
+  { courseCode: 'CS250', knowledgeAreaNames: ['Programming Foundations'] },
+  { courseCode: 'CS250L', knowledgeAreaNames: ['Programming Foundations'] },
+  { courseCode: 'CS350', knowledgeAreaNames: ['Data Structures & Algorithms'] },
   {
     courseCode: 'CS350L',
+    knowledgeAreaNames: ['Data Structures & Algorithms'],
+  },
+  { courseCode: 'CS360', knowledgeAreaNames: ['Programming Foundations'] },
+  { courseCode: 'CS360L', knowledgeAreaNames: ['Programming Foundations'] },
+  {
+    courseCode: 'CS380',
     knowledgeAreaNames: ['Operating Systems & Distributed Computing'],
   },
-  { courseCode: 'CS360', knowledgeAreaNames: ['Computer Networks'] },
-  { courseCode: 'CS360L', knowledgeAreaNames: ['Computer Networks'] },
-  { courseCode: 'CS380', knowledgeAreaNames: ['Data Structures & Algorithms'] },
+  { courseCode: 'CS453', knowledgeAreaNames: ['Programming Foundations'] },
+  { courseCode: 'CS455', knowledgeAreaNames: ['Data Structures & Algorithms'] },
   {
-    courseCode: 'BUS450',
-    knowledgeAreaNames: ['Capstone & Professional Practice'],
+    courseCode: 'CS455G',
+    knowledgeAreaNames: ['Data Structures & Algorithms'],
   },
-  { courseCode: 'CS455', knowledgeAreaNames: ['Data Management & Analytics'] },
-  { courseCode: 'CS457', knowledgeAreaNames: ['Software Engineering'] },
-  { courseCode: 'CS457L', knowledgeAreaNames: ['Software Engineering'] },
+  { courseCode: 'CS457', knowledgeAreaNames: ['Data Management & Analytics'] },
+  { courseCode: 'CS457G', knowledgeAreaNames: ['Data Management & Analytics'] },
+  { courseCode: 'CS457L', knowledgeAreaNames: ['Data Management & Analytics'] },
   {
-    courseCode: 'CS480',
-    knowledgeAreaNames: ['Artificial Intelligence & Machine Learning'],
+    courseCode: 'CS457LG',
+    knowledgeAreaNames: ['Data Management & Analytics'],
   },
-  {
-    courseCode: 'CS480L',
-    knowledgeAreaNames: ['Artificial Intelligence & Machine Learning'],
-  },
-  {
-    courseCode: 'CS481',
-    knowledgeAreaNames: ['Artificial Intelligence & Machine Learning'],
-  },
-  {
-    courseCode: 'CS487',
-    knowledgeAreaNames: ['Capstone & Professional Practice'],
-  },
-  {
-    courseCode: 'CS494',
-    knowledgeAreaNames: ['Capstone & Professional Practice'],
-  },
-
-  // ── BSCS Specialization Electives ──
-  {
-    courseCode: 'CE450',
-    knowledgeAreaNames: ['Computer Architecture & Digital Design'],
-  },
-  {
-    courseCode: 'CS453',
-    knowledgeAreaNames: [
-      'Data Structures & Algorithms',
-      'Mathematical Foundations',
-    ],
-  },
-  { courseCode: 'CS470', knowledgeAreaNames: ['Cybersecurity'] },
-  { courseCode: 'CS477', knowledgeAreaNames: ['Computer Networks'] },
+  { courseCode: 'CS470', knowledgeAreaNames: ['Computer Networks'] },
+  { courseCode: 'CS477', knowledgeAreaNames: ['Cybersecurity'] },
+  { courseCode: 'CS477G', knowledgeAreaNames: ['Cybersecurity'] },
   {
     courseCode: 'CS478',
-    knowledgeAreaNames: ['Operating Systems & Distributed Computing'],
+    knowledgeAreaNames: ['Cybersecurity', 'Software Engineering'],
+  },
+  {
+    courseCode: 'CS480',
+    knowledgeAreaNames: ['Programming Foundations', 'Software Engineering'],
+  },
+  { courseCode: 'CS480L', knowledgeAreaNames: ['Programming Foundations'] },
+  {
+    courseCode: 'CS481',
+    knowledgeAreaNames: [
+      'Artificial Intelligence & Machine Learning',
+      'Data Management & Analytics',
+    ],
+  },
+  {
+    courseCode: 'CS481G',
+    knowledgeAreaNames: [
+      'Artificial Intelligence & Machine Learning',
+      'Data Management & Analytics',
+    ],
   },
   {
     courseCode: 'CS483',
@@ -854,128 +1377,68 @@ export const COURSE_KNOWLEDGE_AREAS: CourseKnowledgeAreaSeed[] = [
   },
   {
     courseCode: 'CS485',
-    knowledgeAreaNames: ['Artificial Intelligence & Machine Learning'],
+    knowledgeAreaNames: ['Programming Foundations', 'Software Engineering'],
   },
-
-  // ── MSCS Foundation ──
-  { courseCode: 'CS455G', knowledgeAreaNames: ['Data Management & Analytics'] },
-  { courseCode: 'CS457G', knowledgeAreaNames: ['Software Engineering'] },
-  { courseCode: 'CS457LG', knowledgeAreaNames: ['Software Engineering'] },
-  { courseCode: 'CS500', knowledgeAreaNames: ['Data Structures & Algorithms'] },
+  { courseCode: 'CS487', knowledgeAreaNames: ['Software Engineering'] },
   {
-    courseCode: 'CS500L',
-    knowledgeAreaNames: ['Data Structures & Algorithms'],
-  },
-  {
-    courseCode: 'CS501',
-    knowledgeAreaNames: ['Operating Systems & Distributed Computing'],
-  },
-
-  // ── MSCS Specialization — Cybersecurity ──
-  {
-    courseCode: 'CS535',
-    knowledgeAreaNames: ['Cybersecurity', 'Computer Networks'],
-  },
-  {
-    courseCode: 'CS571',
-    knowledgeAreaNames: ['Cybersecurity', 'Mathematical Foundations'],
-  },
-  {
-    courseCode: 'CS581',
-    knowledgeAreaNames: ['Cybersecurity', 'Software Engineering'],
-  },
-  {
-    courseCode: 'CS589',
+    courseCode: 'CS494',
     knowledgeAreaNames: ['Capstone & Professional Practice'],
   },
-  { courseCode: 'CS477G', knowledgeAreaNames: ['Computer Networks'] },
-
-  // ── MSCS Specialization — Data Science ──
+  { courseCode: 'CS500', knowledgeAreaNames: ['Programming Foundations'] },
+  { courseCode: 'CS500L', knowledgeAreaNames: ['Programming Foundations'] },
+  { courseCode: 'CS501', knowledgeAreaNames: ['Data Structures & Algorithms'] },
+  {
+    courseCode: 'CS515',
+    knowledgeAreaNames: [
+      'Computer Networks',
+      'Operating Systems & Distributed Computing',
+    ],
+  },
+  { courseCode: 'CS521', knowledgeAreaNames: ['Software Engineering'] },
+  { courseCode: 'CS522', knowledgeAreaNames: ['Software Engineering'] },
+  { courseCode: 'CS535', knowledgeAreaNames: ['Cybersecurity'] },
+  { courseCode: 'CS548', knowledgeAreaNames: ['Software Engineering'] },
   {
     courseCode: 'CS550',
     knowledgeAreaNames: [
+      'Artificial Intelligence & Machine Learning',
       'Data Management & Analytics',
-      'High-Performance & Parallel Computing',
     ],
   },
+  { courseCode: 'CS551', knowledgeAreaNames: ['Software Engineering'] },
+  { courseCode: 'CS556', knowledgeAreaNames: ['Software Engineering'] },
+  { courseCode: 'CS565', knowledgeAreaNames: ['Computer Networks'] },
+  { courseCode: 'CS570', knowledgeAreaNames: ['Data Management & Analytics'] },
   {
-    courseCode: 'CS570',
-    knowledgeAreaNames: ['Artificial Intelligence & Machine Learning'],
-  },
-  {
-    courseCode: 'CS481G',
-    knowledgeAreaNames: ['Artificial Intelligence & Machine Learning'],
-  },
-
-  // ── MSCS Specialization — Network Engineering ──
-  { courseCode: 'CS515', knowledgeAreaNames: ['Computer Networks'] },
-  {
-    courseCode: 'CS565',
+    courseCode: 'CS571',
     knowledgeAreaNames: ['Operating Systems & Distributed Computing'],
   },
-  {
-    courseCode: 'CS575',
-    knowledgeAreaNames: ['Embedded Systems & IoT', 'Computer Networks'],
-  },
-
-  // ── MSCS Capstone ──
+  { courseCode: 'CS575', knowledgeAreaNames: ['Computer Networks'] },
+  { courseCode: 'CS581', knowledgeAreaNames: ['Cybersecurity'] },
+  { courseCode: 'CS589', knowledgeAreaNames: ['Software Engineering'] },
   {
     courseCode: 'CS595',
     knowledgeAreaNames: ['Capstone & Professional Practice'],
   },
-
-  // ── MSEE Foundation ──
-  {
-    courseCode: 'CE450G',
-    knowledgeAreaNames: ['Computer Architecture & Digital Design'],
-  },
-  {
-    courseCode: 'CE450LG',
-    knowledgeAreaNames: ['Computer Architecture & Digital Design'],
-  },
   {
     courseCode: 'EE461G',
-    knowledgeAreaNames: ['Signal Processing & Integrated Circuits'],
+    knowledgeAreaNames: ['Computer Architecture & Digital Design'],
   },
   {
     courseCode: 'EE461LG',
-    knowledgeAreaNames: ['Signal Processing & Integrated Circuits'],
-  },
-  { courseCode: 'EE488G', knowledgeAreaNames: ['Embedded Systems & IoT'] },
-
-  // ── MSEE Specialization — IoT and Embedded Systems ──
-  { courseCode: 'EE517', knowledgeAreaNames: ['Embedded Systems & IoT'] },
-  {
-    courseCode: 'CE521',
-    knowledgeAreaNames: [
-      'Computer Architecture & Digital Design',
-      'Embedded Systems & IoT',
-    ],
-  },
-  {
-    courseCode: 'CE522',
     knowledgeAreaNames: ['Computer Architecture & Digital Design'],
   },
   {
-    courseCode: 'CE523',
+    courseCode: 'EE488G',
+    knowledgeAreaNames: ['Computer Architecture & Digital Design'],
+  },
+  {
+    courseCode: 'EE504',
     knowledgeAreaNames: [
       'Computer Architecture & Digital Design',
       'High-Performance & Parallel Computing',
     ],
   },
-  { courseCode: 'CE530', knowledgeAreaNames: ['Embedded Systems & IoT'] },
-
-  // ── MSEE Specialization — Multicore and Parallel Computing ──
-  {
-    courseCode: 'EE504',
-    knowledgeAreaNames: ['High-Performance & Parallel Computing'],
-  },
-  {
-    courseCode: 'EE553',
-    knowledgeAreaNames: ['High-Performance & Parallel Computing'],
-  },
-
-  // ── MSEE Specialization — Modern Integrated Circuits ──
   {
     courseCode: 'EE505',
     knowledgeAreaNames: ['Signal Processing & Integrated Circuits'],
@@ -984,8 +1447,13 @@ export const COURSE_KNOWLEDGE_AREAS: CourseKnowledgeAreaSeed[] = [
     courseCode: 'EE511',
     knowledgeAreaNames: ['Signal Processing & Integrated Circuits'],
   },
+  { courseCode: 'EE517', knowledgeAreaNames: ['Embedded Systems & IoT'] },
   {
     courseCode: 'EE520',
+    knowledgeAreaNames: ['Signal Processing & Integrated Circuits'],
+  },
+  {
+    courseCode: 'EE553',
     knowledgeAreaNames: [
       'Signal Processing & Integrated Circuits',
       'Computer Architecture & Digital Design',
@@ -995,12 +1463,14 @@ export const COURSE_KNOWLEDGE_AREAS: CourseKnowledgeAreaSeed[] = [
     courseCode: 'EE577',
     knowledgeAreaNames: ['Signal Processing & Integrated Circuits'],
   },
-
-  // ── MSEE Capstone ──
   {
     courseCode: 'EE595',
     knowledgeAreaNames: ['Capstone & Professional Practice'],
   },
+  { courseCode: 'MATH201', knowledgeAreaNames: ['Mathematical Foundations'] },
+  { courseCode: 'MATH202', knowledgeAreaNames: ['Mathematical Foundations'] },
+  { courseCode: 'MATH203', knowledgeAreaNames: ['Mathematical Foundations'] },
+  { courseCode: 'MATH208', knowledgeAreaNames: ['Mathematical Foundations'] },
 ];
 
 // ──────────────────────────────────────────────────────────────
@@ -1019,16 +1489,74 @@ export const PROGRAMS: ProgramSeed[] = [
     requirementGroups: [
       {
         name: 'General Education',
-        description: 'University-wide general education requirements.',
+        description:
+          'SFBU Agility Praxis Pathway — 10 interdisciplinary courses across Areas A–D.',
         minCredits: 30,
         sortOrder: 1,
         requirements: [
+          // Area A — English Language Communication and Critical Thinking (6 cr)
           {
-            courseCode: null,
-            minCredits: 30,
-            description:
-              'General Education courses as listed in the SFBU catalog.',
+            courseCode: 'APP101',
+            minCredits: null,
+            description: null,
             sortOrder: 1,
+          },
+          {
+            courseCode: 'APP103',
+            minCredits: null,
+            description: null,
+            sortOrder: 2,
+          },
+          // Area B — Mathematics and Natural Sciences (9 cr)
+          {
+            courseCode: 'APP201',
+            minCredits: null,
+            description: null,
+            sortOrder: 3,
+          },
+          {
+            courseCode: 'APP202',
+            minCredits: null,
+            description: null,
+            sortOrder: 4,
+          },
+          {
+            courseCode: 'APP301',
+            minCredits: null,
+            description: null,
+            sortOrder: 5,
+          },
+          // Area C — Arts and Humanities (6 cr)
+          {
+            courseCode: 'APP102',
+            minCredits: null,
+            description: null,
+            sortOrder: 6,
+          },
+          {
+            courseCode: 'APP203',
+            minCredits: null,
+            description: null,
+            sortOrder: 7,
+          },
+          // Area D — Social Sciences (9 cr)
+          {
+            courseCode: 'APP104',
+            minCredits: null,
+            description: null,
+            sortOrder: 8,
+          },
+          {
+            courseCode: 'APP204',
+            minCredits: null,
+            description: null,
+            sortOrder: 9,
+          },
+          {
+            courseCode: 'APP302',
+            minCredits: null,
+            description: null,
+            sortOrder: 10,
           },
         ],
       },
@@ -1278,32 +1806,39 @@ export const PROGRAMS: ProgramSeed[] = [
           {
             courseCode: 'CS455G',
             minCredits: null,
-            description: null,
+            // The catalog offers CS501 as the alternative to CS455G, not to CS500.
+            description: 'Or CS501 (Practical Application of Algorithms)',
             sortOrder: 1,
+          },
+          {
+            courseCode: 'CS501',
+            minCredits: null,
+            description: 'Alternative to CS455G',
+            sortOrder: 2,
           },
           {
             courseCode: 'CS457G',
             minCredits: null,
             description: null,
-            sortOrder: 2,
+            sortOrder: 3,
           },
           {
             courseCode: 'CS457LG',
             minCredits: null,
             description: null,
-            sortOrder: 3,
+            sortOrder: 4,
           },
           {
             courseCode: 'CS500',
             minCredits: null,
-            description: 'Or CS501 (Advanced Operating Systems)',
-            sortOrder: 4,
+            description: null,
+            sortOrder: 5,
           },
           {
             courseCode: 'CS500L',
             minCredits: null,
-            description: 'Required if CS500 selected',
-            sortOrder: 5,
+            description: 'Taken concurrently with CS500',
+            sortOrder: 6,
           },
         ],
       },
@@ -1412,11 +1947,101 @@ export const PROGRAMS: ProgramSeed[] = [
           },
         ],
       },
+      // The catalog separates named concentrations (above) from "cluster courses" —
+      // example groupings a student may draw four courses from to satisfy the same
+      // 12-credit specialization requirement without declaring a concentration.
+      {
+        name: 'Cluster — Cloud Computing and Big Data',
+        description:
+          'Example cluster; any four cluster courses satisfy the specialization requirement.',
+        minCredits: 12,
+        sortOrder: 5,
+        requirements: [
+          {
+            courseCode: 'CS550',
+            minCredits: null,
+            description: null,
+            sortOrder: 1,
+          },
+          {
+            courseCode: 'CS570',
+            minCredits: null,
+            description: null,
+            sortOrder: 2,
+          },
+          {
+            courseCode: 'CS571',
+            minCredits: null,
+            description: null,
+            sortOrder: 3,
+          },
+        ],
+      },
+      {
+        name: 'Cluster — Mobile Application Technologies',
+        description:
+          'Example cluster; any four cluster courses satisfy the specialization requirement.',
+        minCredits: 12,
+        sortOrder: 6,
+        requirements: [
+          {
+            courseCode: 'CS548',
+            minCredits: null,
+            description: null,
+            sortOrder: 1,
+          },
+          {
+            courseCode: 'CS551',
+            minCredits: null,
+            description: null,
+            sortOrder: 2,
+          },
+          {
+            courseCode: 'CS556',
+            minCredits: null,
+            description: null,
+            sortOrder: 3,
+          },
+        ],
+      },
+      {
+        name: 'Cluster — QA Engineering',
+        description:
+          'Example cluster; any four cluster courses satisfy the specialization requirement.',
+        minCredits: 12,
+        sortOrder: 7,
+        requirements: [
+          {
+            courseCode: 'CS521',
+            minCredits: null,
+            description: null,
+            sortOrder: 1,
+          },
+          {
+            courseCode: 'CS522',
+            minCredits: null,
+            description: null,
+            sortOrder: 2,
+          },
+          {
+            courseCode: 'CS548',
+            minCredits: null,
+            description: null,
+            sortOrder: 3,
+          },
+          {
+            courseCode: 'CS575',
+            minCredits: null,
+            description: null,
+            sortOrder: 4,
+          },
+        ],
+      },
       {
         name: 'Graduate Electives',
         description: 'Approved graduate-level electives to total 36 credits.',
         minCredits: 10,
-        sortOrder: 5,
+        sortOrder: 8,
         requirements: [
           {
             courseCode: null,
@@ -1430,7 +2055,7 @@ export const PROGRAMS: ProgramSeed[] = [
         name: 'Capstone',
         description: 'Required graduate capstone.',
         minCredits: 3,
-        sortOrder: 6,
+        sortOrder: 9,
         requirements: [
           {
             courseCode: 'CS595',
@@ -1491,7 +2116,7 @@ export const PROGRAMS: ProgramSeed[] = [
         ],
       },
       {
-        name: 'Specialization — IoT and Embedded Systems',
+        name: 'Cluster — Internet of Things (IoT) and Embedded Systems',
         description:
           'Choose this track OR Multicore OR Modern IC (12 credits).',
         minCredits: 12,
@@ -1530,7 +2155,7 @@ export const PROGRAMS: ProgramSeed[] = [
         ],
       },
       {
-        name: 'Specialization — Multicore and Parallel Computing',
+        name: 'Cluster — Multicore Computing',
         description: 'Choose this track OR IoT OR Modern IC (12 credits).',
         minCredits: 12,
         sortOrder: 3,
@@ -1550,7 +2175,7 @@ export const PROGRAMS: ProgramSeed[] = [
         ],
       },
       {
-        name: 'Specialization — Modern Integrated Circuits',
+        name: 'Cluster — Modern IC Technologies',
         description: 'Choose this track OR IoT OR Multicore (12 credits).',
         minCredits: 12,
         sortOrder: 4,

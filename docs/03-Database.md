@@ -368,6 +368,38 @@ admin curation. Clear the table manually when correcting seed data:
 DELETE FROM course_offerings;
 ```
 
+#### What a reseed does and does not repair
+
+| Data | On reseed |
+| --- | --- |
+| Courses | **Updated in place** by course code — title, credits, level and description are all corrected |
+| Requirement groups | **Updated in place** by name — description, minCredits and sortOrder refreshed |
+| Prerequisites, corequisites, knowledge-area joins | **Insert-only** — links that are no longer in the seed survive |
+| Program requirements | Insert-only per (group, course) |
+
+The asymmetry matters when a course's *identity* changes rather than just its
+label. The `CatalogReconciliation1719446404000` migration exists for exactly
+that: correcting 59 wrong course titles left every prerequisite and
+knowledge-area link that had been inferred from the wrong identity still in
+place, so the migration clears those three tables and lets the reseed rebuild
+them. They hold no hand-authored data — there is no admin CRUD for them — so
+clearing is safe.
+
+Renaming a requirement group has the same shape: groups are matched by name, so
+an old name is orphaned rather than updated, and its requirements go with it.
+The same migration deletes the three MSEE groups that were renamed to the
+catalog's wording.
+
+#### Disjunctive prerequisites are not modeled
+
+`Prerequisite` is a plain (course, prerequisite) pair, evaluated as a hard AND.
+The catalog states eight prerequisites as alternatives — `CS480` requires
+"CS250 or CS360" — which this model cannot express. Recording both rows would
+demand both courses and wrongly block a student who took either, so these are
+**deliberately omitted** from `PREREQUISITES` rather than approximated. The
+consequence is that those courses appear to have no prerequisite at all;
+representing the disjunction needs a schema change, tracked in `TASKS.md`.
+
 #### Empty schedule ≠ empty term
 
 `PlannerService.loadOfferings` omits a term with zero offerings from its lookup
