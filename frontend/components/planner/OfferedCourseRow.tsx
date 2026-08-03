@@ -39,13 +39,25 @@ export function OfferedCourseRow({ course, selected, onToggle, unselectedCorequi
               : 'border-gray-200 bg-white hover:border-gray-300'
       }`}
     >
-      <label className="flex cursor-pointer items-start gap-3 px-3 py-2.5">
+      <label
+        className={`flex items-start gap-3 px-3 py-2.5 ${
+          closed ? 'cursor-not-allowed' : 'cursor-pointer'
+        }`}
+      >
         <input
           type="checkbox"
           checked={selected}
-          onChange={onToggle}
+          // Guarded as well as disabled: the attribute stops a real user, this
+          // stops any other path to the handler.
+          onChange={() => {
+            if (!closed) onToggle();
+          }}
+          // A cancelled or closed course cannot be registered for by any means,
+          // so unlike an unmet prerequisite — which a waiver or transfer credit
+          // can resolve — there is nothing for the student to plan around.
+          disabled={closed}
           aria-describedby={blocked || closed ? reasonId : undefined}
-          className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-sfbu-navy focus:ring-sfbu-navy"
+          className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-sfbu-navy focus:ring-sfbu-navy disabled:cursor-not-allowed disabled:opacity-50"
         />
 
         <span className="min-w-0 flex-1">

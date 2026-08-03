@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
 import { api, type Course, type TermSummary } from '../../../lib/api';
-import { courseIdsFromRoadmap, type ProgramOption } from '../../../lib/programScope';
+import {
+  courseIdsFromRoadmap,
+  tiersFromRoadmap,
+  type ProgramOption,
+} from '../../../lib/programScope';
 import { Breadcrumb } from '../../../components/ui/Breadcrumb';
 import { OfferingPlanner } from '../../../components/planner/OfferingPlanner';
 
@@ -49,9 +53,14 @@ async function loadProgramOptions(): Promise<ProgramOption[]> {
       programs.data.map(async (p) => {
         const base = { id: p.id, abbreviation: p.abbreviation, name: p.name };
         try {
-          return { ...base, courseIds: courseIdsFromRoadmap(await api.programs.roadmap(p.id)) };
+          const roadmap = await api.programs.roadmap(p.id);
+          return {
+            ...base,
+            courseIds: courseIdsFromRoadmap(roadmap),
+            tiers: tiersFromRoadmap(roadmap),
+          };
         } catch {
-          return { ...base, courseIds: [] };
+          return { ...base, courseIds: [], tiers: {} };
         }
       }),
     );

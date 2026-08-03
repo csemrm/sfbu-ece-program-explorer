@@ -29,7 +29,7 @@ const terms: TermSummary[] = [
 ];
 
 const programs: ProgramOption[] = [
-  { id: 'p-1', abbreviation: 'BSCS', name: 'Bachelor of Science', courseIds: ['c-1'] },
+  { id: 'p-1', abbreviation: 'BSCS', name: 'Bachelor of Science', courseIds: ['c-1'], tiers: {} },
 ];
 
 /** The term detail the API now serves: whole term, each course flagged inProgram. */
@@ -307,6 +307,136 @@ describe('OfferingPlanner — the Suggested column is a shortlist', () => {
     const column = heading.closest('div')!.parentElement as HTMLElement;
     await waitFor(() =>
       expect(within(column).getAllByRole('button', { name: /^Add CS/ })).toHaveLength(5),
+    );
+  });
+});
+
+describe('OfferingPlanner — ordering and precedence', () => {
+  const catalog = ['req', 'spec', 'elec'];
+
+  const withTiers: ProgramOption[] = [
+    {
+      id: 'p-1',
+      abbreviation: 'BSCS',
+      name: 'Bachelor of Science',
+      courseIds: catalog,
+      tiers: { req: 'required', spec: 'specialization', elec: 'elective' },
+    },
+  ];
+
+  beforeEach(() => {
+    window.localStorage.clear();
+    // Deliberately served elective-first, so any correct ordering is the
+    // component's doing rather than the API's.
+    api.terms.get.mockResolvedValue({
+      id: 't-1',
+      name: 'Fall 2026',
+      sortOrder: 1,
+      courseCount: 3,
+      inProgramCount: 3,
+      courses: ['elec', 'spec', 'req'].map((id) => ({
+        id,
+        courseCode: id.toUpperCase(),
+        title: id,
+        creditHours: 3,
+        level: 'graduate' as const,
+        openForRegistration: true,
+        sectionCount: null,
+        statusNote: null,
+        inProgram: true,
+      })),
+    });
+    api.planner.evaluate.mockImplementation(({ terms: t }: { terms: { courseIds: string[] }[] }) =>
+      Promise.resolve({
+        terms: [
+          {
+            term: 1,
+            termId: 't-1',
+            termName: 'Fall 2026',
+            termCredits: 0,
+            courses: t[0].courseIds.map((id) => ({
+              courseId: id,
+              courseCode: id.toUpperCase(),
+              title: id,
+              creditHours: 3,
+              level: 'graduate' as const,
+              eligible: true,
+              offered: true,
+              openForRegistration: true,
+              sectionCount: null,
+              statusNote: null,
+              registrable: true,
+              alreadyCompleted: false,
+              satisfiedPrerequisites: [],
+              missingPrerequisites: [],
+              backgroundPrerequisites: [],
+              corequisites: [],
+              reason: 'Eligible',
+            })),
+          },
+        ],
+        suggestions: [],
+        totalPlannedCredits: 0,
+        allEligible: true,
+        allOffered: true,
+      }),
+    );
+  });
+
+  it('ranks Suggested by how firmly the degree requires each course', async () => {
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={withTiers} />);
+    const heading = await screen.findByText(/^Suggested for Fall 2026$/);
+    const column = heading.closest('div')!.parentElement as HTMLElement;
+
+    await waitFor(() =>
+      expect(
+        within(column)
+          .getAllByRole('button', { name: /^Add / })
+          .map((b) => b.getAttribute('aria-label')),
+      ).toEqual(['Add REQ to your plan', 'Add SPEC to your plan', 'Add ELEC to your plan']),
+    );
+  });
+
+  it('puts in-program offerings ahead of the rest of the term', async () => {
+    api.terms.get.mockResolvedValue({
+      id: 't-1',
+      name: 'Fall 2026',
+      sortOrder: 1,
+      courseCount: 2,
+      inProgramCount: 1,
+      courses: [
+        {
+          id: 'outside',
+          courseCode: 'ZZZ999',
+          title: 'Outside',
+          creditHours: 3,
+          level: 'graduate' as const,
+          openForRegistration: true,
+          sectionCount: null,
+          statusNote: null,
+          inProgram: false,
+        },
+        {
+          id: 'inside',
+          courseCode: 'AAA100',
+          title: 'Inside',
+          creditHours: 3,
+          level: 'graduate' as const,
+          openForRegistration: true,
+          sectionCount: null,
+          statusNote: null,
+          inProgram: true,
+        },
+      ],
+    });
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={withTiers} />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /Show all 2 anyway/ }));
+    await waitFor(() =>
+      expect(api.planner.evaluate).toHaveBeenCalledWith(
+        // The in-program course leads even though the API listed it second.
+        expect.objectContaining({ terms: [{ termId: 't-1', courseIds: ['inside', 'outside'] }] }),
+      ),
     );
   });
 });

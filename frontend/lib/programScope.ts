@@ -1,6 +1,40 @@
 import type { ProgramRoadmap } from './api';
 
 /**
+ * How firmly a program requires a course.
+ *
+ * `required` — everyone takes it (Core, Foundation, Preparation, Capstone,
+ * General Education). `specialization` — one track or cluster among several.
+ * `elective` — any course counting toward an open credit requirement.
+ */
+export type RequirementTier = 'required' | 'specialization' | 'elective';
+
+const TIER_ORDER: Record<RequirementTier, number> = {
+  required: 0,
+  specialization: 1,
+  elective: 2,
+};
+
+/** Rank a course by how firmly its program requires it; lower sorts first. */
+export const tierRank = (tier: RequirementTier | undefined): number =>
+  tier ? TIER_ORDER[tier] : TIER_ORDER.elective;
+
+/**
+ * Classify a requirement group by name.
+ *
+ * The group name is the only signal the roadmap carries, but the catalog names
+ * them consistently: an "Electives" group is an open credit requirement, a
+ * "Specialization"/"Cluster" group is one track among alternatives, and
+ * everything else — Core, Foundation, Preparation, Capstone, General Education —
+ * is taken by every student on the programme.
+ */
+export function tierForGroup(groupName: string): RequirementTier {
+  if (/elective/i.test(groupName)) return 'elective';
+  if (/^(specialization|cluster)\b|—/i.test(groupName)) return 'specialization';
+  return 'required';
+}
+
+/**
  * A degree the planner can be scoped to, plus the catalog courses that belong
  * to it.
  *
@@ -14,10 +48,31 @@ export interface ProgramOption {
   name: string;
   /** Distinct course ids across every roadmap phase. Empty means "unknown". */
   courseIds: string[];
+  /** How firmly the program requires each course, keyed by course id. */
+  tiers: Record<string, RequirementTier>;
 }
 
 export function courseIdsFromRoadmap(roadmap: ProgramRoadmap): string[] {
   return [...new Set(roadmap.phases.flatMap((phase) => phase.courses.map((c) => c.id)))];
+}
+
+/**
+ * Requirement tier per course id.
+ *
+ * A course can sit in more than one group — CS550 is both a Data Science
+ * specialization course and a cluster course — so the firmest classification
+ * wins, which is what a student is actually bound by.
+ */
+export function tiersFromRoadmap(roadmap: ProgramRoadmap): Record<string, RequirementTier> {
+  const tiers: Record<string, RequirementTier> = {};
+  for (const phase of roadmap.phases) {
+    const tier = tierForGroup(phase.name);
+    for (const course of phase.courses) {
+      const current = tiers[course.id];
+      if (!current || tierRank(tier) < tierRank(current)) tiers[course.id] = tier;
+    }
+  }
+  return tiers;
 }
 
 /**

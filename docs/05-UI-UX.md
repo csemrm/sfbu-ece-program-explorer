@@ -317,7 +317,7 @@ A program whose roadmap returns no courses is treated as "do not scope" — filt
 
 Completed-courses column
 
-The degree's courses are listed as a single flat checklist ordered by course code, with a filter box above it. The list was originally grouped into collapsible subject sections; once the degree selector narrowed it, those sections mostly held one subject each and cost a click to open, so the grouping was dropped in favour of a list that scans in one pass.
+The degree's courses are listed as a single flat checklist with a filter box above it. **Marked courses sort to the top**, separated by a rule, with everything else following by course code — correcting a mistake meant hunting through a hundred unmarked rows otherwise. Order within each half is by course code. The list was originally grouped into collapsible subject sections; once the degree selector narrowed it, those sections mostly held one subject each and cost a click to open, so the grouping was dropped in favour of a list that scans in one pass.
 
 Courses completed under one degree stay marked when the user switches degree; the chips resolve against the unscoped catalog so their codes still render.
 
@@ -325,7 +325,9 @@ Suggested column
 
 "Ready to register" is drawn from the term's own offerings — registrable, not already completed, not already chosen — rather than the planner API's `suggestions` feed, which answers the different question of what the *whole plan* would unlock later.
 
-It shows **at most five**. A recommendation list as long as the term's schedule is not a recommendation; five fills a semester and reads without scrolling, and the full list is the Offered column beside it.
+It shows **at most five**, ranked by how firmly the degree requires each course: Core/Foundation/Preparation/Capstone first, then a specialization or cluster choice, then a free elective. With only five slots, spending one on an elective while a required course is available would be the wrong advice. The tier comes from the requirement group's name in the roadmap, so it needs no extra data.
+
+A recommendation list as long as the term's schedule is not a recommendation; five fills a semester and reads without scrolling, and the full list is the Offered column beside it.
 
 PDF download
 
@@ -342,7 +344,11 @@ Course states in the right column
 | Corequisite not selected | Amber note, shown only once the course itself is selected |
 | Already completed | Amber note (likely a mistake to re-take) |
 
-A blocked course stays **selectable**. The planner is advisory, not a registration gate, and a student may be resolving the prerequisite by other means (transfer credit, waiver, a course taken elsewhere). Disabling the checkbox would assert an authority this tool does not have. The selection summary counts how many picks are still blocked.
+A **cancelled or closed** course is not selectable — its checkbox is disabled. This is deliberately different from the rule below: no waiver or transfer credit makes a cancelled course registerable, so there is nothing for the student to plan around.
+
+When the escape hatch reveals the rest of the term, **in-program courses sort first**. Showing sixty other-degree courses should not bury the ones the degree needs.
+
+A prerequisite-blocked course stays **selectable**. The planner is advisory, not a registration gate, and a student may be resolving the prerequisite by other means (transfer credit, waiver, a course taken elsewhere). Disabling the checkbox would assert an authority this tool does not have. The selection summary counts how many picks are still blocked.
 
 Blocked rows carry a visually-hidden "Prerequisites pending:" prefix and an `aria-describedby` link from the checkbox to the reason, so the red highlight is never the only signal.
 

@@ -8,7 +8,7 @@ import {
   type PlanEvaluation,
   type TermSummary,
 } from '../../lib/api';
-import { scopeFor, type ProgramOption } from '../../lib/programScope';
+import { scopeFor, tierRank, type ProgramOption } from '../../lib/programScope';
 import { CompletedPanel } from './CompletedPanel';
 import { OfferedCourseRow } from './OfferedCourseRow';
 import { PlanSummaryColumn } from './PlanSummaryColumn';
@@ -174,7 +174,13 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
 
   // Every offered course is evaluated, not just the selected ones, so the
   // column can show what is blocked *before* the user commits to it.
-  const termOfferedIds = useMemo(() => offerings.map((o) => o.id), [offerings]);
+  //
+  // In-program courses lead. Revealing the rest of the term should not bury the
+  // ones the degree actually needs beneath sixty it does not.
+  const termOfferedIds = useMemo(
+    () => [...offerings].sort((a, b) => Number(b.inProgram) - Number(a.inProgram)).map((o) => o.id),
+    [offerings],
+  );
 
   const inScopeOfferedIds = useMemo(
     () => offerings.filter((o) => o.inProgram).map((o) => o.id),
@@ -257,6 +263,15 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
    */
   const recommended = evaluated
     .filter((c) => c.registrable && !c.alreadyCompleted && !selectedSet.has(c.courseId))
+    // Ranked by how firmly the degree requires the course: a Core or Foundation
+    // course outranks a specialization choice, which outranks a free elective.
+    // With only five slots, spending one on an elective while a required course
+    // is available would be the wrong advice.
+    .sort(
+      (a, b) =>
+        tierRank(program?.tiers[a.courseId]) - tierRank(program?.tiers[b.courseId]) ||
+        a.courseCode.localeCompare(b.courseCode),
+    )
     .slice(0, MAX_RECOMMENDATIONS);
 
   const completedCodes = useMemo(() => {

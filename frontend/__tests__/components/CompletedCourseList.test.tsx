@@ -102,4 +102,18 @@ describe('CompletedCourseList', () => {
     });
     expect(await axe(container)).toHaveNoViolations();
   });
+
+  it('floats marked courses to the top so they are easy to correct', () => {
+    renderList({ completedIds: ['c-math203', 'c-cs380'] });
+    // Marked first (code-ordered among themselves), then the rest.
+    expect(codes()).toEqual(['CS380', 'MATH203', 'CE305', 'CS200', 'CS230L', 'EE310']);
+  });
+
+  it('keeps marked courses on top while filtering', () => {
+    renderList({ completedIds: ['c-cs380'] });
+    fireEvent.change(screen.getByLabelText('Filter courses by code or title'), {
+      target: { value: 'cs' },
+    });
+    expect(codes()[0]).toBe('CS380');
+  });
 });

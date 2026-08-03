@@ -190,4 +190,31 @@ describe('OfferedCourseRow', () => {
     });
     expect(await axe(container)).toHaveNoViolations();
   });
+
+  it('makes a cancelled course unselectable — no waiver revives it', () => {
+    const onToggle = jest.fn();
+    renderRow({
+      course: {
+        ...eligible,
+        openForRegistration: false,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+      onToggle,
+    });
+    const box = screen.getByRole('checkbox');
+    expect(box).toBeDisabled();
+    fireEvent.click(box);
+    expect(onToggle).not.toHaveBeenCalled();
+  });
+
+  it('still lets a prerequisite-blocked course be selected', () => {
+    // Deliberately different from a cancelled course: a student may be
+    // resolving the prerequisite by transfer credit or a waiver.
+    const onToggle = jest.fn();
+    renderRow({ course: blocked, onToggle });
+    const box = screen.getByRole('checkbox');
+    expect(box).not.toBeDisabled();
+    fireEvent.click(box);
+    expect(onToggle).toHaveBeenCalled();
+  });
 });

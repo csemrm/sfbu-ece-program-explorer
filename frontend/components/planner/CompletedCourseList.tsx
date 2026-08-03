@@ -34,13 +34,23 @@ export function CompletedCourseList({ courses, completedIds, onToggle }: Props) 
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return [...courses]
-      .sort((a, b) => a.courseCode.localeCompare(b.courseCode))
-      .filter(
-        (c) =>
-          q === '' || c.courseCode.toLowerCase().includes(q) || c.title.toLowerCase().includes(q),
-      );
-  }, [courses, query]);
+    return (
+      [...courses]
+        .filter(
+          (c) =>
+            q === '' || c.courseCode.toLowerCase().includes(q) || c.title.toLowerCase().includes(q),
+        )
+        // Marked courses float to the top: they are the answer the user has built,
+        // and hunting for them among a hundred unmarked rows to correct a mistake
+        // was the one thing this list made hard.
+        .sort((a, b) => {
+          const marked = Number(completed.has(b.id)) - Number(completed.has(a.id));
+          return marked !== 0 ? marked : a.courseCode.localeCompare(b.courseCode);
+        })
+    );
+  }, [courses, query, completed]);
+
+  const markedCount = visible.filter((c) => completed.has(c.id)).length;
 
   return (
     <div>
@@ -63,10 +73,13 @@ export function CompletedCourseList({ courses, completedIds, onToggle }: Props) 
         </p>
       ) : (
         <ul className="mt-3 max-h-[26rem] space-y-0.5 overflow-y-auto pr-1">
-          {visible.map((course) => {
+          {visible.map((course, index) => {
             const isMarked = completed.has(course.id);
+            // A rule under the last marked course, so the reordering reads as
+            // two groups rather than an arbitrary sort.
+            const firstUnmarked = !isMarked && index === markedCount && markedCount > 0;
             return (
-              <li key={course.id}>
+              <li key={course.id} className={firstUnmarked ? 'border-t border-gray-200 pt-1' : ''}>
                 <label
                   className={`flex cursor-pointer items-center gap-2.5 rounded-lg border px-2.5 py-1.5 text-sm transition-colors ${
                     isMarked
