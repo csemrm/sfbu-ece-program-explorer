@@ -1,27 +1,34 @@
 import Link from 'next/link';
 import type { Program } from '../../lib/api';
 
+// Per-programme presentation, keyed by abbreviation. A programme missing from
+// these maps still renders — it just loses its colour and credit badge — but
+// each new degree has to be added here by hand. Noted in TASKS.md.
 const DEGREE_LABELS: Record<string, string> = {
   BSCS: 'Bachelor of Science',
   MSCS: 'Master of Science',
+  MSDS: 'Master of Science',
   MSEE: 'Master of Science',
 };
 
 const CREDIT_TOTALS: Record<string, number> = {
   BSCS: 120,
   MSCS: 36,
+  MSDS: 30,
   MSEE: 36,
 };
 
 const ACCENT: Record<string, string> = {
   BSCS: 'bg-[#f0f4fa] border-[#c5d3e8] hover:border-sfbu-navy',
   MSCS: 'bg-purple-50 border-purple-200 hover:border-purple-500',
+  MSDS: 'bg-amber-50 border-amber-200 hover:border-amber-500',
   MSEE: 'bg-emerald-50 border-emerald-200 hover:border-emerald-500',
 };
 
 const BADGE: Record<string, string> = {
   BSCS: 'bg-[#1c3766] text-white',
   MSCS: 'bg-purple-100 text-purple-800',
+  MSDS: 'bg-amber-100 text-amber-900',
   MSEE: 'bg-emerald-100 text-emerald-800',
 };
 

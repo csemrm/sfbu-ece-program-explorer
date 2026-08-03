@@ -48,7 +48,8 @@ export default async function ProgramsPage() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Academic Programs</h1>
               <p className="text-gray-500 mt-1.5 text-base">
-                Undergraduate and graduate programs in Computer Science and Electrical Engineering.
+                Undergraduate and graduate programs in Computer Science, Data Science and Electrical
+                Engineering.
               </p>
             </div>
             <div className="hidden sm:flex flex-col items-end gap-1.5 pb-0.5 shrink-0">

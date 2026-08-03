@@ -44,7 +44,10 @@ Current programs:
 
 * Bachelor of Science in Computer Science (BSCS)
 * Master of Science in Computer Science (MSCS)
+* Master of Science in Data Science (MSDS)
 * Master of Science in Electrical Engineering (MSEE)
+
+All four are School of Engineering programs.
 
 The architecture should allow future programs without major redesign.
 

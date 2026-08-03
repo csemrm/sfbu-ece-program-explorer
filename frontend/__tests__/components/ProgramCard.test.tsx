@@ -94,4 +94,31 @@ describe('ProgramCard', () => {
     const results = await axe(container);
     expect(results).toHaveNoViolations();
   });
+
+  it('renders each modelled degree with its credit total', () => {
+    // The four presentation maps are hand-maintained; a degree missing from them
+    // silently loses its badge, which is how MSDS first shipped.
+    for (const [abbr, credits, label] of [
+      ['BSCS', '120 credits', 'Bachelor of Science'],
+      ['MSCS', '36 credits', 'Master of Science'],
+      ['MSDS', '30 credits', 'Master of Science'],
+      ['MSEE', '36 credits', 'Master of Science'],
+    ] as const) {
+      const { unmount } = render(
+        <ProgramCard
+          program={{
+            id: `p-${abbr}`,
+            name: `Program ${abbr}`,
+            abbreviation: abbr,
+            description: 'A degree.',
+            createdAt: '',
+            updatedAt: '',
+          }}
+        />,
+      );
+      expect(screen.getByText(credits)).toBeInTheDocument();
+      expect(screen.getByText(label)).toBeInTheDocument();
+      unmount();
+    }
+  });
 });
