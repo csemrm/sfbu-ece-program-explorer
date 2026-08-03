@@ -36,6 +36,8 @@ const program = (courseIds: string[]): ProgramOption => ({
   name: 'Master of Science in Computer Science',
   courseIds,
   tiers: {},
+  groups: {},
+  groupOrder: {},
 });
 
 describe('courseIdsFromRoadmap', () => {

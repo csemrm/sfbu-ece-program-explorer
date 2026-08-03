@@ -321,6 +321,8 @@ The degree's courses are listed as a single flat checklist with a filter box abo
 
 Courses completed under one degree stay marked when the user switches degree; the chips resolve against the unscoped catalog so their codes still render.
 
+When a filter matches nothing, the panel says whether the course exists **in another degree** — "CS483, CS483L are in the catalog but not part of MSCS". An empty result is usually the degree filter doing its job, and silence there reads as a missing course.
+
 Suggested column
 
 "Ready to register" is drawn from the term's own offerings — registrable, not already completed, not already chosen — rather than the planner API's `suggestions` feed, which answers the different question of what the *whole plan* would unlock later.
@@ -333,7 +335,9 @@ PDF download
 
 The plan prints through a hidden `.plan-print` sheet revealed only under `@media print`, with `window.print()` behind a "Download as PDF" button; the user chooses "Save as PDF" in the browser dialog. No PDF library is bundled, keeping the client bundle unchanged.
 
-The sheet carries the term, degree, planned courses with per-course status, total credits, the completed-course list, and an "Advisory only — not a registration record" disclaimer. Suggestions are deliberately left off paper: the printed artefact is the registration sheet, not the recommendation.
+The sheet carries **every list on the screen**: the plan broken out by requirement group, the ready-to-register shortlist, the full term offering table with each course's registration status, and the completed-course list — plus the term, degree and an "Advisory only — not a registration record" disclaimer.
+
+**Your plan** is grouped by requirement group on screen and on paper — Foundation Courses, Capstone, Free Electives — with credits per group. A flat list of five codes does not tell a student whether they have covered their core requirements or stacked five electives, which is the question a registration plan exists to answer. Groups sort by requirement tier, then by the catalog's own sequence, so Foundation precedes Capstone rather than the alphabet deciding.
 
 Course states in the right column
 
@@ -346,7 +350,7 @@ Course states in the right column
 
 A **cancelled or closed** course is not selectable — its checkbox is disabled. This is deliberately different from the rule below: no waiver or transfer credit makes a cancelled course registerable, so there is nothing for the student to plan around.
 
-When the escape hatch reveals the rest of the term, **in-program courses sort first**. Showing sixty other-degree courses should not bury the ones the degree needs.
+The column has its own **filter box** — 96 offerings is too many to scan — and is ordered by what the student can act on: anything **closed or cancelled sinks to the end** regardless of degree, and among the rest **in-program courses lead**. The sort is applied before the scoped/full split, so the default view is ordered too.
 
 A prerequisite-blocked course stays **selectable**. The planner is advisory, not a registration gate, and a student may be resolving the prerequisite by other means (transfer credit, waiver, a course taken elsewhere). Disabling the checkbox would assert an authority this tool does not have. The selection summary counts how many picks are still blocked.
 

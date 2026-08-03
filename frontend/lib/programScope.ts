@@ -50,6 +50,10 @@ export interface ProgramOption {
   courseIds: string[];
   /** How firmly the program requires each course, keyed by course id. */
   tiers: Record<string, RequirementTier>;
+  /** The requirement group each course sits in, keyed by course id. */
+  groups: Record<string, string>;
+  /** The group's position in the catalog sequence, keyed by course id. */
+  groupOrder: Record<string, number>;
 }
 
 export function courseIdsFromRoadmap(roadmap: ProgramRoadmap): string[] {
@@ -64,15 +68,51 @@ export function courseIdsFromRoadmap(roadmap: ProgramRoadmap): string[] {
  * wins, which is what a student is actually bound by.
  */
 export function tiersFromRoadmap(roadmap: ProgramRoadmap): Record<string, RequirementTier> {
-  const tiers: Record<string, RequirementTier> = {};
+  const placements = placementsFromRoadmap(roadmap);
+  return Object.fromEntries(Object.entries(placements).map(([id, p]) => [id, p.tier])) as Record<
+    string,
+    RequirementTier
+  >;
+}
+
+/** The requirement group each course sits in, keyed by course id. */
+export function groupsFromRoadmap(roadmap: ProgramRoadmap): Record<string, string> {
+  const placements = placementsFromRoadmap(roadmap);
+  return Object.fromEntries(Object.entries(placements).map(([id, p]) => [id, p.groupName]));
+}
+
+/** Each course's group position in the catalog sequence, keyed by course id. */
+export function groupOrderFromRoadmap(roadmap: ProgramRoadmap): Record<string, number> {
+  const placements = placementsFromRoadmap(roadmap);
+  return Object.fromEntries(Object.entries(placements).map(([id, p]) => [id, p.sortOrder]));
+}
+
+export interface Placement {
+  tier: RequirementTier;
+  groupName: string;
+  /** The group's position in the catalog's own sequence. */
+  sortOrder: number;
+}
+
+/**
+ * Where each course sits in the programme — its firmest requirement group.
+ *
+ * A course can appear in several groups (CS550 is both a Data Science
+ * specialization course and a cluster course), so the strongest obligation
+ * wins: that is the one that actually binds the student.
+ */
+export function placementsFromRoadmap(roadmap: ProgramRoadmap): Record<string, Placement> {
+  const placements: Record<string, Placement> = {};
   for (const phase of roadmap.phases) {
     const tier = tierForGroup(phase.name);
     for (const course of phase.courses) {
-      const current = tiers[course.id];
-      if (!current || tierRank(tier) < tierRank(current)) tiers[course.id] = tier;
+      const current = placements[course.id];
+      if (!current || tierRank(tier) < tierRank(current.tier)) {
+        placements[course.id] = { tier, groupName: phase.name, sortOrder: phase.sortOrder };
+      }
     }
   }
-  return tiers;
+  return placements;
 }
 
 /**

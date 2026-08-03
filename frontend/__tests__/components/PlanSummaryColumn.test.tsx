@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { PlanSummaryColumn } from '../../components/planner/PlanSummaryColumn';
 import type { EvaluatedCourse } from '../../lib/api';
@@ -57,6 +57,7 @@ const renderColumn = (props: Partial<React.ComponentProps<typeof PlanSummaryColu
       programLabel="MSCS — Master of Science in Computer Science"
       recommended={[]}
       selected={[]}
+      offered={[]}
       completedCodes={[]}
       onAdd={() => {}}
       {...props}
@@ -143,5 +144,72 @@ describe('PlanSummaryColumn', () => {
   it('has no accessibility violations', async () => {
     const { container } = renderColumn({ recommended: [lab], selected: [base, blocked] });
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('groups the plan by requirement group, strongest obligation first', () => {
+    renderColumn({
+      selected: [base, lab],
+      groups: { 'c-1': 'Free Electives', 'c-2': 'Foundation Courses' },
+      tiers: { 'c-1': 'elective', 'c-2': 'required' },
+    });
+    // Restricted to the on-screen column; the print sheet repeats the headings.
+    const onScreen = document.querySelector('.rounded-xl') as HTMLElement;
+    const headings = within(onScreen)
+      .getAllByText(/Foundation Courses|Free Electives/)
+      .map((e) => e.textContent);
+    // Required group leads even though the elective course was listed first.
+    expect(headings[0]).toMatch(/Foundation Courses/);
+  });
+
+  it('labels a course with no group in this degree rather than dropping it', () => {
+    // Appears on screen and again on the print sheet, hence getAllByText.
+    renderColumn({ selected: [base], groups: {}, tiers: {} });
+    expect(screen.getAllByText(/Not in this degree/).length).toBeGreaterThan(0);
+  });
+
+  it('prints every list, not just the plan', () => {
+    const { container } = renderColumn({
+      selected: [base],
+      recommended: [lab],
+      offered: [base, blocked],
+      completedCodes: ['CS380'],
+      groups: { 'c-1': 'Foundation Courses' },
+      tiers: { 'c-1': 'required' },
+    });
+    const sheet = container.querySelector('.plan-print') as HTMLElement;
+
+    expect(sheet).toHaveTextContent('Planned courses (1)');
+    expect(sheet).toHaveTextContent('Foundation Courses');
+    expect(sheet).toHaveTextContent('Ready to register (1)');
+    expect(sheet).toHaveTextContent('Offered in Fall 2026 (2)');
+    expect(sheet).toHaveTextContent('Completed courses (1)');
+  });
+
+  it('prints the registration status of each offered course', () => {
+    const { container } = renderColumn({
+      selected: [base],
+      offered: [
+        { ...base, openForRegistration: false, statusNote: 'Cancelled due to low enrollment' },
+        blocked,
+      ],
+    });
+    const sheet = container.querySelector('.plan-print') as HTMLElement;
+    expect(sheet).toHaveTextContent('Cancelled due to low enrollment');
+    expect(sheet).toHaveTextContent('Open — prerequisites pending');
+  });
+
+  it('orders same-tier groups by the catalog sequence, not the alphabet', () => {
+    // Foundation (1) before Capstone (9), though "Capstone" sorts first by name.
+    renderColumn({
+      selected: [base, lab],
+      groups: { 'c-1': 'Capstone', 'c-2': 'Foundation Courses' },
+      tiers: { 'c-1': 'required', 'c-2': 'required' },
+      groupOrder: { 'c-1': 9, 'c-2': 1 },
+    });
+    const onScreen = document.querySelector('.rounded-xl') as HTMLElement;
+    const headings = within(onScreen)
+      .getAllByText(/Capstone|Foundation Courses/)
+      .map((e) => e.textContent);
+    expect(headings[0]).toMatch(/Foundation Courses/);
   });
 });

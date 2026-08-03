@@ -101,6 +101,7 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [programId, setProgramId] = useState<string | null>(null);
   const [showAllOfferings, setShowAllOfferings] = useState(false);
+  const [offeredQuery, setOfferedQuery] = useState('');
   const [evaluation, setEvaluation] = useState<PlanEvaluation | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
@@ -175,16 +176,29 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
   // Every offered course is evaluated, not just the selected ones, so the
   // column can show what is blocked *before* the user commits to it.
   //
-  // In-program courses lead. Revealing the rest of the term should not bury the
-  // ones the degree actually needs beneath sixty it does not.
-  const termOfferedIds = useMemo(
-    () => [...offerings].sort((a, b) => Number(b.inProgram) - Number(a.inProgram)).map((o) => o.id),
+  // Ordered by what the student can act on: anything closed or cancelled sinks
+  // to the end regardless of degree, because it cannot be registered for at
+  // all; among the rest the degree's own courses lead, so revealing the whole
+  // term does not bury them.
+  //
+  // Sorted once, before the split — sorting only the full list left the default
+  // scoped view in whatever order the API returned.
+  const sortedOfferings = useMemo(
+    () =>
+      [...offerings].sort(
+        (a, b) =>
+          Number(b.openForRegistration) - Number(a.openForRegistration) ||
+          Number(b.inProgram) - Number(a.inProgram) ||
+          a.courseCode.localeCompare(b.courseCode),
+      ),
     [offerings],
   );
 
+  const termOfferedIds = useMemo(() => sortedOfferings.map((o) => o.id), [sortedOfferings]);
+
   const inScopeOfferedIds = useMemo(
-    () => offerings.filter((o) => o.inProgram).map((o) => o.id),
-    [offerings],
+    () => sortedOfferings.filter((o) => o.inProgram).map((o) => o.id),
+    [sortedOfferings],
   );
 
   const hiddenByDegree = termOfferedIds.length - inScopeOfferedIds.length;
@@ -249,6 +263,15 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
    */
   const evaluated = (evaluation?.terms[0]?.courses ?? []).filter((c) => !c.alreadyCompleted);
   const completedHiddenCount = (evaluation?.terms[0]?.courses.length ?? 0) - evaluated.length;
+
+  /** The offerings column after its own filter — the term is long enough to need one. */
+  const visibleOffered = useMemo(() => {
+    const q = offeredQuery.trim().toLowerCase();
+    if (q === '') return evaluated;
+    return evaluated.filter(
+      (c) => c.courseCode.toLowerCase().includes(q) || c.title.toLowerCase().includes(q),
+    );
+  }, [evaluated, offeredQuery]);
   const selectedSet = new Set(selectedIds);
   const selected = evaluated.filter((c) => selectedSet.has(c.courseId));
   const selectedCredits = Math.round(selected.reduce((sum, c) => sum + c.creditHours, 0) * 10) / 10;
@@ -348,6 +371,7 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
           <CompletedPanel
             courses={scopedCourses}
             allCourses={courses}
+            degreeLabel={program?.abbreviation ?? null}
             completedIds={completedIds}
             onAdd={addCompleted}
             onRemove={removeCompleted}
@@ -388,6 +412,19 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
             </div>
           )}
 
+          {offeredIds.length > 0 && (
+            <div className="border-b border-gray-100 px-4 py-2.5">
+              <input
+                type="search"
+                value={offeredQuery}
+                onChange={(e) => setOfferedQuery(e.target.value)}
+                placeholder="Filter offered courses…"
+                aria-label="Filter offered courses by code or title"
+                className="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:border-sfbu-navy focus:outline-none focus:ring-1 focus:ring-sfbu-navy"
+              />
+            </div>
+          )}
+
           <div className="px-4 py-3">
             {!term ? (
               <p className="py-6 text-center text-sm text-gray-400">
@@ -411,7 +448,12 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
               <p className="py-6 text-center text-sm text-gray-400">Checking eligibility…</p>
             ) : (
               <ul className="space-y-2">
-                {evaluated.map((c) => (
+                {visibleOffered.length === 0 && (
+                  <li className="py-4 text-center text-sm text-gray-400">
+                    No offered courses match &ldquo;{offeredQuery.trim()}&rdquo;.
+                  </li>
+                )}
+                {visibleOffered.map((c) => (
                   <OfferedCourseRow
                     key={c.courseId}
                     course={c}
@@ -452,7 +494,11 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
           programLabel={program ? `${program.abbreviation} — ${program.name}` : null}
           recommended={recommended}
           selected={selected}
+          offered={evaluated}
           completedCodes={completedCodes}
+          groups={program?.groups}
+          tiers={program?.tiers}
+          groupOrder={program?.groupOrder}
           onAdd={addSelected}
         />
       </div>

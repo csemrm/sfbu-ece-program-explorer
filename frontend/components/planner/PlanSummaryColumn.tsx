@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { EvaluatedCourse } from '../../lib/api';
+import { tierRank, type RequirementTier } from '../../lib/programScope';
 
 interface Props {
   termName: string | null;
@@ -10,9 +11,24 @@ interface Props {
   recommended: EvaluatedCourse[];
   /** Offered courses the user has ticked. */
   selected: EvaluatedCourse[];
+  /** Every offered course in the term, for the printed sheet. */
+  offered: EvaluatedCourse[];
   completedCodes: string[];
+  /** Requirement group per course id, for grouping the plan. */
+  groups?: Record<string, string>;
+  /** Requirement tier per course id, for ordering those groups. */
+  tiers?: Record<string, RequirementTier>;
+  /** The group's position in the catalog sequence, per course id. */
+  groupOrder?: Record<string, number>;
   onAdd: (courseId: string) => void;
 }
+
+const TABLE = { width: '100%', borderCollapse: 'collapse' as const, fontSize: '10pt' };
+const TH = { textAlign: 'left' as const, borderBottom: '1px solid #000', padding: '3pt 0' };
+const TD = { padding: '3pt 0' };
+
+/** "1 credit", not "1 credits" — it is printed and handed to an advisor. */
+const creditLabel = (n: number) => `${n} credit${n === 1 ? '' : 's'}`;
 
 const credits = (courses: EvaluatedCourse[]) =>
   Math.round(courses.reduce((sum, c) => sum + c.creditHours, 0) * 10) / 10;
@@ -31,13 +47,44 @@ export function PlanSummaryColumn({
   programLabel,
   recommended,
   selected,
+  offered,
   completedCodes,
+  groups,
+  tiers,
+  groupOrder,
   onAdd,
 }: Props) {
   const [printedOn, setPrintedOn] = useState<string | null>(null);
 
   const blocked = selected.filter((c) => !c.eligible);
   const total = credits(selected);
+
+  /**
+   * The plan split by requirement group, strongest obligation first.
+   *
+   * A flat list of five codes does not tell a student whether they have covered
+   * their core requirements or stacked five electives — which is the question a
+   * registration plan exists to answer.
+   */
+  const grouped = useMemo(() => {
+    const byGroup = new Map<string, EvaluatedCourse[]>();
+    for (const course of selected) {
+      const name = groups?.[course.courseId] ?? 'Not in this degree';
+      const list = byGroup.get(name);
+      if (list) list.push(course);
+      else byGroup.set(name, [course]);
+    }
+    return [...byGroup.entries()]
+      .map(([name, courses]) => ({
+        name,
+        courses,
+        rank: tierRank(tiers?.[courses[0].courseId]),
+        // Within a tier, follow the catalog's own sequence — Foundation before
+        // Capstone, not alphabetically the other way round.
+        order: groupOrder?.[courses[0].courseId] ?? Number.MAX_SAFE_INTEGER,
+      }))
+      .sort((a, b) => a.rank - b.rank || a.order - b.order || a.name.localeCompare(b.name));
+  }, [selected, groups, tiers, groupOrder]);
 
   const download = () => {
     // Stamped on click rather than during render — a date computed while
@@ -106,21 +153,31 @@ export function PlanSummaryColumn({
           </p>
         ) : (
           <>
-            <ul className="mt-2 space-y-1">
-              {selected.map((c) => (
-                <li key={c.courseId} className="flex items-center gap-2 text-sm">
-                  <span
-                    className={`w-[4.5rem] shrink-0 rounded px-1.5 py-0.5 text-center font-mono text-xs font-bold ${
-                      c.eligible ? 'bg-gray-100 text-gray-700' : 'bg-red-100 text-red-700'
-                    }`}
-                  >
-                    {c.courseCode}
+            {grouped.map((group) => (
+              <div key={group.name} className="mt-2">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                  {group.name}
+                  <span className="ml-1.5 font-normal normal-case tracking-normal">
+                    {credits(group.courses)} cr
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-gray-700">{c.title}</span>
-                  <span className="shrink-0 text-xs text-gray-400">{c.creditHours} cr</span>
-                </li>
-              ))}
-            </ul>
+                </p>
+                <ul className="mt-1 space-y-1">
+                  {group.courses.map((c) => (
+                    <li key={c.courseId} className="flex items-center gap-2 text-sm">
+                      <span
+                        className={`w-[4.5rem] shrink-0 rounded px-1.5 py-0.5 text-center font-mono text-xs font-bold ${
+                          c.eligible ? 'bg-gray-100 text-gray-700' : 'bg-red-100 text-red-700'
+                        }`}
+                      >
+                        {c.courseCode}
+                      </span>
+                      <span className="min-w-0 flex-1 truncate text-gray-700">{c.title}</span>
+                      <span className="shrink-0 text-xs text-gray-400">{c.creditHours} cr</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
 
             {blocked.length > 0 && (
               <ul className="mt-2 space-y-1">
@@ -159,40 +216,84 @@ export function PlanSummaryColumn({
         </p>
 
         <h2 style={{ fontSize: '12pt', fontWeight: 700, marginBottom: '4pt' }}>
-          Planned courses ({selected.length}) — {total} credits
+          Planned courses ({selected.length}) — {creditLabel(total)}
         </h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10pt' }}>
-          <thead>
-            <tr>
-              <th style={{ textAlign: 'left', borderBottom: '1px solid #000', padding: '3pt 0' }}>
-                Code
-              </th>
-              <th style={{ textAlign: 'left', borderBottom: '1px solid #000', padding: '3pt 0' }}>
-                Title
-              </th>
-              <th style={{ textAlign: 'right', borderBottom: '1px solid #000', padding: '3pt 0' }}>
-                Credits
-              </th>
-              <th style={{ textAlign: 'left', borderBottom: '1px solid #000', padding: '3pt 0' }}>
-                Status
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {selected.map((c) => (
-              <tr key={c.courseId}>
-                <td style={{ padding: '3pt 0' }}>{c.courseCode}</td>
-                <td style={{ padding: '3pt 0' }}>{c.title}</td>
-                <td style={{ textAlign: 'right', padding: '3pt 0' }}>{c.creditHours}</td>
-                <td style={{ padding: '3pt 0' }}>
-                  {c.eligible
-                    ? 'Ready'
-                    : `Blocked — needs ${c.missingPrerequisites.map((p) => p.courseCode).join(', ')}`}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {grouped.map((group) => (
+          <div key={group.name} style={{ marginBottom: '8pt' }}>
+            <h3 style={{ fontSize: '10pt', fontWeight: 700, margin: '0 0 2pt' }}>
+              {group.name} — {creditLabel(credits(group.courses))}
+            </h3>
+            <table style={TABLE}>
+              <thead>
+                <tr>
+                  <th style={TH}>Code</th>
+                  <th style={TH}>Title</th>
+                  <th style={{ ...TH, textAlign: 'right' }}>Credits</th>
+                  <th style={TH}>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {group.courses.map((c) => (
+                  <tr key={c.courseId}>
+                    <td style={TD}>{c.courseCode}</td>
+                    <td style={TD}>{c.title}</td>
+                    <td style={{ ...TD, textAlign: 'right' }}>{c.creditHours}</td>
+                    <td style={TD}>
+                      {c.eligible
+                        ? 'Ready'
+                        : `Blocked — needs ${c.missingPrerequisites.map((p) => p.courseCode).join(', ')}`}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
+
+        {recommended.length > 0 && (
+          <>
+            <h2 style={{ fontSize: '12pt', fontWeight: 700, margin: '12pt 0 4pt' }}>
+              Ready to register ({recommended.length})
+            </h2>
+            <p style={{ fontSize: '10pt' }}>
+              {recommended.map((c) => `${c.courseCode} ${c.title}`).join(' · ')}
+            </p>
+          </>
+        )}
+
+        {offered.length > 0 && (
+          <>
+            <h2 style={{ fontSize: '12pt', fontWeight: 700, margin: '12pt 0 4pt' }}>
+              Offered in {termName ?? 'this term'} ({offered.length})
+            </h2>
+            <table style={TABLE}>
+              <thead>
+                <tr>
+                  <th style={TH}>Code</th>
+                  <th style={TH}>Title</th>
+                  <th style={{ ...TH, textAlign: 'right' }}>Credits</th>
+                  <th style={TH}>Registration</th>
+                </tr>
+              </thead>
+              <tbody>
+                {offered.map((c) => (
+                  <tr key={c.courseId}>
+                    <td style={TD}>{c.courseCode}</td>
+                    <td style={TD}>{c.title}</td>
+                    <td style={{ ...TD, textAlign: 'right' }}>{c.creditHours}</td>
+                    <td style={TD}>
+                      {c.openForRegistration === false
+                        ? (c.statusNote ?? 'Closed')
+                        : c.eligible
+                          ? 'Open'
+                          : 'Open — prerequisites pending'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
 
         {completedCodes.length > 0 && (
           <>

@@ -12,6 +12,8 @@ interface Props {
    * code must still resolve even though it is absent from `courses`.
    */
   allCourses?: Course[];
+  /** Abbreviation of the selected degree, shown when a filter matches nothing. */
+  degreeLabel?: string | null;
   completedIds: string[];
   onAdd: (courseId: string) => void;
   onRemove: (courseId: string) => void;
@@ -22,6 +24,7 @@ interface Props {
 export function CompletedPanel({
   courses,
   allCourses,
+  degreeLabel,
   completedIds,
   onAdd,
   onRemove,
@@ -54,7 +57,13 @@ export function CompletedPanel({
         )}
       </div>
 
-      <CompletedCourseList courses={courses} completedIds={completedIds} onToggle={toggle} />
+      <CompletedCourseList
+        courses={courses}
+        allCourses={allCourses}
+        degreeLabel={degreeLabel}
+        completedIds={completedIds}
+        onToggle={toggle}
+      />
 
       {completedIds.length > 0 && (
         <ul className="mt-3 flex flex-wrap gap-2 border-t border-gray-100 pt-3">

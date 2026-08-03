@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { api, type Course, type TermSummary } from '../../../lib/api';
 import {
   courseIdsFromRoadmap,
+  groupOrderFromRoadmap,
+  groupsFromRoadmap,
   tiersFromRoadmap,
   type ProgramOption,
 } from '../../../lib/programScope';
@@ -58,9 +60,11 @@ async function loadProgramOptions(): Promise<ProgramOption[]> {
             ...base,
             courseIds: courseIdsFromRoadmap(roadmap),
             tiers: tiersFromRoadmap(roadmap),
+            groups: groupsFromRoadmap(roadmap),
+            groupOrder: groupOrderFromRoadmap(roadmap),
           };
         } catch {
-          return { ...base, courseIds: [], tiers: {} };
+          return { ...base, courseIds: [], tiers: {}, groups: {}, groupOrder: {} };
         }
       }),
     );

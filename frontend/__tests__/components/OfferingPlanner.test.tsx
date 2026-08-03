@@ -29,7 +29,15 @@ const terms: TermSummary[] = [
 ];
 
 const programs: ProgramOption[] = [
-  { id: 'p-1', abbreviation: 'BSCS', name: 'Bachelor of Science', courseIds: ['c-1'], tiers: {} },
+  {
+    id: 'p-1',
+    abbreviation: 'BSCS',
+    name: 'Bachelor of Science',
+    courseIds: ['c-1'],
+    tiers: {},
+    groups: {},
+    groupOrder: {},
+  },
 ];
 
 /** The term detail the API now serves: whole term, each course flagged inProgram. */
@@ -321,6 +329,8 @@ describe('OfferingPlanner — ordering and precedence', () => {
       name: 'Bachelor of Science',
       courseIds: catalog,
       tiers: { req: 'required', spec: 'specialization', elec: 'elective' },
+      groups: { req: 'Core Courses', spec: 'Specialization — X', elec: 'Free Electives' },
+      groupOrder: { req: 1, spec: 2, elec: 3 },
     },
   ];
 

@@ -116,4 +116,26 @@ describe('CompletedCourseList', () => {
     });
     expect(codes()[0]).toBe('CS380');
   });
+
+  it('explains that an unmatched course belongs to another degree', () => {
+    // CS483 is real, but BSCS-only — an empty result otherwise reads as a
+    // missing course rather than as the degree filter doing its job.
+    const cs483 = course('c-cs483', 'CS483', 'Fundamentals of Artificial Intelligence');
+    renderList({ allCourses: [...courses, cs483], degreeLabel: 'MSCS' });
+
+    fireEvent.change(screen.getByLabelText('Filter courses by code or title'), {
+      target: { value: 'CS483' },
+    });
+    expect(screen.getByText(/No courses match/)).toBeInTheDocument();
+    expect(screen.getByText(/CS483.*not part of MSCS/)).toBeInTheDocument();
+  });
+
+  it('says nothing extra when the course does not exist at all', () => {
+    renderList({ allCourses: courses, degreeLabel: 'MSCS' });
+    fireEvent.change(screen.getByLabelText('Filter courses by code or title'), {
+      target: { value: 'ZZZ999' },
+    });
+    expect(screen.getByText(/No courses match/)).toBeInTheDocument();
+    expect(screen.queryByText(/not part of/)).not.toBeInTheDocument();
+  });
 });
