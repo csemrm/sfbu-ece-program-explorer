@@ -128,8 +128,30 @@ describe('catalog seed data', () => {
 
   it('resolves every seeded offering to a seeded course', () => {
     for (const offering of COURSE_OFFERINGS) {
-      for (const code of offering.courseCodes) {
-        expect(codes.has(code)).toBe(true);
+      for (const offered of offering.courses) {
+        expect(codes.has(offered.courseCode)).toBe(true);
+      }
+    }
+  });
+
+  it('lists each course at most once per term', () => {
+    for (const offering of COURSE_OFFERINGS) {
+      const seen = offering.courses.map((c) => c.courseCode);
+      expect(new Set(seen).size).toBe(seen.length);
+    }
+  });
+
+  it('closes registration on every offering the registrar marked cancelled', () => {
+    for (const offering of COURSE_OFFERINGS) {
+      for (const offered of offering.courses) {
+        if (offered.statusNote && /cancel/i.test(offered.statusNote)) {
+          // A cancelled course that still reads as open would send a student to
+          // enrol in something that will not run.
+          expect(offered.openForRegistration).toBe(false);
+        }
+        if (offered.sectionCount !== undefined) {
+          expect(offered.sectionCount).toBeGreaterThan(0);
+        }
       }
     }
   });

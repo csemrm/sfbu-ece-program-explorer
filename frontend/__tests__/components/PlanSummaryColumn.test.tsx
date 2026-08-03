@@ -14,9 +14,13 @@ const base: EvaluatedCourse = {
   eligible: true,
   offered: true,
   registrable: true,
+  openForRegistration: true,
+  sectionCount: null,
+  statusNote: null,
   alreadyCompleted: false,
   satisfiedPrerequisites: [],
   missingPrerequisites: [],
+  backgroundPrerequisites: [],
   corequisites: [],
   reason: 'Eligible — all prerequisites are satisfied.',
 };
@@ -30,6 +34,9 @@ const blocked: EvaluatedCourse = {
   title: 'Big Data Systems',
   eligible: false,
   registrable: false,
+  openForRegistration: true,
+  sectionCount: null,
+  statusNote: null,
   missingPrerequisites: [
     {
       id: 'p-1',
@@ -40,6 +47,7 @@ const blocked: EvaluatedCourse = {
       plannedInLaterTerm: null,
     },
   ],
+  backgroundPrerequisites: [],
 };
 
 const renderColumn = (props: Partial<React.ComponentProps<typeof PlanSummaryColumn>> = {}) =>

@@ -355,10 +355,23 @@ fabricating one would put invented availability in front of students. A term
 with no offerings is treated as *not yet curated* (`offered: null`), never as
 "offers nothing" — see the planner note below.
 
-Two fields on the official list are **not modeled**: `Open For Registration`
-(false for CS522, CS571 and CS583 — the course runs but is not open) and section
-counts. Capturing them needs a schema change. Until then a seeded offering means
-"runs this term", not "you can register right now".
+`Open For Registration`, section counts and the registrar's cancellation notes
+**are** modeled, on `course_offerings`:
+
+| Column | Meaning |
+| --- | --- |
+| `open_for_registration` | Registration is actually open. Defaults true, so offerings curated before the column existed keep their prior meaning. |
+| `section_count` | Sections on the published schedule; null when unstated. |
+| `status_note` | The registrar's wording, verbatim — "Cancelled due to low enrollment". Free text rather than an enum: the actual reason serves a student better than a category. |
+
+An offering row therefore means "runs this term"; `open_for_registration` is the
+separate question of whether a student can enrol. Of the 96 Fall 2026 offerings,
+34 are closed and 18 carry a note.
+
+**The source list contradicts itself on two courses.** CS500 and FIN310 carry
+both a cancellation note and `Open For Registration: true`. Cancelled wins in the
+seed — showing a cancelled course as registrable sends a student to enrol in
+something that will not run, which is the costlier error.
 
 Seeding is idempotent, but **insert-only**: it never deletes. Offerings removed
 from `COURSE_OFFERINGS` are not pruned on reseed, because doing so would destroy

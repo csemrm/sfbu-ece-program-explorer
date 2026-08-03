@@ -347,7 +347,6 @@ Database
 
 Use
 
-* pgAdmin
 * psql
 
 ⸻

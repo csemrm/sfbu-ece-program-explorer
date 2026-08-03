@@ -6,6 +6,7 @@ import { Prerequisite } from '../../database/entities/prerequisite.entity';
 import { Corequisite } from '../../database/entities/corequisite.entity';
 import { AcademicTerm } from '../../database/entities/academic-term.entity';
 import { CourseOffering } from '../../database/entities/course-offering.entity';
+import { ProgramRequirement } from '../../database/entities/program-requirement.entity';
 import {
   CorequisiteStatus,
   EvaluatePlanDto,
@@ -32,6 +33,8 @@ export class PlannerService {
     private readonly termRepo: Repository<AcademicTerm>,
     @InjectRepository(CourseOffering)
     private readonly offeringRepo: Repository<CourseOffering>,
+    @InjectRepository(ProgramRequirement)
+    private readonly requirementRepo: Repository<ProgramRequirement>,
   ) {}
 
   /**
@@ -72,6 +75,7 @@ export class PlannerService {
     }
 
     const { termNames, offeredByTerm } = await this.loadOfferings(dto);
+    const programCourses = await this.loadProgramCourses(dto.programId);
 
     const prereqMap = groupBy(
       prereqs,
@@ -129,9 +133,16 @@ export class PlannerService {
 
           const satisfiedPrerequisites: PlannerCourseRefDto[] = [];
           const missingPrerequisites: MissingPrerequisiteDto[] = [];
+          const backgroundPrerequisites: PlannerCourseRefDto[] = [];
           for (const pid of prereqIds) {
             if (satisfied.has(pid)) {
               satisfiedPrerequisites.push(ref(pid));
+            } else if (programCourses && !programCourses.has(pid)) {
+              // Belongs to a different degree. Every graduate programme states
+              // its own background preparation, cleared before admission, so
+              // blocking an MSCS student on an undergraduate BSCS course would
+              // enforce a requirement the university does not make of them.
+              backgroundPrerequisites.push(ref(pid));
             } else {
               const laterTerm = termOfCourse.get(pid);
               missingPrerequisites.push({
@@ -155,7 +166,12 @@ export class PlannerService {
             missingPrerequisites.length === 0 &&
             corequisites.every((c) => c.status !== 'unmet');
 
-          const offered = offeredHere ? offeredHere.has(courseId) : null;
+          const offering = offeredHere?.get(courseId) ?? null;
+          const offered = offeredHere ? offering !== null : null;
+          // A course that runs but is closed cannot be registered for, so it is
+          // reported separately from "not offered" — the fix differs: one waits
+          // for the registrar, the other for a different term.
+          const openForRegistration = offering?.openForRegistration ?? null;
 
           return {
             courseId,
@@ -165,10 +181,15 @@ export class PlannerService {
             level: course.level,
             eligible,
             offered,
-            registrable: eligible && offered !== false,
+            openForRegistration,
+            sectionCount: offering?.sectionCount ?? null,
+            statusNote: offering?.statusNote ?? null,
+            registrable:
+              eligible && offered !== false && openForRegistration !== false,
             alreadyCompleted: completedSet.has(courseId),
             satisfiedPrerequisites,
             missingPrerequisites,
+            backgroundPrerequisites,
             corequisites,
             reason: buildReason(
               eligible,
@@ -177,6 +198,8 @@ export class PlannerService {
               completedSet.has(courseId),
               offered,
               termName,
+              openForRegistration,
+              offering?.statusNote ?? null,
             ),
           };
         },
@@ -259,12 +282,39 @@ export class PlannerService {
    * reporting the latter would tell a student, with apparent authority, that
    * every course in the catalog is unavailable.
    */
+  /**
+   * Course ids belonging to a degree, or null when no degree was supplied.
+   *
+   * Derived from the program's requirement rows, which is the same set the
+   * roadmap is built from — there is no separate "courses in this program"
+   * table. A program with no course-bearing requirements yields null rather
+   * than an empty set, so an unmodelled degree does not silently excuse every
+   * prerequisite in the catalog.
+   */
+  private async loadProgramCourses(
+    programId?: string,
+  ): Promise<Set<string> | null> {
+    if (!programId) return null;
+
+    const rows = await this.requirementRepo
+      .createQueryBuilder('req')
+      .innerJoin('req.requirementGroup', 'rg')
+      .innerJoin('rg.catalogYear', 'cy')
+      .where('cy.program_id = :programId', { programId })
+      .andWhere('req.course_id IS NOT NULL')
+      .select('req.course_id', 'courseId')
+      .getRawMany<{ courseId: string }>();
+
+    if (!rows.length) return null;
+    return new Set(rows.map((r) => r.courseId));
+  }
+
   private async loadOfferings(dto: EvaluatePlanDto): Promise<{
     termNames: Map<string, string>;
-    offeredByTerm: Map<string, Set<string>>;
+    offeredByTerm: Map<string, Map<string, OfferingStatus>>;
   }> {
     const termNames = new Map<string, string>();
-    const offeredByTerm = new Map<string, Set<string>>();
+    const offeredByTerm = new Map<string, Map<string, OfferingStatus>>();
 
     const termIds = [
       ...new Set(dto.terms.filter((t) => t.termId).map((t) => t.termId!)),
@@ -290,9 +340,14 @@ export class PlannerService {
     // Built only from rows that exist, so a term with zero offerings never
     // gets an (empty, and therefore falsifying) entry.
     for (const o of offerings) {
-      const set = offeredByTerm.get(o.termId);
-      if (set) set.add(o.courseId);
-      else offeredByTerm.set(o.termId, new Set([o.courseId]));
+      const status: OfferingStatus = {
+        openForRegistration: o.openForRegistration,
+        sectionCount: o.sectionCount,
+        statusNote: o.statusNote,
+      };
+      const map = offeredByTerm.get(o.termId);
+      if (map) map.set(o.courseId, status);
+      else offeredByTerm.set(o.termId, new Map([[o.courseId, status]]));
     }
 
     return { termNames, offeredByTerm };
@@ -314,6 +369,13 @@ function groupBy<T>(
   return map;
 }
 
+/** Registration status of one offering, as published by the registrar. */
+interface OfferingStatus {
+  openForRegistration: boolean;
+  sectionCount: number | null;
+  statusNote: string | null;
+}
+
 function buildReason(
   eligible: boolean,
   missing: MissingPrerequisiteDto[],
@@ -321,15 +383,23 @@ function buildReason(
   alreadyCompleted: boolean,
   offered: boolean | null,
   termName: string | null,
+  openForRegistration: boolean | null,
+  statusNote: string | null,
 ): string {
   // "Not offered" is a scheduling fact, not a readiness failure, so it is
   // reported alongside the prerequisite verdict rather than replacing it.
   const notOffered = offered === false;
+  const closed = openForRegistration === false;
   const where = termName ? ` in ${termName}` : ' in the selected term';
+  // The registrar's own wording beats any category we could invent for it.
+  const because = statusNote ? ` (${statusNote})` : '';
 
   if (eligible) {
     if (notOffered) {
       return `Prerequisites satisfied, but this course is not offered${where}.`;
+    }
+    if (closed) {
+      return `Prerequisites satisfied, but registration is closed${where}${because}.`;
     }
     if (alreadyCompleted) {
       return 'Eligible, but you have already marked this course as completed.';
@@ -358,6 +428,8 @@ function buildReason(
   }
   if (notOffered) {
     parts.push(`it is also not offered${where}`);
+  } else if (closed) {
+    parts.push(`registration is also closed${where}${because}`);
   }
   return `Not eligible — ${parts.join('; ')}.`;
 }

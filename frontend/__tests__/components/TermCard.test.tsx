@@ -36,9 +36,13 @@ const evaluation = (offered: boolean | null): EvaluatedTerm => ({
       eligible: true,
       offered,
       registrable: offered !== false,
+      openForRegistration: true,
+      sectionCount: null,
+      statusNote: null,
       alreadyCompleted: false,
       satisfiedPrerequisites: [],
       missingPrerequisites: [],
+      backgroundPrerequisites: [],
       corequisites: [],
       reason: 'Eligible — all prerequisites are satisfied.',
     },
@@ -109,9 +113,7 @@ describe('TermCard', () => {
   });
 
   it('does not mention offerings when the term is unbound', () => {
-    render(
-      <TermCard {...defaults} courseIds={[COURSES[0].id]} evaluation={evaluation(null)} />,
-    );
+    render(<TermCard {...defaults} courseIds={[COURSES[0].id]} evaluation={evaluation(null)} />);
     expect(screen.queryByText(/not offered/)).not.toBeInTheDocument();
   });
 

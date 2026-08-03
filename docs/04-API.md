@@ -568,3 +568,29 @@ Version 2 may include
 * Epic 008 – Administration Dashboard
 
 This API specification is consistent with the rest of your documentation and is suitable as the authoritative API design document for the project.
+---
+
+## Planner — degree scoping and registration status
+
+`POST /planner/evaluate` accepts an optional `programId`.
+
+When supplied, an unmet prerequisite belonging to a **different** degree is
+returned in `backgroundPrerequisites` instead of `missingPrerequisites`, and does
+not affect `eligible`. Every graduate programme states its own background
+preparation, cleared before admission, so blocking an MSCS student on an
+undergraduate BSCS course would enforce a requirement the university does not
+make of them.
+
+A program with no course-bearing requirement rows is treated as "no scope" rather
+than an empty one, so an unmodelled degree cannot silently excuse every
+prerequisite in the catalog.
+
+Each evaluated course also reports the offering's registration status:
+
+| Field | Meaning |
+| --- | --- |
+| `offered` | The course runs in the bound term. Null when the term is unbound. |
+| `openForRegistration` | The registrar has registration open. Distinct from `offered` — a cancelled course still appears on the schedule. |
+| `sectionCount` | Sections on the published schedule, or null. |
+| `statusNote` | The registrar's wording, verbatim (e.g. "Cancelled due to low enrollment"). |
+| `registrable` | `eligible && offered !== false && openForRegistration !== false`. |

@@ -7,6 +7,7 @@ import { Prerequisite } from '../../database/entities/prerequisite.entity';
 import { Corequisite } from '../../database/entities/corequisite.entity';
 import { AcademicTerm } from '../../database/entities/academic-term.entity';
 import { CourseOffering } from '../../database/entities/course-offering.entity';
+import { ProgramRequirement } from '../../database/entities/program-requirement.entity';
 
 const course = (id: string, courseCode: string, creditHours = 3): Course =>
   ({
@@ -55,12 +56,17 @@ describe('PlannerService', () => {
   let service: PlannerService;
   let termRepo: { find: jest.Mock };
   let offeringRepo: { find: jest.Mock };
+  /** Course ids the mocked program "contains"; drives the scoping tests. */
+  let programCourseIds: string[];
 
   beforeEach(async () => {
     // The service filters by `In(termIds)`; the mocks return the full fixture
     // and let the service's own bookkeeping do the narrowing.
     termRepo = { find: jest.fn().mockResolvedValue(TERMS) };
     offeringRepo = { find: jest.fn().mockResolvedValue(OFFERINGS) };
+    // CS100 is deliberately absent: it stands for a prerequisite belonging to a
+    // different degree, which the programId path must treat as background.
+    programCourseIds = ['c200', 'c250', 'c300', 'lab201'];
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -79,6 +85,24 @@ describe('PlannerService', () => {
         },
         { provide: getRepositoryToken(AcademicTerm), useValue: termRepo },
         { provide: getRepositoryToken(CourseOffering), useValue: offeringRepo },
+        {
+          provide: getRepositoryToken(ProgramRequirement),
+          useValue: {
+            createQueryBuilder: jest.fn(() => ({
+              innerJoin: jest.fn().mockReturnThis(),
+              where: jest.fn().mockReturnThis(),
+              andWhere: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              getRawMany: jest
+                .fn()
+                .mockImplementation(() =>
+                  Promise.resolve(
+                    programCourseIds.map((courseId) => ({ courseId })),
+                  ),
+                ),
+            })),
+          },
+        },
       ],
     }).compile();
 
@@ -342,6 +366,69 @@ describe('PlannerService', () => {
 
       expect(result.terms[0].courses[0].offered).toBe(false);
       expect(result.allOffered).toBe(false);
+    });
+  });
+
+  describe('degree-scoped prerequisites', () => {
+    it('blocks on a prerequisite from the same degree', async () => {
+      const result = await service.evaluate({
+        completedCourseIds: [],
+        terms: [{ courseIds: ['c300'] }],
+        programId: '11111111-1111-4111-8111-111111111111',
+      });
+
+      const cs300 = result.terms[0].courses[0];
+      expect(cs300.missingPrerequisites.map((p) => p.courseCode)).toEqual([
+        'CS200',
+      ]);
+      expect(cs300.backgroundPrerequisites).toHaveLength(0);
+      expect(cs300.eligible).toBe(false);
+    });
+
+    it('treats a prerequisite from another degree as background, not a blocker', async () => {
+      const result = await service.evaluate({
+        completedCourseIds: [],
+        terms: [{ courseIds: ['c250'] }],
+        programId: '11111111-1111-4111-8111-111111111111',
+      });
+
+      const cs250 = result.terms[0].courses[0];
+      // CS100 is outside the program: reported, but it does not block.
+      expect(cs250.missingPrerequisites).toHaveLength(0);
+      expect(cs250.backgroundPrerequisites.map((p) => p.courseCode)).toEqual([
+        'CS100',
+      ]);
+      expect(cs250.eligible).toBe(true);
+    });
+
+    it('still blocks on that same prerequisite when no degree is given', async () => {
+      const result = await service.evaluate({
+        completedCourseIds: [],
+        terms: [{ courseIds: ['c250'] }],
+      });
+
+      const cs250 = result.terms[0].courses[0];
+      expect(cs250.missingPrerequisites.map((p) => p.courseCode)).toEqual([
+        'CS100',
+      ]);
+      expect(cs250.backgroundPrerequisites).toHaveLength(0);
+      expect(cs250.eligible).toBe(false);
+    });
+
+    it('does not excuse everything when the degree has no course requirements', async () => {
+      // An unmodelled program must not silently clear the whole catalog.
+      programCourseIds = [];
+      const result = await service.evaluate({
+        completedCourseIds: [],
+        terms: [{ courseIds: ['c250'] }],
+        programId: '11111111-1111-4111-8111-111111111111',
+      });
+
+      const cs250 = result.terms[0].courses[0];
+      expect(cs250.missingPrerequisites.map((p) => p.courseCode)).toEqual([
+        'CS100',
+      ]);
+      expect(cs250.eligible).toBe(false);
     });
   });
 });

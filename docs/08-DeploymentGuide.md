@@ -40,7 +40,6 @@ Access points:
 - Frontend: http://localhost
 - Admin: http://localhost/admin
 - API: http://localhost/api/v1
-- pgAdmin: http://localhost:8088 (override with `PGADMIN_PORT`)
 
 ---
 
@@ -159,8 +158,8 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod \
 
 | File | Purpose |
 |---|---|
-| `docker-compose.yml` | Local development (hot reload, pgAdmin, HTTP only) |
-| `docker-compose.prod.yml` | Production (production builds, HTTPS, no pgAdmin) |
+| `docker-compose.yml` | Local development (hot reload, HTTP only) |
+| `docker-compose.prod.yml` | Production (production builds, HTTPS) |
 
 ---
 
@@ -328,7 +327,6 @@ curl https://ece.sfbu.edu/api/v1/health
 - [ ] HTTPS enabled with valid certificate
 - [ ] Admin password changed after first login
 - [ ] Postgres port (5432) not exposed to internet (compose `internal` network only)
-- [ ] pgAdmin not running in production
 - [ ] `docker/ssl/` added to `.gitignore`
 
 ---

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { OfferingPlanner } from '../../components/planner/OfferingPlanner';
 import type { Course, TermSummary } from '../../lib/api';
 import type { ProgramOption } from '../../lib/programScope';
@@ -32,7 +32,7 @@ const programs: ProgramOption[] = [
   { id: 'p-1', abbreviation: 'BSCS', name: 'Bachelor of Science', courseIds: ['c-1'] },
 ];
 
-const evaluationFor = (ids: string[]) => ({
+const evaluationFor = (ids: string[], completed: string[] = []) => ({
   terms: [
     {
       term: 1,
@@ -42,15 +42,19 @@ const evaluationFor = (ids: string[]) => ({
       courses: ids.map((id) => ({
         courseId: id,
         courseCode: courses.find((c) => c.id === id)!.courseCode,
-        title: 'T',
+        title: courses.find((c) => c.id === id)!.title,
         creditHours: 3,
         level: 'graduate' as const,
         eligible: true,
         offered: true,
         registrable: true,
-        alreadyCompleted: false,
+        openForRegistration: true,
+        sectionCount: null,
+        statusNote: null,
+        alreadyCompleted: completed.includes(id),
         satisfiedPrerequisites: [],
         missingPrerequisites: [],
+        backgroundPrerequisites: [],
         corequisites: [],
         reason: 'Eligible',
       })),
@@ -125,5 +129,62 @@ describe('OfferingPlanner — out-of-degree offerings', () => {
 
     fireEvent.change(screen.getByLabelText('Degree'), { target: { value: 'p-1' } });
     expect(await screen.findByRole('button', { name: /Show all 2 anyway/ })).toBeInTheDocument();
+  });
+});
+
+describe('OfferingPlanner — completed courses in the offerings column', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.planner.evaluate.mockImplementation(
+      ({
+        completedCourseIds,
+        terms: t,
+      }: {
+        completedCourseIds: string[];
+        terms: { courseIds: string[] }[];
+      }) => Promise.resolve(evaluationFor(t[0].courseIds, completedCourseIds)),
+    );
+  });
+
+  const seed = (completedIds: string[]) =>
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        completedIds,
+        termId: 't-1',
+        selectedIds: [],
+        programId: 'p-1',
+        showAllOfferings: true,
+      }),
+    );
+
+  /** The offerings column only — course titles also appear under Suggested. */
+  const offeredColumn = async () => {
+    const heading = await screen.findByText(/^Offered in Fall 2026$/);
+    return heading.closest('div')!.parentElement as HTMLElement;
+  };
+
+  it('drops an already-completed course from the offerings column', async () => {
+    seed(['c-2']);
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+
+    const column = await offeredColumn();
+    // CS501 still on offer; CS500 is completed and no longer a candidate.
+    await waitFor(() => expect(within(column).getByText('Title CS501')).toBeInTheDocument());
+    expect(within(column).queryByText('Title CS500')).not.toBeInTheDocument();
+  });
+
+  it('says how many were hidden rather than silently shrinking the list', async () => {
+    seed(['c-2']);
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+    expect(await screen.findByText(/1 completed hidden/)).toBeInTheDocument();
+  });
+
+  it('reports the all-completed case instead of looking like it is still loading', async () => {
+    seed(['c-2', 'c-3']);
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+    expect(
+      await screen.findByText(/already completed everything offered in Fall 2026/),
+    ).toBeInTheDocument();
   });
 });

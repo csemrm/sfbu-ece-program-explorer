@@ -195,11 +195,27 @@ export interface EvaluatedCourse {
   eligible: boolean;
   /** Null when the term is not bound to an academic term. */
   offered: boolean | null;
-  /** eligible && offered !== false */
+  /**
+   * Whether the registrar has registration open. Distinct from `offered`: a
+   * cancelled or closed course still runs on the schedule but cannot be
+   * enrolled in. Null when offering data does not apply.
+   */
+  openForRegistration: boolean | null;
+  /** Sections on the published schedule, or null when unstated. */
+  sectionCount: number | null;
+  /** The registrar's note, verbatim — e.g. "Cancelled due to low enrollment". */
+  statusNote: string | null;
+  /** eligible && offered !== false && openForRegistration !== false */
   registrable: boolean;
   alreadyCompleted: boolean;
   satisfiedPrerequisites: PlannerCourseRef[];
   missingPrerequisites: MissingPrerequisite[];
+  /**
+   * Unmet prerequisites belonging to a different degree. Reported but not
+   * blocking — a graduate programme's admission requirements already cover
+   * this ground. Empty when no programId was sent.
+   */
+  backgroundPrerequisites: PlannerCourseRef[];
   corequisites: CorequisiteStatusItem[];
   reason: string;
 }
@@ -232,6 +248,8 @@ export interface PlanEvaluation {
 export interface EvaluatePlanRequest {
   completedCourseIds: string[];
   terms: { courseIds: string[]; termId?: string }[];
+  /** Scopes prerequisites to this degree; others count as background preparation. */
+  programId?: string;
 }
 
 // ── Academic Terms & Offerings ─────────────────────────────────
@@ -304,14 +322,13 @@ export const api = {
     requirements: (id: string) => get<ProgramRequirements>(`/programs/${id}/requirements`),
     roadmap: (id: string) => get<ProgramRoadmap>(`/programs/${id}/roadmap`),
     graph: (id: string) => get<ProgramGraph>(`/programs/${id}/graph`),
-    knowledgeAreas: (id: string) =>
-      get<ProgramKnowledgeAreas>(`/programs/${id}/knowledge-areas`),
+    knowledgeAreas: (id: string) => get<ProgramKnowledgeAreas>(`/programs/${id}/knowledge-areas`),
   },
   knowledgeAreas: {
     list: (params?: { page?: number; limit?: number }) =>
       get<PaginatedResult<KnowledgeAreaSummary>>(
         '/knowledge-areas',
-        params as Record<string, string | number>
+        params as Record<string, string | number>,
       ),
     get: (id: string) => get<KnowledgeAreaDetail>(`/knowledge-areas/${id}`),
   },

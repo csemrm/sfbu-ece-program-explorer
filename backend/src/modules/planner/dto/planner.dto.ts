@@ -52,6 +52,14 @@ export class EvaluatePlanDto {
   @ValidateNested({ each: true })
   @Type(() => PlannerTermDto)
   terms: PlannerTermDto[];
+
+  @ApiPropertyOptional({
+    description:
+      "Optional degree to evaluate within. Prerequisites outside this program's own course set are treated as background preparation — cleared before admission — and no longer block eligibility. Omit to evaluate against the whole catalog.",
+  })
+  @IsOptional()
+  @IsUUID('4')
+  programId?: string;
 }
 
 // ── Response shapes ─────────────────────────────────────────────
@@ -105,8 +113,29 @@ export class EvaluatedCourseDto {
   offered: boolean | null;
 
   @ApiProperty({
+    nullable: true,
     description:
-      'True when the student could actually register: eligible AND not known to be unoffered (offered !== false).',
+      'Whether the registrar has registration open for this offering. Distinct from `offered`: a cancelled or closed course still runs on the schedule but cannot be enrolled in. Null when offering data does not apply.',
+  })
+  openForRegistration: boolean | null;
+
+  @ApiProperty({
+    nullable: true,
+    description:
+      'Sections on the published schedule, or null when the schedule does not state one.',
+  })
+  sectionCount: number | null;
+
+  @ApiProperty({
+    nullable: true,
+    description:
+      "The registrar's note on this offering, verbatim — e.g. 'Cancelled due to low enrollment'. Null when there is none.",
+  })
+  statusNote: string | null;
+
+  @ApiProperty({
+    description:
+      'True when the student could actually register: eligible AND not known to be unoffered AND registration is not closed.',
   })
   registrable: boolean;
 
@@ -121,6 +150,13 @@ export class EvaluatedCourseDto {
 
   @ApiProperty({ type: [MissingPrerequisiteDto] })
   missingPrerequisites: MissingPrerequisiteDto[];
+
+  @ApiProperty({
+    type: [PlannerCourseRefDto],
+    description:
+      "Unmet prerequisites that belong to a different program than the one being evaluated. Reported for transparency but excluded from `eligible`: a graduate programme's admission requirements already cover this ground, so blocking an MSCS student on an undergraduate BSCS course would be wrong. Always empty when no programId is supplied.",
+  })
+  backgroundPrerequisites: PlannerCourseRefDto[];
 
   @ApiProperty({ type: [CorequisiteStatusDto] })
   corequisites: CorequisiteStatusDto[];

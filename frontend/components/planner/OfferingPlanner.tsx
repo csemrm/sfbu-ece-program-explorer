@@ -163,6 +163,9 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
         .evaluate({
           completedCourseIds: completedIds,
           terms: [{ termId, courseIds: offeredIds }],
+          // Scopes prerequisites to the chosen degree, so an MSCS student is not
+          // blocked on undergraduate BSCS courses their admission already covered.
+          ...(programId ? { programId } : {}),
         })
         .then((result) => {
           if (id === reqId.current) {
@@ -177,7 +180,7 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
         });
     }, 300);
     return () => clearTimeout(timer);
-  }, [completedIds, termId, offeredIds, hydrated]);
+  }, [completedIds, termId, offeredIds, programId, hydrated]);
 
   const addCompleted = useCallback(
     (id: string) => setCompletedIds((prev) => (prev.includes(id) ? prev : [...prev, id])),
@@ -197,7 +200,15 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
     [],
   );
 
-  const evaluated = evaluation?.terms[0]?.courses ?? [];
+  /**
+   * Courses already marked completed are dropped from the offerings column.
+   *
+   * The column answers "what can I register for next semester", and something
+   * already passed is not a candidate — leaving it in was noise the student had
+   * to filter out by hand on every render.
+   */
+  const evaluated = (evaluation?.terms[0]?.courses ?? []).filter((c) => !c.alreadyCompleted);
+  const completedHiddenCount = (evaluation?.terms[0]?.courses.length ?? 0) - evaluated.length;
   const selectedSet = new Set(selectedIds);
   const selected = evaluated.filter((c) => selectedSet.has(c.courseId));
   const selectedCredits = Math.round(selected.reduce((sum, c) => sum + c.creditHours, 0) * 10) / 10;
@@ -297,7 +308,8 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
             </h2>
             <p className="text-xs text-gray-400">
               {offeredIds.length > 0
-                ? `${offeredIds.length} course${offeredIds.length !== 1 ? 's' : ''} · ${selectedIds.length} selected · ${selectedCredits} cr`
+                ? `${evaluated.length} course${evaluated.length !== 1 ? 's' : ''} · ${selectedIds.length} selected · ${selectedCredits} cr` +
+                  (completedHiddenCount > 0 ? ` · ${completedHiddenCount} completed hidden` : '')
                 : 'Select the courses you plan to register for.'}
             </p>
           </div>
@@ -333,6 +345,12 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
             ) : offeredIds.length === 0 ? (
               <p className="py-6 text-center text-sm text-gray-400">
                 Nothing in {term.name} matches this degree.
+              </p>
+            ) : evaluated.length === 0 && completedHiddenCount > 0 ? (
+              // Every offered course is already completed — a real state, and a
+              // good one. Without this it would sit on "Checking eligibility…".
+              <p className="py-6 text-center text-sm text-gray-400">
+                You&rsquo;ve already completed everything offered in {term.name}.
               </p>
             ) : evaluated.length === 0 ? (
               <p className="py-6 text-center text-sm text-gray-400">Checking eligibility…</p>
