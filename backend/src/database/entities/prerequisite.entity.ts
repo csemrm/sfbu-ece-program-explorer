@@ -24,6 +24,15 @@ export class Prerequisite {
   @Index()
   prerequisiteCourseId: string;
 
+  /**
+   * Groups alternatives together: rows sharing a non-null value for the same
+   * course are OR'd, so satisfying any one satisfies the group. Separate groups
+   * are ANDed, as is a null group — which is every prerequisite that predates
+   * this column.
+   */
+  @Column({ name: 'alternative_group', type: 'smallint', nullable: true })
+  alternativeGroup: number | null;
+
   @ManyToOne(() => Course, (course) => course.prerequisites, {
     onDelete: 'CASCADE',
   })

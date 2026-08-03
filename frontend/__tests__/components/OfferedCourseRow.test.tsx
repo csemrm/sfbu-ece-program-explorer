@@ -43,6 +43,7 @@ const blocked: EvaluatedCourse = {
       creditHours: 3,
       level: 'graduate',
       plannedInLaterTerm: null,
+      alternativeGroup: null,
     },
   ],
   backgroundPrerequisites: [],
@@ -81,6 +82,68 @@ describe('OfferedCourseRow', () => {
     renderRow({ course: blocked });
     expect(screen.getByText('Prerequisites pending')).toBeInTheDocument();
     expect(screen.getByText('CS515')).toBeInTheDocument();
+  });
+
+  it('reads alternatives as one "or" requirement, not two blockers', () => {
+    // Alternatives share a group — satisfying either clears the requirement, so
+    // listing them separately would overstate what the student still owes.
+    renderRow({
+      course: {
+        ...blocked,
+        missingPrerequisites: [
+          {
+            id: 'p-a',
+            courseCode: 'CS250',
+            title: 'Data Structures',
+            creditHours: 3,
+            level: 'undergraduate',
+            plannedInLaterTerm: null,
+            alternativeGroup: 0,
+          },
+          {
+            id: 'p-b',
+            courseCode: 'CS360',
+            title: 'Algorithm Analysis',
+            creditHours: 3,
+            level: 'undergraduate',
+            plannedInLaterTerm: null,
+            alternativeGroup: 0,
+          },
+        ],
+      },
+    });
+    expect(screen.getByText(/Needs/).textContent).toContain('CS250 or CS360');
+  });
+
+  it('separates independently required prerequisites with a comma', () => {
+    renderRow({
+      course: {
+        ...blocked,
+        missingPrerequisites: [
+          {
+            id: 'p-a',
+            courseCode: 'CS250',
+            title: 'Data Structures',
+            creditHours: 3,
+            level: 'undergraduate',
+            plannedInLaterTerm: null,
+            alternativeGroup: null,
+          },
+          {
+            id: 'p-b',
+            courseCode: 'CS360',
+            title: 'Algorithm Analysis',
+            creditHours: 3,
+            level: 'undergraduate',
+            plannedInLaterTerm: null,
+            alternativeGroup: null,
+          },
+        ],
+      },
+    });
+    const text = screen.getByText(/Needs/).textContent ?? '';
+    expect(text).toContain('CS250, CS360');
+    expect(text).not.toContain('or');
   });
 
   it('links the blocked reason to the checkbox for screen readers', () => {

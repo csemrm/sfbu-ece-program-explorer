@@ -431,4 +431,137 @@ describe('PlannerService', () => {
       expect(cs250.eligible).toBe(false);
     });
   });
+
+  describe('alternative prerequisites', () => {
+    /** CS480-style: "c100 or c250", either one satisfying the requirement. */
+    const withAlternatives = (rows: typeof PREREQS) => [
+      ...rows.filter((r) => r.courseId !== 'c300'),
+      { courseId: 'c300', prerequisiteCourseId: 'c100', alternativeGroup: 1 },
+      { courseId: 'c300', prerequisiteCourseId: 'c250', alternativeGroup: 1 },
+    ];
+
+    const serviceWith = async (prereqRows: unknown[]) => {
+      const module: TestingModule = await Test.createTestingModule({
+        providers: [
+          PlannerService,
+          {
+            provide: getRepositoryToken(Course),
+            useValue: { find: jest.fn().mockResolvedValue(CATALOG) },
+          },
+          {
+            provide: getRepositoryToken(Prerequisite),
+            useValue: { find: jest.fn().mockResolvedValue(prereqRows) },
+          },
+          {
+            provide: getRepositoryToken(Corequisite),
+            useValue: { find: jest.fn().mockResolvedValue(COREQS) },
+          },
+          { provide: getRepositoryToken(AcademicTerm), useValue: termRepo },
+          {
+            provide: getRepositoryToken(CourseOffering),
+            useValue: offeringRepo,
+          },
+          {
+            provide: getRepositoryToken(ProgramRequirement),
+            useValue: {
+              createQueryBuilder: jest.fn(() => ({
+                innerJoin: jest.fn().mockReturnThis(),
+                where: jest.fn().mockReturnThis(),
+                andWhere: jest.fn().mockReturnThis(),
+                select: jest.fn().mockReturnThis(),
+                getRawMany: jest
+                  .fn()
+                  .mockImplementation(() =>
+                    Promise.resolve(
+                      programCourseIds.map((courseId) => ({ courseId })),
+                    ),
+                  ),
+              })),
+            },
+          },
+        ],
+      }).compile();
+      return module.get<PlannerService>(PlannerService);
+    };
+
+    it('is satisfied by either alternative', async () => {
+      const svc = await serviceWith(withAlternatives(PREREQS));
+      for (const taken of ['c100', 'c250']) {
+        const result = await svc.evaluate({
+          completedCourseIds: [taken],
+          terms: [{ courseIds: ['c300'] }],
+        });
+        const cs300 = result.terms[0].courses[0];
+        expect(cs300.eligible).toBe(true);
+        expect(cs300.missingPrerequisites).toHaveLength(0);
+      }
+    });
+
+    it('blocks when neither alternative is taken, naming both as one requirement', async () => {
+      const svc = await serviceWith(withAlternatives(PREREQS));
+      const result = await svc.evaluate({
+        completedCourseIds: [],
+        terms: [{ courseIds: ['c300'] }],
+      });
+      const cs300 = result.terms[0].courses[0];
+
+      expect(cs300.eligible).toBe(false);
+      expect(
+        cs300.missingPrerequisites.map((p) => p.courseCode).sort(),
+      ).toEqual(['CS100', 'CS250']);
+      // A shared group is what lets the caller render "CS100 or CS250" rather
+      // than two independent blockers.
+      const groups = new Set(
+        cs300.missingPrerequisites.map((p) => p.alternativeGroup),
+      );
+      expect(groups.size).toBe(1);
+      expect([...groups][0]).not.toBeNull();
+    });
+
+    it('states alternatives as one "or" requirement in the reason', async () => {
+      const svc = await serviceWith(withAlternatives(PREREQS));
+      const result = await svc.evaluate({
+        completedCourseIds: [],
+        terms: [{ courseIds: ['c300'] }],
+      });
+      expect(result.terms[0].courses[0].reason).toContain(
+        'missing prerequisite: CS100 or CS250',
+      );
+    });
+
+    it('keeps separate ungrouped prerequisites ANDed', async () => {
+      // CS300 needs c100 *and* c250 here; satisfying one must not clear the
+      // other. Scoped to this test rather than the shared fixture, which other
+      // suites plan against.
+      const svc = await serviceWith([
+        { courseId: 'c300', prerequisiteCourseId: 'c100' },
+        { courseId: 'c300', prerequisiteCourseId: 'c250' },
+      ] as typeof PREREQS);
+      const result = await svc.evaluate({
+        completedCourseIds: ['c100'],
+        terms: [{ courseIds: ['c300'] }],
+      });
+      const cs300 = result.terms[0].courses[0];
+      expect(cs300.eligible).toBe(false);
+      expect(cs300.missingPrerequisites.map((p) => p.courseCode)).toEqual([
+        'CS250',
+      ]);
+      expect(cs300.missingPrerequisites[0].alternativeGroup).toBeNull();
+    });
+
+    it('excuses an alternative requirement only when every option is outside the degree', async () => {
+      programCourseIds = ['c300', 'c250'];
+      const svc = await serviceWith(withAlternatives(PREREQS));
+      const result = await svc.evaluate({
+        completedCourseIds: [],
+        terms: [{ courseIds: ['c300'] }],
+        programId: '11111111-1111-4111-8111-111111111111',
+      });
+      const cs300 = result.terms[0].courses[0];
+      // c250 is in the degree, so the requirement still blocks — the student is
+      // expected to take that route rather than the out-of-degree one.
+      expect(cs300.eligible).toBe(false);
+      expect(cs300.backgroundPrerequisites).toHaveLength(0);
+    });
+  });
 });

@@ -79,6 +79,13 @@ export class MissingPrerequisiteDto extends PlannerCourseRefDto {
   @ApiProperty({
     nullable: true,
     description:
+      'Identifies interchangeable alternatives: entries sharing a group are one "A or B" requirement, and taking any one of them satisfies it. Null when the prerequisite stands alone and is required outright.',
+  })
+  alternativeGroup: number | null;
+
+  @ApiProperty({
+    nullable: true,
+    description:
       'If this unmet prerequisite is itself planned in a later term, its 1-based term number (an ordering conflict); otherwise null',
   })
   plannedInLaterTerm: number | null;

@@ -179,6 +179,11 @@ export type CorequisiteStatus = 'completed' | 'same-term' | 'unmet';
 
 export interface MissingPrerequisite extends PlannerCourseRef {
   plannedInLaterTerm: number | null;
+  /**
+   * Interchangeable alternatives share a group — "CS250 or CS360" — and taking
+   * any one satisfies the requirement. Null when the prerequisite stands alone.
+   */
+  alternativeGroup: number | null;
 }
 
 export interface CorequisiteStatusItem extends PlannerCourseRef {

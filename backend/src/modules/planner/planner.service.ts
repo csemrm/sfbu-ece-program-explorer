@@ -77,11 +77,11 @@ export class PlannerService {
     const { termNames, offeredByTerm } = await this.loadOfferings(dto);
     const programCourses = await this.loadProgramCourses(dto.programId);
 
-    const prereqMap = groupBy(
-      prereqs,
-      (p) => p.courseId,
-      (p) => p.prerequisiteCourseId,
-    );
+    // Prerequisites become a list of requirements per course, each of which is a
+    // set of interchangeable courses. A row with no alternativeGroup is its own
+    // one-course requirement, which is how every prerequisite behaved before
+    // alternatives existed.
+    const prereqMap = groupRequirements(prereqs);
     const coreqMap = groupBy(
       coreqs,
       (c) => c.courseId,
@@ -128,31 +128,46 @@ export class PlannerService {
       const courseResults = term.courseIds.map(
         (courseId): EvaluatedCourseDto => {
           const course = courseMap.get(courseId)!;
-          const prereqIds = prereqMap.get(courseId) ?? [];
+          const requirements = prereqMap.get(courseId) ?? [];
           const coreqIds = coreqMap.get(courseId) ?? [];
 
           const satisfiedPrerequisites: PlannerCourseRefDto[] = [];
           const missingPrerequisites: MissingPrerequisiteDto[] = [];
           const backgroundPrerequisites: PlannerCourseRefDto[] = [];
-          for (const pid of prereqIds) {
-            if (satisfied.has(pid)) {
-              satisfiedPrerequisites.push(ref(pid));
-            } else if (programCourses && !programCourses.has(pid)) {
-              // Belongs to a different degree. Every graduate programme states
-              // its own background preparation, cleared before admission, so
-              // blocking an MSCS student on an undergraduate BSCS course would
-              // enforce a requirement the university does not make of them.
-              backgroundPrerequisites.push(ref(pid));
-            } else {
+
+          requirements.forEach((requirement, index) => {
+            const met = requirement.filter((pid) => satisfied.has(pid));
+            if (met.length) {
+              // Only the alternative actually taken is reported as satisfied.
+              satisfiedPrerequisites.push(...met.map(ref));
+              return;
+            }
+
+            // Outside the degree only excuses the requirement when *every*
+            // alternative is: if one of them belongs to this programme, that is
+            // the route the student is expected to take.
+            if (
+              programCourses &&
+              requirement.every((pid) => !programCourses.has(pid))
+            ) {
+              backgroundPrerequisites.push(...requirement.map(ref));
+              return;
+            }
+
+            // Alternatives share a group so the caller can render them as one
+            // "A or B" requirement rather than two independent blockers.
+            const alternativeGroup = requirement.length > 1 ? index : null;
+            for (const pid of requirement) {
               const laterTerm = termOfCourse.get(pid);
               missingPrerequisites.push({
                 ...ref(pid),
+                alternativeGroup,
                 // Only an ordering conflict if the prereq is in this term or later.
                 plannedInLaterTerm:
                   laterTerm && laterTerm >= termNo ? laterTerm : null,
               });
             }
-          }
+          });
 
           const corequisites = coreqIds.map((cid) => {
             let status: CorequisiteStatus;
@@ -240,7 +255,9 @@ export class PlannerService {
     const suggestions: SuggestedCourseDto[] = courses
       .filter((c) => !satisfied.has(c.id))
       .filter((c) =>
-        (prereqMap.get(c.id) ?? []).every((pid) => satisfied.has(pid)),
+        (prereqMap.get(c.id) ?? []).every((req) =>
+          requirementMet(req, satisfied),
+        ),
       )
       .map((c) => ({ ...ref(c.id), offeredInTerms: offeredIn(c.id) }))
       .sort(
@@ -354,6 +371,54 @@ export class PlannerService {
   }
 }
 
+/** One prerequisite requirement: satisfying any listed course satisfies it. */
+type PrerequisiteRequirement = string[];
+
+/**
+ * Prerequisites per course, as a list of requirements.
+ *
+ * Rows sharing an alternativeGroup collapse into one requirement holding all of
+ * them — "CS250 or CS360". Rows without a group each become a requirement of
+ * their own, so they remain individually mandatory.
+ */
+function groupRequirements(
+  rows: {
+    courseId: string;
+    prerequisiteCourseId: string;
+    alternativeGroup?: number | null;
+  }[],
+): Map<string, PrerequisiteRequirement[]> {
+  const byCourse = new Map<string, Map<string, PrerequisiteRequirement>>();
+  for (const row of rows) {
+    const buckets =
+      byCourse.get(row.courseId) ?? new Map<string, PrerequisiteRequirement>();
+    // Ungrouped rows get a unique key so they never merge with one another.
+    // == null catches undefined as well: a row built without the field must
+    // stay individually mandatory, not merge with every other ungrouped row
+    // into one OR.
+    const key =
+      row.alternativeGroup == null
+        ? `single:${row.prerequisiteCourseId}`
+        : `group:${row.alternativeGroup}`;
+    const bucket = buckets.get(key);
+    if (bucket) bucket.push(row.prerequisiteCourseId);
+    else buckets.set(key, [row.prerequisiteCourseId]);
+    byCourse.set(row.courseId, buckets);
+  }
+  return new Map(
+    [...byCourse].map(([courseId, buckets]) => [
+      courseId,
+      [...buckets.values()],
+    ]),
+  );
+}
+
+/** A requirement is met when any one of its interchangeable courses is satisfied. */
+const requirementMet = (
+  requirement: PrerequisiteRequirement,
+  satisfied: Set<string>,
+): boolean => requirement.some((id) => satisfied.has(id));
+
 function groupBy<T>(
   rows: T[],
   key: (row: T) => string,
@@ -409,13 +474,29 @@ function buildReason(
 
   const parts: string[] = [];
   if (missing.length) {
-    const items = missing.map((m) =>
-      m.plannedInLaterTerm
-        ? `${m.courseCode} (planned in term ${m.plannedInLaterTerm}, which is too late)`
-        : m.courseCode,
+    // Alternatives share a group and read as one "CS250 or CS360" requirement.
+    // Listing them flat would name two courses where the student owes either.
+    const groups = new Map<string, MissingPrerequisiteDto[]>();
+    for (const m of missing) {
+      const key =
+        m.alternativeGroup === null
+          ? `single:${m.id}`
+          : `group:${m.alternativeGroup}`;
+      const bucket = groups.get(key);
+      if (bucket) bucket.push(m);
+      else groups.set(key, [m]);
+    }
+    const items = [...groups.values()].map((options) =>
+      options
+        .map((m) =>
+          m.plannedInLaterTerm
+            ? `${m.courseCode} (planned in term ${m.plannedInLaterTerm}, which is too late)`
+            : m.courseCode,
+        )
+        .join(' or '),
     );
     parts.push(
-      `missing prerequisite${missing.length > 1 ? 's' : ''}: ${items.join(', ')}`,
+      `missing prerequisite${items.length > 1 ? 's' : ''}: ${items.join(', ')}`,
     );
   }
   const unmetCoreqs = coreqs

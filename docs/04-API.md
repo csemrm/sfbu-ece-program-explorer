@@ -585,6 +585,13 @@ A program with no course-bearing requirement rows is treated as "no scope" rathe
 than an empty one, so an unmodelled degree cannot silently excuse every
 prerequisite in the catalog.
 
+Each entry in `missingPrerequisites` carries an `alternativeGroup`. Entries
+sharing a non-null group are interchangeable — the catalog's "CS250 or CS360" —
+and taking any one of them clears the requirement; `null` means the course is
+required outright. Clients must group by this field before listing what a
+student still owes, otherwise two alternatives read as two separate blockers.
+The `reason` string is already grouped: "missing prerequisite: CS360 or CS500".
+
 Each evaluated course also reports the offering's registration status:
 
 | Field | Meaning |
