@@ -8,6 +8,8 @@ interface Props {
   onToggle: () => void;
   /** Corequisite codes that are offered but not currently selected. */
   unselectedCorequisites: string[];
+  /** Credits still short of the degree total; set only for a capstone taken too early. */
+  capstoneShortfall?: number | null;
 }
 
 /**
@@ -19,7 +21,13 @@ interface Props {
  * other means (transfer credit, waiver, a course taken elsewhere). Blocking the
  * checkbox would assert an authority this tool does not have.
  */
-export function OfferedCourseRow({ course, selected, onToggle, unselectedCorequisites }: Props) {
+export function OfferedCourseRow({
+  course,
+  selected,
+  onToggle,
+  unselectedCorequisites,
+  capstoneShortfall = null,
+}: Props) {
   const blocked = !course.eligible;
   // A course that runs but is closed to registration is a different problem
   // from an unmet prerequisite: the student is ready, the registrar is not.
@@ -71,6 +79,11 @@ export function OfferedCourseRow({ course, selected, onToggle, unselectedCorequi
                 Prerequisites pending
               </span>
             )}
+            {capstoneShortfall !== null && !closed && (
+              <span className="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[11px] font-semibold text-amber-800">
+                Final semester
+              </span>
+            )}
             {closed && (
               <span className="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[11px] font-semibold text-amber-800">
                 {cancelled ? 'Cancelled' : 'Registration closed'}
@@ -114,6 +127,14 @@ export function OfferedCourseRow({ course, selected, onToggle, unselectedCorequi
             <span id={reasonId} className="mt-1 block text-xs text-amber-700">
               <span className="sr-only">{cancelled ? 'Cancelled: ' : 'Registration closed: '}</span>
               {course.statusNote ?? 'Not open for registration this term.'}
+            </span>
+          )}
+
+          {capstoneShortfall !== null && !closed && (
+            <span className="mt-1 block text-xs text-amber-700">
+              <span className="sr-only">Final semester only: </span>
+              The capstone is taken in your final semester — {capstoneShortfall} more credits needed
+              first.
             </span>
           )}
 

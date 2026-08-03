@@ -352,6 +352,8 @@ A **cancelled or closed** course is not selectable — its checkbox is disabled.
 
 The column has its own **filter box** — 96 offerings is too many to scan — and is ordered by what the student can act on: anything **closed or cancelled sinks to the end** regardless of degree, and among the rest **in-program courses lead**. The sort is applied before the scoped/full split, so the default view is ordered too.
 
+The **capstone** is flagged when taken too early: the catalog reserves it for "all or most coursework" completed, so it is offered once the current semester would carry the student to the degree's required credits, and below that it carries a "Final semester — N more credits needed" note and drops out of Suggested. It stays selectable — "most" is an advisor's judgement, not the planner's.
+
 A prerequisite-blocked course stays **selectable**. The planner is advisory, not a registration gate, and a student may be resolving the prerequisite by other means (transfer credit, waiver, a course taken elsewhere). Disabling the checkbox would assert an authority this tool does not have. The selection summary counts how many picks are still blocked.
 
 Blocked rows carry a visually-hidden "Prerequisites pending:" prefix and an `aria-describedby` link from the checkbox to the reason, so the red highlight is never the only signal.

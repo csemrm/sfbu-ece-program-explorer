@@ -309,8 +309,47 @@ export function OfferingPlanner({
    * recommendation. Five is enough to fill a semester and short enough to read
    * without scrolling; the full list is the Offered column beside it.
    */
+  /**
+   * Capstone courses the student is not yet ready for.
+   *
+   * The catalog reserves the capstone for "all or most coursework" completed, so
+   * it is offered once this semester would carry the student to the degree's
+   * required credits. Below that it is flagged with the shortfall rather than
+   * blocked: "most" is a judgement an advisor makes, and the planner does not
+   * hold that authority — the same reason an unmet prerequisite stays
+   * selectable.
+   */
+  const capstoneShortfall = useMemo(() => {
+    const required = program?.requiredCredits ?? 0;
+    const capstones = new Set(program?.capstoneCourseIds ?? []);
+    if (!required || capstones.size === 0) return new Map<string, number>();
+
+    const creditsOf = new Map(courses.map((c) => [c.id, Number(c.creditHours) || 0]));
+    const completedCredits = completedIds.reduce((sum, id) => sum + (creditsOf.get(id) ?? 0), 0);
+    const plannedCredits = selectedIds.reduce((sum, id) => sum + (creditsOf.get(id) ?? 0), 0);
+
+    const shortfall = new Map<string, number>();
+    for (const id of capstones) {
+      const withCapstone =
+        completedCredits +
+        plannedCredits +
+        (selectedIds.includes(id) ? 0 : (creditsOf.get(id) ?? 0));
+      const gap = Math.round((required - withCapstone) * 10) / 10;
+      if (gap > 0) shortfall.set(id, gap);
+    }
+    return shortfall;
+  }, [program, courses, completedIds, selectedIds]);
+
   const recommended = evaluated
-    .filter((c) => c.registrable && !c.alreadyCompleted && !selectedSet.has(c.courseId))
+    .filter(
+      (c) =>
+        c.registrable &&
+        !c.alreadyCompleted &&
+        !selectedSet.has(c.courseId) &&
+        // Recommending a capstone to a student who is not near the end would be
+        // advice they cannot act on.
+        !capstoneShortfall.has(c.courseId),
+    )
     // Ranked by how firmly the degree requires the course: a Core or Foundation
     // course outranks a specialization choice, which outranks a free elective.
     // With only five slots, spending one on an elective while a required course
@@ -499,6 +538,7 @@ export function OfferingPlanner({
                     selected={selectedSet.has(c.courseId)}
                     onToggle={() => toggleSelected(c.courseId)}
                     unselectedCorequisites={coreqsNotSelected(c.courseId)}
+                    capstoneShortfall={capstoneShortfall.get(c.courseId) ?? null}
                   />
                 ))}
               </ul>

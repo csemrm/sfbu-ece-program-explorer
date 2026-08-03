@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import type { RoadmapPhase } from '../../lib/api';
+import type { ProgramRoadmap, RoadmapPhase } from '../../lib/api';
+import { isAlternativeGroup, requiredCreditsFromRoadmap } from '../../lib/programScope';
 import { PhaseColumn } from './PhaseColumn';
 
 interface Props {
@@ -22,36 +23,17 @@ const COLUMN_COLORS = [
 
 const SPEC_COLOR = 'bg-amber-600';
 
-function isSpecialization(name: string) {
-  return name.toLowerCase().includes('specialization');
-}
-
-// Sum minCredits per phase, counting only ONE specialization track.
-// Students choose one specialization — all tracks are shown so they can compare options.
+// Sum minCredits per phase, counting only ONE alternative group. Students choose
+// a single specialization or cluster; all are shown so they can compare options.
+// Shared with the planner so both agree on what a degree costs.
 function computeRequiredCredits(phases: RoadmapPhase[]): number {
-  let total = 0;
-  let specCounted = false;
-  for (const p of phases) {
-    const mc = Number(p.minCredits ?? 0);
-    const courseCr = p.courses.reduce((s, c) => s + parseFloat(String(c.creditHours)), 0);
-    const credits = mc > 0 ? mc : courseCr; // minCredits is authoritative
-    if (!credits) continue;
-    if (isSpecialization(p.name)) {
-      if (!specCounted) {
-        total += credits;
-        specCounted = true;
-      }
-    } else {
-      total += credits;
-    }
-  }
-  return total;
+  return requiredCreditsFromRoadmap({ phases } as ProgramRoadmap);
 }
 
 export function RoadmapCanvas({ phases, academicYear }: Props) {
   const [zoom, setZoom] = useState(100);
 
-  const specPhases = phases.filter((p) => isSpecialization(p.name));
+  const specPhases = phases.filter((p) => isAlternativeGroup(p.name));
   const hasSpecializations = specPhases.length > 1;
   const requiredCredits = computeRequiredCredits(phases);
 
@@ -144,9 +126,11 @@ export function RoadmapCanvas({ phases, academicYear }: Props) {
               key={phase.id}
               phase={phase}
               colorClass={
-                isSpecialization(phase.name) ? SPEC_COLOR : COLUMN_COLORS[i % COLUMN_COLORS.length]
+                isAlternativeGroup(phase.name)
+                  ? SPEC_COLOR
+                  : COLUMN_COLORS[i % COLUMN_COLORS.length]
               }
-              isSpecialization={isSpecialization(phase.name)}
+              isSpecialization={isAlternativeGroup(phase.name)}
             />
           ))}
         </div>

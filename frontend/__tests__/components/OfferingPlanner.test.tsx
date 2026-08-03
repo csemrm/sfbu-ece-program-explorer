@@ -37,6 +37,8 @@ const programs: ProgramOption[] = [
     tiers: {},
     groups: {},
     groupOrder: {},
+    requiredCredits: 36,
+    capstoneCourseIds: [],
   },
 ];
 
@@ -164,6 +166,9 @@ describe('OfferingPlanner — out-of-degree offerings', () => {
 describe('OfferingPlanner — completed courses in the offerings column', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    // Set explicitly rather than inherited from an earlier describe — leaked
+    // mock state made this block's failures depend on execution order.
+    api.terms.get.mockResolvedValue(termDetail(['c-2', 'c-3']));
     api.planner.evaluate.mockImplementation(
       ({
         completedCourseIds,
@@ -331,6 +336,8 @@ describe('OfferingPlanner — ordering and precedence', () => {
       tiers: { req: 'required', spec: 'specialization', elec: 'elective' },
       groups: { req: 'Core Courses', spec: 'Specialization — X', elec: 'Free Electives' },
       groupOrder: { req: 1, spec: 2, elec: 3 },
+      requiredCredits: 36,
+      capstoneCourseIds: [],
     },
   ];
 
@@ -461,6 +468,8 @@ describe('OfferingPlanner — opening from a program page', () => {
       tiers: {},
       groups: {},
       groupOrder: {},
+      requiredCredits: 36,
+      capstoneCourseIds: [],
     },
     {
       id: 'p-2',
@@ -470,6 +479,8 @@ describe('OfferingPlanner — opening from a program page', () => {
       tiers: {},
       groups: {},
       groupOrder: {},
+      requiredCredits: 36,
+      capstoneCourseIds: [],
     },
   ];
 

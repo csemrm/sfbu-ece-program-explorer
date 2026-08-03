@@ -1,6 +1,9 @@
 import {
   courseIdsFromRoadmap,
   scopeFor,
+  capstoneCourseIdsFromRoadmap,
+  isAlternativeGroup,
+  requiredCreditsFromRoadmap,
   tierForGroup,
   tiersFromRoadmap,
   type ProgramOption,
@@ -38,6 +41,8 @@ const program = (courseIds: string[]): ProgramOption => ({
   tiers: {},
   groups: {},
   groupOrder: {},
+  requiredCredits: 36,
+  capstoneCourseIds: [],
 });
 
 describe('courseIdsFromRoadmap', () => {
@@ -160,5 +165,131 @@ describe('tiersFromRoadmap', () => {
     );
     expect(tiers.cs550).toBe('specialization');
     expect(tiers.cs500).toBe('required');
+  });
+});
+
+describe('requiredCreditsFromRoadmap', () => {
+  const phase = (name: string, minCredits: number | null, ids: string[] = []) => ({
+    id: name,
+    name,
+    description: null,
+    minCredits,
+    sortOrder: 0,
+    courses: ids.map((id) => ({
+      id,
+      courseCode: id.toUpperCase(),
+      title: id,
+      creditHours: 3,
+      level: 'graduate' as const,
+      description: null,
+    })),
+  });
+  const roadmap = (phases: ReturnType<typeof phase>[]) =>
+    ({
+      programId: 'p',
+      programName: 'P',
+      programAbbreviation: 'P',
+      catalogYearId: null,
+      academicYear: null,
+      phases,
+    }) as Parameters<typeof requiredCreditsFromRoadmap>[0];
+
+  it('counts one alternative group, not every specialization and cluster', () => {
+    // MSCS in miniature: three concentrations and three clusters, all
+    // alternatives satisfying the same 12-credit requirement. Counting them all
+    // would report 72 credits against a stated 36.
+    const total = requiredCreditsFromRoadmap(
+      roadmap([
+        phase('Foundation Courses', 11),
+        phase('Specialization — Cybersecurity', 12),
+        phase('Specialization — Data Science', 12),
+        phase('Cluster — QA Engineering', 12),
+        phase('Cluster — Mobile Application Technologies', 12),
+        phase('Graduate Electives', 10),
+        phase('Capstone', 3),
+      ]),
+    );
+    expect(total).toBe(36);
+  });
+
+  it('counts every non-alternative group, including electives', () => {
+    const total = requiredCreditsFromRoadmap(
+      roadmap([
+        phase('General Education', 30),
+        phase('Core Courses', 48),
+        phase('Specialization Electives', 15),
+        phase('Free Electives', 15),
+        phase('Preparation Courses', 12),
+      ]),
+    );
+    // "Specialization Electives" is an open credit requirement, not an
+    // alternative track, so it counts alongside Free Electives.
+    expect(total).toBe(120);
+  });
+
+  it('falls back to the sum of a group with no stated credits', () => {
+    expect(requiredCreditsFromRoadmap(roadmap([phase('Core Courses', null, ['a', 'b'])]))).toBe(6);
+  });
+});
+
+describe('isAlternativeGroup', () => {
+  it('treats concentrations and clusters as alternatives', () => {
+    expect(isAlternativeGroup('Specialization — Data Science')).toBe(true);
+    expect(isAlternativeGroup('Cluster — QA Engineering')).toBe(true);
+  });
+
+  it('does not treat an electives group as one', () => {
+    expect(isAlternativeGroup('Specialization Electives')).toBe(false);
+    expect(isAlternativeGroup('Free Electives')).toBe(false);
+    expect(isAlternativeGroup('Core Courses')).toBe(false);
+  });
+});
+
+describe('capstoneCourseIdsFromRoadmap', () => {
+  it('collects the courses in a capstone group', () => {
+    const ids = capstoneCourseIdsFromRoadmap({
+      programId: 'p',
+      programName: 'P',
+      programAbbreviation: 'P',
+      catalogYearId: null,
+      academicYear: null,
+      phases: [
+        {
+          id: 'g1',
+          name: 'Capstone',
+          description: null,
+          minCredits: 3,
+          sortOrder: 9,
+          courses: [
+            {
+              id: 'cs595',
+              courseCode: 'CS595',
+              title: 'Capstone',
+              creditHours: 3,
+              level: 'graduate',
+              description: null,
+            },
+          ],
+        },
+        {
+          id: 'g2',
+          name: 'Core Courses',
+          description: null,
+          minCredits: 48,
+          sortOrder: 1,
+          courses: [
+            {
+              id: 'cs200',
+              courseCode: 'CS200',
+              title: 'Discrete',
+              creditHours: 3,
+              level: 'undergraduate',
+              description: null,
+            },
+          ],
+        },
+      ],
+    } as Parameters<typeof capstoneCourseIdsFromRoadmap>[0]);
+    expect(ids).toEqual(['cs595']);
   });
 });

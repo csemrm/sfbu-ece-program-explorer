@@ -54,6 +54,10 @@ export interface ProgramOption {
   groups: Record<string, string>;
   /** The group's position in the catalog sequence, keyed by course id. */
   groupOrder: Record<string, number>;
+  /** Credits the degree requires in total, counting one alternative group. */
+  requiredCredits: number;
+  /** Courses the catalog reserves for the final term. */
+  capstoneCourseIds: string[];
 }
 
 export function courseIdsFromRoadmap(roadmap: ProgramRoadmap): string[] {
@@ -79,6 +83,50 @@ export function tiersFromRoadmap(roadmap: ProgramRoadmap): Record<string, Requir
 export function groupsFromRoadmap(roadmap: ProgramRoadmap): Record<string, string> {
   const placements = placementsFromRoadmap(roadmap);
   return Object.fromEntries(Object.entries(placements).map(([id, p]) => [id, p.groupName]));
+}
+
+/**
+ * A group the student picks *one* of, rather than completing all of.
+ *
+ * Both named concentrations and the catalog's example "cluster" groups are
+ * alternatives to each other — a student satisfies the same 12-credit
+ * specialization requirement through any one of them.
+ */
+export const isAlternativeGroup = (groupName: string): boolean =>
+  /specialization|^cluster\b/i.test(groupName) && !/elective/i.test(groupName);
+
+/**
+ * Credits the programme requires, counting only one alternative group.
+ *
+ * `minCredits` is authoritative where the catalog states it; a group without
+ * one falls back to the sum of its courses. Counting every specialization and
+ * cluster would treble MSCS to 72 credits against a stated 36.
+ */
+export function requiredCreditsFromRoadmap(roadmap: ProgramRoadmap): number {
+  let total = 0;
+  let alternativeCounted = false;
+  for (const phase of roadmap.phases) {
+    const stated = Number(phase.minCredits ?? 0);
+    const fromCourses = phase.courses.reduce((sum, c) => sum + Number(c.creditHours), 0);
+    const credits = stated > 0 ? stated : fromCourses;
+    if (!credits) continue;
+    if (isAlternativeGroup(phase.name)) {
+      if (!alternativeCounted) {
+        total += credits;
+        alternativeCounted = true;
+      }
+    } else {
+      total += credits;
+    }
+  }
+  return total;
+}
+
+/** Course ids in a capstone group — the catalog reserves these for the final term. */
+export function capstoneCourseIdsFromRoadmap(roadmap: ProgramRoadmap): string[] {
+  return roadmap.phases
+    .filter((phase) => /capstone/i.test(phase.name))
+    .flatMap((phase) => phase.courses.map((c) => c.id));
 }
 
 /** Each course's group position in the catalog sequence, keyed by course id. */
