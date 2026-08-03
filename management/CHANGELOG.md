@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.7.1](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.7.0...v1.7.1) (2026-08-03)
+
+
+### Bug Fixes
+
+* **planner:** stop a course with unmet prerequisites being added to a plan ([#12](https://github.com/csemrm/sfbu-ece-program-explorer/issues/12)) ([c7a4ed9](https://github.com/csemrm/sfbu-ece-program-explorer/commit/c7a4ed9d9b7663a885186465846d4a7642ca1c52))
+
 # [1.7.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.6.0...v1.7.0) (2026-08-03)
 
 
