@@ -65,10 +65,19 @@ async function seed(dataSource: DataSource): Promise<void> {
     const exists = await prereqRepo.findOne({
       where: { courseId, prerequisiteCourseId: prereqId },
     });
+    const alternativeGroup = p.alternativeGroup ?? null;
     if (!exists) {
       await prereqRepo.save(
-        prereqRepo.create({ courseId, prerequisiteCourseId: prereqId }),
+        prereqRepo.create({
+          courseId,
+          prerequisiteCourseId: prereqId,
+          alternativeGroup,
+        }),
       );
+    } else if (exists.alternativeGroup !== alternativeGroup) {
+      // A link can change from required outright to one of several alternatives,
+      // so the grouping is refreshed rather than left as first written.
+      await prereqRepo.update(exists.id, { alternativeGroup });
     }
   }
 

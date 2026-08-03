@@ -1,6 +1,7 @@
 'use client';
 
 import type { EvaluatedCourse } from '../../lib/api';
+import { missingRequirements } from '../../lib/prerequisites';
 
 interface Props {
   course: EvaluatedCourse;
@@ -48,6 +49,7 @@ export function OfferedCourseRow({
    * gating here does not shut them out.
    */
   const cannotAdd = (blocked || closed) && !selected;
+  const requirements = missingRequirements(course.missingPrerequisites);
 
   return (
     <li
@@ -117,15 +119,20 @@ export function OfferedCourseRow({
             <span id={reasonId} className="mt-1 block text-xs text-red-700">
               <span className="sr-only">Prerequisites pending: </span>
               Needs{' '}
-              {course.missingPrerequisites.map((p, i) => (
-                <span key={p.id}>
+              {requirements.map((codes, i) => (
+                <span key={codes.join('|')}>
                   {i > 0 && ', '}
-                  <span className="font-mono font-semibold">{p.courseCode}</span>
+                  {codes.map((code, j) => (
+                    <span key={code}>
+                      {j > 0 && ' or '}
+                      <span className="font-mono font-semibold">{code}</span>
+                    </span>
+                  ))}
                 </span>
               ))}
               {course.corequisites.some((c) => c.status === 'unmet') && (
                 <>
-                  {course.missingPrerequisites.length > 0 && '; '}
+                  {requirements.length > 0 && '; '}
                   corequisite{' '}
                   {course.corequisites
                     .filter((c) => c.status === 'unmet')

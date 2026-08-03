@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import type { EvaluatedCourse } from '../../lib/api';
+import { formatMissingPrerequisites } from '../../lib/prerequisites';
 import { tierRank, type RequirementTier } from '../../lib/programScope';
 
 interface Props {
@@ -184,7 +185,7 @@ export function PlanSummaryColumn({
                 {blocked.map((c) => (
                   <li key={c.courseId} className="text-xs text-red-600">
                     ⚠ {c.courseCode} is blocked — needs{' '}
-                    {c.missingPrerequisites.map((p) => p.courseCode).join(', ')}
+                    {formatMissingPrerequisites(c.missingPrerequisites)}
                   </li>
                 ))}
               </ul>
@@ -241,7 +242,7 @@ export function PlanSummaryColumn({
                     <td style={TD}>
                       {c.eligible
                         ? 'Ready'
-                        : `Blocked — needs ${c.missingPrerequisites.map((p) => p.courseCode).join(', ')}`}
+                        : `Blocked — needs ${formatMissingPrerequisites(c.missingPrerequisites)}`}
                     </td>
                   </tr>
                 ))}

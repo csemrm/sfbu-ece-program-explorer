@@ -45,6 +45,7 @@ const blocked: EvaluatedCourse = {
       creditHours: 3,
       level: 'graduate',
       plannedInLaterTerm: null,
+      alternativeGroup: null,
     },
   ],
   backgroundPrerequisites: [],

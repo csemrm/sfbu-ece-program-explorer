@@ -232,6 +232,7 @@ erDiagram
 | id           | UUID      | ✓  |        | Unique prerequisite identifier    |
 | course_id    | UUID      |    | Courses| Course that has the prerequisite  |
 | prerequisite_course_id | UUID| | Courses| Course that is prerequisite       |
+| alternative_group | SMALLINT | | | Groups interchangeable alternatives; NULL = required outright |
 | created_at   | TIMESTAMP |    |        | Record creation timestamp         |
 | updated_at   | TIMESTAMP |    |        | Record last update timestamp      |
 
@@ -403,15 +404,24 @@ an old name is orphaned rather than updated, and its requirements go with it.
 The same migration deletes the three MSEE groups that were renamed to the
 catalog's wording.
 
-#### Disjunctive prerequisites are not modeled
+#### Disjunctive prerequisites
 
-`Prerequisite` is a plain (course, prerequisite) pair, evaluated as a hard AND.
-The catalog states eight prerequisites as alternatives — `CS480` requires
-"CS250 or CS360" — which this model cannot express. Recording both rows would
-demand both courses and wrongly block a student who took either, so these are
-**deliberately omitted** from `PREREQUISITES` rather than approximated. The
-consequence is that those courses appear to have no prerequisite at all;
-representing the disjunction needs a schema change, tracked in `TASKS.md`.
+The catalog states some prerequisites as alternatives — `CS480` requires
+"CS250 or CS360". `alternative_group` expresses this: rows sharing a non-null
+group for the same course are interchangeable, and satisfying any one satisfies
+the group. Separate groups are ANDed with each other, as are rows with a null
+group, so every prerequisite recorded before the column existed keeps exactly
+its original meaning.
+
+The group is scoped per course rather than globally, so a `smallint` suffices
+and the existing `(course_id, prerequisite_course_id)` uniqueness still holds —
+a course may not name the same prerequisite twice whichever group it is in.
+
+Five courses use it today: `CS480` (CS250 or CS360), `CS480L` (CS250L or
+CS360L), `CS556` (CS360 or CS500), and `DS520`/`DS565` (CS500 or DS501). Before
+this was modeled they were omitted from `PREREQUISITES` entirely — recording
+both sides would have demanded both courses — so they appeared to have no
+prerequisite at all.
 
 #### Empty schedule ≠ empty term
 
@@ -469,7 +479,6 @@ apparent authority, that every course in the catalog is unavailable.
 
 - Support for multi-campus or multi-department programs.
 - Integration with SIS for read-only student progress data.
-- Advanced prerequisite logic (e.g., OR/AND conditions).
 - Support for cross-listed courses and joint program requirements.
 - Enhanced audit trail with detailed change history.
 - Implementation of materialized views for complex reporting.
