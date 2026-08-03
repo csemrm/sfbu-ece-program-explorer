@@ -450,3 +450,123 @@ describe('OfferingPlanner — ordering and precedence', () => {
     );
   });
 });
+
+describe('OfferingPlanner — opening from a program page', () => {
+  const two: ProgramOption[] = [
+    {
+      id: 'p-1',
+      abbreviation: 'BSCS',
+      name: 'Bachelor',
+      courseIds: ['c-1'],
+      tiers: {},
+      groups: {},
+      groupOrder: {},
+    },
+    {
+      id: 'p-2',
+      abbreviation: 'MSCS',
+      name: 'Master',
+      courseIds: ['c-2'],
+      tiers: {},
+      groups: {},
+      groupOrder: {},
+    },
+  ];
+
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.terms.get.mockResolvedValue(termDetail());
+    api.planner.evaluate.mockImplementation(({ terms: t }: { terms: { courseIds: string[] }[] }) =>
+      Promise.resolve(evaluationFor(t[0].courseIds)),
+    );
+  });
+
+  it('shows the degree as a label, not a selector, when linked from a program page', async () => {
+    render(
+      <OfferingPlanner
+        courses={courses}
+        academicTerms={terms}
+        programs={two}
+        initialProgramId="p-2"
+      />,
+    );
+    // The choice was already made on the program page; offering it again invites
+    // the user to undo the navigation they just performed.
+    // Scoped to the header: the label also appears on the hidden print sheet.
+    await waitFor(() =>
+      expect(screen.getByText('Degree').parentElement).toHaveTextContent('MSCS — Master'),
+    );
+    expect(screen.queryByLabelText('Degree')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /back to programme/ })).toHaveAttribute(
+      'href',
+      '/programs/p-2',
+    );
+  });
+
+  it('still offers the selector when not linked from a program page', async () => {
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={two} />);
+    await waitFor(() => expect(screen.getByLabelText('Degree')).toBeInTheDocument());
+  });
+
+  it('opens on the requested degree', async () => {
+    render(
+      <OfferingPlanner
+        courses={courses}
+        academicTerms={terms}
+        programs={two}
+        initialProgramId="p-2"
+      />,
+    );
+    await waitFor(() =>
+      expect(screen.getByText('Degree').parentElement).toHaveTextContent('MSCS — Master'),
+    );
+  });
+
+  it('overrides a stored degree, since the click was deliberate', async () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        completedIds: [],
+        termId: 't-1',
+        selectedIds: [],
+        programId: 'p-1',
+        showAllOfferings: false,
+      }),
+    );
+    render(
+      <OfferingPlanner
+        courses={courses}
+        academicTerms={terms}
+        programs={two}
+        initialProgramId="p-2"
+      />,
+    );
+    await waitFor(() =>
+      expect(screen.getByText('Degree').parentElement).toHaveTextContent('MSCS — Master'),
+    );
+  });
+
+  it('falls back to the stored degree when the requested one is unknown', async () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        completedIds: [],
+        termId: 't-1',
+        selectedIds: [],
+        programId: 'p-2',
+        showAllOfferings: false,
+      }),
+    );
+    render(
+      <OfferingPlanner
+        courses={courses}
+        academicTerms={terms}
+        programs={two}
+        initialProgramId="not-a-program"
+      />,
+    );
+    await waitFor(() =>
+      expect((screen.getByLabelText('Degree') as HTMLSelectElement).value).toBe('p-2'),
+    );
+  });
+});

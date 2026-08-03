@@ -73,7 +73,14 @@ async function loadProgramOptions(): Promise<ProgramOption[]> {
   }
 }
 
-export default async function PlanPage() {
+export default async function PlanPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ program?: string }>;
+}) {
+  // Linked from a program page, so the planner opens on that degree rather than
+  // whatever the browser last stored.
+  const { program: requestedProgramId } = await searchParams;
   let courses: Course[];
   try {
     courses = await loadAllCourses();
@@ -115,7 +122,12 @@ export default async function PlanPage() {
 
       {/* Wider than the rest of the site — three columns need the room. */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <OfferingPlanner courses={courses} academicTerms={academicTerms} programs={programs} />
+        <OfferingPlanner
+          courses={courses}
+          academicTerms={academicTerms}
+          programs={programs}
+          initialProgramId={requestedProgramId ?? null}
+        />
       </div>
     </div>
   );

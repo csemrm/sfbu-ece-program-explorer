@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   api,
@@ -17,6 +18,12 @@ interface Props {
   courses: Course[];
   academicTerms: TermSummary[];
   programs: ProgramOption[];
+  /**
+   * Degree to open on, from `?program=` — set when the planner is linked from a
+   * program page. Takes precedence over the stored plan, because arriving from
+   * BSCS and landing on MSCS would be the wrong answer to a deliberate click.
+   */
+  initialProgramId?: string | null;
 }
 
 interface PlanState {
@@ -95,7 +102,12 @@ function loadState(): PlanState {
  * the gap is stated in words and an escape hatch shows the unscoped term
  * rather than leaving a blank panel that reads as a bug.
  */
-export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
+export function OfferingPlanner({
+  courses,
+  academicTerms,
+  programs,
+  initialProgramId = null,
+}: Props) {
   const [completedIds, setCompletedIds] = useState<string[]>([]);
   const [termId, setTermId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -118,12 +130,17 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
     setCompletedIds(s.completedIds);
     setSelectedIds(s.selectedIds);
     setTermId(s.termId ?? defaultTermId);
+    const known = (id: string | null) => !!id && programs.some((p) => p.id === id);
     setProgramId(
-      s.programId && programs.some((p) => p.id === s.programId) ? s.programId : defaultProgramId,
+      known(initialProgramId)
+        ? initialProgramId
+        : known(s.programId)
+          ? s.programId
+          : defaultProgramId,
     );
     setShowAllOfferings(s.showAllOfferings);
     setHydrated(true);
-  }, [defaultTermId, defaultProgramId, programs]);
+  }, [defaultTermId, defaultProgramId, programs, initialProgramId]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -135,6 +152,14 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
 
   const term = academicTerms.find((t) => t.id === termId) ?? null;
   const program = programs.find((p) => p.id === programId) ?? null;
+
+  /**
+   * Arriving from a program page means the degree is already decided, so it is
+   * shown rather than offered as a choice — a selector there invites the user
+   * to undo the navigation they just made. It is still named, because the rest
+   * of the screen is scoped to it and that must not be invisible.
+   */
+  const degreeFixed = !!initialProgramId && programs.some((p) => p.id === initialProgramId);
   // Still used for the completed-courses column, which lists the whole degree
   // rather than one term's offerings.
   const scope = useMemo(() => scopeFor(program), [program]);
@@ -313,28 +338,42 @@ export function OfferingPlanner({ courses, academicTerms, programs }: Props) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-        {programs.length > 0 && (
-          <div className="flex items-center gap-3">
-            <label htmlFor="planner-program" className="text-sm font-medium text-gray-600">
-              Degree
-            </label>
-            <select
-              id="planner-program"
-              value={programId ?? ''}
-              onChange={(e) => {
-                setProgramId(e.target.value || null);
-                setShowAllOfferings(false);
-              }}
-              className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 focus:border-sfbu-navy focus:outline-none"
-            >
-              {programs.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.abbreviation} — {p.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        {programs.length > 0 &&
+          (degreeFixed ? (
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-gray-600">Degree</span>
+              <span className="rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-800">
+                {program ? `${program.abbreviation} — ${program.name}` : '—'}
+              </span>
+              <Link
+                href={`/programs/${programId}`}
+                className="text-xs text-gray-400 underline hover:text-sfbu-navy"
+              >
+                back to programme
+              </Link>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <label htmlFor="planner-program" className="text-sm font-medium text-gray-600">
+                Degree
+              </label>
+              <select
+                id="planner-program"
+                value={programId ?? ''}
+                onChange={(e) => {
+                  setProgramId(e.target.value || null);
+                  setShowAllOfferings(false);
+                }}
+                className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 focus:border-sfbu-navy focus:outline-none"
+              >
+                {programs.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.abbreviation} — {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
 
         <div className="flex items-center gap-3">
           <label htmlFor="planner-term" className="text-sm font-medium text-gray-600">
