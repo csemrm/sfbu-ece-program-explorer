@@ -14,10 +14,13 @@ export class PlannerTermDto {
   @ApiProperty({
     type: [String],
     description:
-      'Course IDs planned for this term (order within a term is irrelevant)',
+      "Course IDs to evaluate for this term (order within a term is irrelevant). This is not only what the student has selected: the planner evaluates every course on offer so it can show what is blocked before the student commits, so the bound is a term's full published schedule rather than a plausible course load.",
   })
   @IsArray()
-  @ArrayMaxSize(30)
+  // Sized for a whole term schedule, not a student's course load. The original
+  // limit of 30 was the latter, and rejected every degree the moment Fall 2026
+  // was seeded in full — 96 offerings, of which BSCS alone matches 55.
+  @ArrayMaxSize(200)
   @IsUUID('4', { each: true })
   courseIds: string[];
 
