@@ -14,9 +14,13 @@ const base: EvaluatedCourse = {
   eligible: true,
   offered: null,
   registrable: true,
+  openForRegistration: true,
+  sectionCount: null,
+  statusNote: null,
   alreadyCompleted: false,
   satisfiedPrerequisites: [],
   missingPrerequisites: [],
+  backgroundPrerequisites: [],
   corequisites: [],
   reason: 'Eligible — all prerequisites are satisfied.',
 };
@@ -29,6 +33,9 @@ const eligibleNotOffered: EvaluatedCourse = {
   ...base,
   offered: false,
   registrable: false,
+  openForRegistration: true,
+  sectionCount: null,
+  statusNote: null,
   reason: 'Prerequisites satisfied, but this course is not offered in Spring 2027.',
 };
 
@@ -36,6 +43,9 @@ const blocked: EvaluatedCourse = {
   ...base,
   eligible: false,
   registrable: false,
+  openForRegistration: true,
+  sectionCount: null,
+  statusNote: null,
   missingPrerequisites: [
     {
       id: 'c-0000-0000-0000-000000000002',
@@ -46,6 +56,7 @@ const blocked: EvaluatedCourse = {
       plannedInLaterTerm: null,
     },
   ],
+  backgroundPrerequisites: [],
   reason: 'Not eligible — missing prerequisite: CS100.',
 };
 
@@ -94,12 +105,7 @@ describe('CourseVerdictRow', () => {
   });
 
   it('keeps the blocked styling when a course is both blocked and unoffered', () => {
-    render(
-      <CourseVerdictRow
-        course={{ ...blocked, offered: false }}
-        onRemove={() => {}}
-      />,
-    );
+    render(<CourseVerdictRow course={{ ...blocked, offered: false }} onRemove={() => {}} />);
     // The prerequisite failure is the more actionable problem, so it wins the
     // row treatment — but the availability badge is still shown.
     expect(screen.getByText('Not eligible:')).toBeInTheDocument();
@@ -108,9 +114,7 @@ describe('CourseVerdictRow', () => {
 
   it('exposes an accessible remove control', () => {
     render(<CourseVerdictRow course={eligibleUnbound} onRemove={() => {}} />);
-    expect(
-      screen.getByRole('button', { name: 'Remove CS250 from this term' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Remove CS250 from this term' })).toBeInTheDocument();
   });
 
   it('has no accessibility violations across verdict states', async () => {

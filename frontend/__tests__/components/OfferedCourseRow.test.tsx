@@ -14,9 +14,13 @@ const eligible: EvaluatedCourse = {
   eligible: true,
   offered: true,
   registrable: true,
+  openForRegistration: true,
+  sectionCount: null,
+  statusNote: null,
   alreadyCompleted: false,
   satisfiedPrerequisites: [],
   missingPrerequisites: [],
+  backgroundPrerequisites: [],
   corequisites: [],
   reason: 'Eligible — all prerequisites are satisfied.',
 };
@@ -28,6 +32,9 @@ const blocked: EvaluatedCourse = {
   title: 'Big Data Processing & Analytics',
   eligible: false,
   registrable: false,
+  openForRegistration: true,
+  sectionCount: null,
+  statusNote: null,
   missingPrerequisites: [
     {
       id: 'p-1',
@@ -38,6 +45,7 @@ const blocked: EvaluatedCourse = {
       plannedInLaterTerm: null,
     },
   ],
+  backgroundPrerequisites: [],
   reason: 'Not eligible — missing prerequisite: CS515.',
 };
 
@@ -119,5 +127,67 @@ describe('OfferedCourseRow', () => {
       expect(await axe(container)).toHaveNoViolations();
       unmount();
     }
+  });
+
+  it('marks a course that runs but is closed to registration', () => {
+    renderRow({
+      course: {
+        ...eligible,
+        openForRegistration: false,
+        registrable: false,
+        statusNote: 'Registration closed by the registrar',
+      },
+    });
+    expect(screen.getByText('Registration closed')).toBeInTheDocument();
+    expect(screen.getByText(/Registration closed by the registrar/)).toBeInTheDocument();
+  });
+
+  it('calls a cancelled course cancelled and quotes the registrar verbatim', () => {
+    renderRow({
+      course: {
+        ...eligible,
+        openForRegistration: false,
+        registrable: false,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+    });
+    expect(screen.getByText('Cancelled')).toBeInTheDocument();
+    expect(screen.getByText(/Cancelled due to low enrollment/)).toBeInTheDocument();
+  });
+
+  it('links the closed reason to the checkbox for screen readers', () => {
+    renderRow({
+      course: { ...eligible, openForRegistration: false, statusNote: 'Cancelled — no room' },
+    });
+    expect(screen.getByRole('checkbox')).toHaveAttribute('aria-describedby', 'offered-c-1-reason');
+    expect(screen.getByText(/^Cancelled:$/)).toBeInTheDocument();
+  });
+
+  it('lets an unmet prerequisite win the row over a closed registration', () => {
+    // Both are true; the prerequisite is the one the student can act on.
+    renderRow({ course: { ...blocked, openForRegistration: false, statusNote: 'Cancelled' } });
+    expect(screen.getByText('Prerequisites pending')).toBeInTheDocument();
+    expect(screen.getByText('Cancelled')).toBeInTheDocument();
+    expect(screen.getByText(/Needs/)).toBeInTheDocument();
+  });
+
+  it('shows the section count only when more than one runs', () => {
+    const { unmount } = renderRow({ course: { ...eligible, sectionCount: 1 } });
+    expect(screen.queryByText(/section/)).not.toBeInTheDocument();
+    unmount();
+
+    renderRow({ course: { ...eligible, sectionCount: 3 } });
+    expect(screen.getByText('3 sections')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations when closed or cancelled', async () => {
+    const { container } = renderRow({
+      course: {
+        ...eligible,
+        openForRegistration: false,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+    });
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

@@ -155,21 +155,31 @@ async function seed(dataSource: DataSource): Promise<void> {
       );
       continue;
     }
-    for (const courseCode of seed.courseCodes) {
-      const courseId = courseMap.get(courseCode);
+    for (const offered of seed.courses) {
+      const courseId = courseMap.get(offered.courseCode);
       if (!courseId) {
         console.warn(
-          `    Skipping offering for unknown course: ${courseCode} (${seed.termName})`,
+          `    Skipping offering for unknown course: ${offered.courseCode} (${seed.termName})`,
         );
         continue;
       }
+      const fields = {
+        openForRegistration: offered.openForRegistration,
+        sectionCount: offered.sectionCount ?? null,
+        statusNote: offered.statusNote ?? null,
+      };
       const exists = await offeringRepo.findOne({
         where: { termId: term.id, courseId },
       });
       if (!exists) {
         await offeringRepo.save(
-          offeringRepo.create({ termId: term.id, courseId }),
+          offeringRepo.create({ termId: term.id, courseId, ...fields }),
         );
+      } else {
+        // Registration status changes during a term — a course is cancelled or
+        // reopened — so it is refreshed rather than left at whatever it was
+        // when the offering was first created.
+        await offeringRepo.update(exists.id, fields);
       }
     }
   }

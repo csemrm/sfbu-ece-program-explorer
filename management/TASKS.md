@@ -49,7 +49,29 @@ Follow-on UX pass. `/plan` becomes three columns behind a degree selector.
 - [ ] A program whose roadmap has no courses is treated as "do not scope". Correct for a data gap, but indistinguishable from a genuinely empty program — revisit if a real program ever has zero roadmap courses
 - [ ] The print sheet is not covered by an automated visual check; only its DOM content is asserted
 - [x] Catalog gap, partly closed: CS521 and CS522 **are** in the catalog (Software Project Management; Software Quality Assurance and Test Automation) and are now seeded. CS547, CS582, CS583 and CS587 appear on the Fall 2026 registration list but genuinely have no catalog entry — still outstanding below.
-- [ ] Catalog gap: CS547, CS582, CS583, CS587 are on the official Fall 2026 list but have no entry in the 2025-2026 catalog (need title, credits, prerequisites, requirement-group placement, knowledge areas — none of which the registration list carries)
+- [x] Catalog gap closed for the course records: CS547, CS582, CS583 and CS587 are seeded from the Fall 2026 registration list. They still have no 2025-2026 catalog entry, so they carry the list's title and credits with a description saying so, and no prerequisites or requirement-group placement.
+
+### Fall 2026 registration list (full schedule)
+
+- [x] All 96 courses on the official Fall 2026 list are seeded as offerings, not just the ECE slice — 49 courses were missing from the catalog and are added (34 Business, 12 ECE-side, 3 Psychology). Catalog: 81 → 130 courses.
+- [x] `course_offerings` models `open_for_registration`, `section_count` and `status_note` (`OfferingRegistrationStatus1719446405000`). A row means "runs this term"; registration being open is now a separate fact. 34 of 96 are closed, 18 carry a registrar's note.
+- [x] Planner: `registrable` requires registration to be open. `OfferedCourseRow` shows "Cancelled" / "Registration closed" with the registrar's wording verbatim, and section counts when more than one runs.
+- [x] Completed courses are dropped from both the Offered column and the Suggested column — the columns answer "what can I register for", and a course already passed is not a candidate. The count of hidden ones is stated rather than the list silently shrinking.
+- [x] Planner: optional `programId` scopes prerequisites to the chosen degree. Prerequisites from another program are returned as `backgroundPrerequisites` and no longer block — an MSCS student was being blocked on undergraduate BSCS courses their admission already covered.
+- [x] pgAdmin removed from `docker-compose.yml`, `.env.example` and the deployment guide.
+
+Follow-ups this surfaced:
+
+- [ ] **The source list contradicts itself on CS500 and FIN310** — both carry a cancellation note *and* `Open For Registration: true`. The seed treats cancelled as decisive. Worth confirming with the registrar which is right.
+- [x] Every course now belongs to a requirement group. The catalog's own elective rules place them: BSCS electives are "courses in any discipline" (22 undergraduate non-major courses → Free Electives), and MSCS/MSEE electives are "any graduate-level course, including those outside of software engineering / even outside of engineering" (26 graduate courses → both Graduate Electives groups). CS483L joins its lecture CS483 in BSCS Specialization Electives, as CS480/CS480L are paired.
+- [x] Open-ended elective groups keep their unenumerated credit placeholder alongside the course list — the catalog allows any discipline, so the enumerated courses are what is on the current schedule, not the whole rule. Group descriptions say so.
+- [x] Roadmap fix: a phase badge summed its listed courses, so Free Electives showed 60 cr against a 15-credit requirement. The stated `minCredits` now wins, matching how `RoadmapCanvas` already totals the programme.
+- [x] `catalog-data.spec.ts` guards both: no course may be orphaned from every requirement group, and the three open-ended elective groups must keep a credit placeholder.
+- [x] Fix: `PlannerTermDto.courseIds` was capped at 30, sized for a student's course load. The planner evaluates *every* offered course so it can show what is blocked before the student commits, so the real bound is a term's full schedule — once Fall 2026 was seeded in full and electives were placed, all three degrees exceeded it (BSCS 55, MSCS 36, MSEE 31) and `/plan` returned 400 for every degree. Raised to 200 and pinned by `planner.dto.spec.ts`.
+- [ ] Business and Psychology courses are placed as **electives only**. None was added to a named Specialization or Cluster: the catalog enumerates those groups course by course and does not list any Business or Psychology course among them, so thematic placement (e.g. the AI5xx courses under Data Science) would be inventing curriculum structure rather than transcribing it. Needs departmental direction before any such mapping.
+- [ ] `CS587` and `BUS587` carry flexible credit (1;2;3) and `SEMINAR100`/`SEMINAR200` state none at all. `credit_hours` is a single non-null number, so they are seeded at the minimum and say so in the description; planned credit totals understate rather than overstate.
+- [ ] The registration list titles `EE461L` "Verilog HDL Lab" where the catalog calls it "Digital Design and HDL Lab", and lists 400G courses under their base code (EE461, EE488) while the catalog also defines G-suffixed graduate variants. Both are seeded; the relationship between the pairs is not modelled.
+
 ### Catalog reconciliation (closed)
 
 The mistitling was not limited to graduate CS: **59 of 66 seeded courses carried

@@ -1126,6 +1126,623 @@ export const COURSES: CourseSeed[] = [
     description:
       'SFBU Agility Praxis Pathway general-education course, Area D: Social Sciences.',
   },
+
+  // ── Added from the Fall 2026 registration list ──
+  {
+    courseCode: 'ACC110',
+    title: 'Financial Accounting',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'AI501',
+    title: 'Management and Leadership in AI',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'AI510',
+    title: 'Data Science and AI',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'AI511',
+    title: 'Multiagent Development in AI',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'AI520',
+    title: 'Building an AI Business: From Idea to VC Funded Startup Launch',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'BAN463',
+    title: 'Data Visualization',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Students will learn how to explore data and provide insight to others using data ' +
+      'visualization techniques. After completing this course, students will be able to ' +
+      'design, develop, analyze, and interpret various types of visualizations. They will ' +
+      'also be able to develop compelling presentations and insightful stories based on a ' +
+      'given case study. The approach used will include theory as well as a hands-on ' +
+      'component.',
+  },
+  {
+    courseCode: 'BAN472',
+    title: 'Introduction to Artificial Intelligence (AI)',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'This course provides a comprehensive introduction to artificial intelligence (AI), ' +
+      'covering its history, fundamental concepts, applications, risks, and mitigation ' +
+      'strategies. It offers insights into AI components and technologies, development ' +
+      'processes, and ethical considerations, preparing students to understand the evolving ' +
+      'world of AI. Note: This course is not open to students enrolled in the School of ' +
+      'Engineering without prior written approval from the Engineering Department Chair. ' +
+      'Engineering students are encouraged to take CS483/CS483L Fundamentals of Artificial ' +
+      'Intelligence. Business Law (3 credit hours required) BLAW310 Introduction to Business ' +
+      'Law (3 credit hours; required) This course is designed as an introductory-level course ' +
+      'in U.S. business law. The focus will be on preparing students to spot potential legal ' +
+      'issues in the operation of businesses so they can operate legally and know when to ' +
+      'consult an attorney before taking action. The course begins with an overview of the ' +
+      'fundamental structures and processes of the U.S. legal system. Topics include sources ' +
+      'of law and ethics, contracts, torts, agency, criminal law, business organizations, and ' +
+      'judicial and administrative processes. Emphasis is placed on fundamental legal ' +
+      'principles pertaining to business transactions. Business (3 credit hours required) ' +
+      'BUS387 Independent Research Project (variable 1-3 credit hours) This course offers ' +
+      'students a unique opportunity to engage in one-on-one mentorship with a faculty mentor ' +
+      'to conduct in-depth research on a topic of their choice within the field of business. ' +
+      'This course fosters independent research skills, critical thinking, and academic ' +
+      'writing proficiency. The culmination of the course is a publication-quality research ' +
+      'paper suitable for submission to a peer-reviewed academic journal. BUS450 Professional ' +
+      'and Technical Writing (3 credit hours; required) This course presents students with ' +
+      'practical instructions about communicating in different kinds of academic and ' +
+      'workplace environments, as well as professional/technical communities. Students will ' +
+      'learn how to organize and produce common professional writing work, such as technical ' +
+      'reports, white papers, proposals, theses, and resumes. The course also covers ' +
+      'different forms of effective writing, writing styles, approaches, formats, and ' +
+      'citations of referenced materials.',
+  },
+  {
+    courseCode: 'BAN501',
+    title: 'Quantitative Methods for Business',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'BLAW310',
+    title: 'Introduction to Business Law',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'BUS493',
+    title: 'Senior Project',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'This instructor-driven course implements a senior project as a culminating ' +
+      'undergraduate experience in a student’s professional area of interest, wherein ' +
+      'students successfully demonstrate mastery of specialized knowledge and effectively ' +
+      'communicate their results in writing and in oral presentations. Projects may later be ' +
+      'used to showcase a student’s skills to potential industry employers or as material to ' +
+      'support graduate-level studies.',
+  },
+  {
+    courseCode: 'BUS587',
+    title: 'Individual Research Project',
+    creditHours: 1,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code. Variable ' +
+      'credit (1, 2, 3 credit hours); seeded at the minimum so planned credit totals are ' +
+      'never overstated.',
+  },
+  {
+    courseCode: 'BUS595',
+    title: 'Business Capstone Course',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'CS483L',
+    title: 'Artificial Intelligence & Machine Learning Lab',
+    creditHours: 1,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Students will learn Python programming in the Google Colab platform with numpy, ' +
+      'pandas, matplotlib, scikit-learn, seaborn, tensorflow models, and Keras API to ' +
+      'implement algorithms covered in the lecture from different raw dataset sources. And ' +
+      'they will have the chance to build systems for several hands-on design projects. In a ' +
+      'two-hour lab session, students will become familiar with algorithm functions in the ' +
+      'aforementioned libraries to implement different data processes in machine learning, ' +
+      'search, Markov decision processes, constraint satisfaction, graphical models, and ' +
+      'logic and to optimize design systems by plotting data process curves and error ' +
+      'analysis in the model.',
+  },
+  {
+    courseCode: 'CS547',
+    title: 'Advanced Database Design and Analysis',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'This course is intended for graduate students to further explore database server ' +
+      'development and database tuning. The course specifically details procedural extensions ' +
+      'to SQL to develop stored procedures, functions, packages, and database triggers. In ' +
+      'addition, it covers database performance tuning from an application development point ' +
+      'of view by exploring query optimizers, database hints, and various database access ' +
+      'methods. Hands-on exercises are required.',
+  },
+  {
+    courseCode: 'CS582',
+    title: 'Agentic AI',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Computer Science course offered in Fall 2026. Transcribed from the SFBU Fall 2026 ' +
+      'registration list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'CS583',
+    title: 'Enterprise AI',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Computer Science course offered in Fall 2026. Transcribed from the SFBU Fall 2026 ' +
+      'registration list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'CS587',
+    title: 'Individual Research Project',
+    creditHours: 1,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Computer Science course offered in Fall 2026. Transcribed from the SFBU Fall 2026 ' +
+      'registration list; the 2025-2026 catalog carries no description for this course code. ' +
+      'Variable credit (1, 2, 3 credit hours); seeded at the minimum so planned credit totals ' +
+      'are never overstated.',
+  },
+  {
+    courseCode: 'DS500',
+    title: 'Mathematics and Statistics for Data Science',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'This course is designed to provide students with a solid foundation in the fundamental ' +
+      'mathematical and statistical concepts essential for success in the field of data ' +
+      'science. It aims to equip students with the necessary quantitative skills to analyze ' +
+      'and interpret data, make informed decisions, and derive meaningful insights from ' +
+      'complex datasets.',
+  },
+  {
+    courseCode: 'DS520',
+    title: 'Deep Learning',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'This course is designed to provide students with a solid understanding of the core ' +
+      'concepts, techniques, and applications of deep learning (DL). Deep learning, a subset ' +
+      'of machine learning, has revolutionized the field of artificial intelligence and has ' +
+      'become an impetus behind advancements in various domains, including computer vision, ' +
+      'natural language processing, and speech recognition. Students will learn the concepts ' +
+      'of neural networks (CNNs & RNNs), the development of generative models, and ' +
+      'applications of DL in artificial intelligence.',
+  },
+  {
+    courseCode: 'ECON201',
+    title: 'Principles of Macroeconomics',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'EE461',
+    title: 'Digital Design and HDL',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Electrical Engineering course offered in Fall 2026. Transcribed from the SFBU Fall ' +
+      '2026 registration list; the 2025-2026 catalog carries no description for this course ' +
+      'code.',
+  },
+  {
+    courseCode: 'EE461L',
+    title: 'Verilog HDL Lab',
+    creditHours: 1,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Electrical Engineering course offered in Fall 2026. Transcribed from the SFBU Fall ' +
+      '2026 registration list; the 2025-2026 catalog carries no description for this course ' +
+      'code.',
+  },
+  {
+    courseCode: 'EE488',
+    title: 'Computer Architecture',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Electrical Engineering course offered in Fall 2026. Transcribed from the SFBU Fall ' +
+      '2026 registration list; the 2025-2026 catalog carries no description for this course ' +
+      'code.',
+  },
+  {
+    courseCode: 'FIN310',
+    title: 'Fundamentals of Finance',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'FIN501',
+    title: 'Financial Management',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'FIN522',
+    title: 'International Trade and Investment',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'This course covers the theories of international trade through comparative advantage ' +
+      'and related corporate strategies, the impacts of emerging regional economic blocks, ' +
+      'the institutions of the multilateral trading system, and trade barriers. Students will ' +
+      'learn the mechanics of international payment, shipping, and distribution.',
+  },
+  {
+    courseCode: 'FIN568',
+    title: 'Corporate Finance',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'This course is in the accounting/finance area of interest. The first part of the ' +
+      'course uses lectures, discussions, and case studies to cover essential corporate ' +
+      'finance subjects, including executive compensation, corporate governance, and ' +
+      'bankruptcy law. The second part of the course consists of discussions of corporate ' +
+      'financing, such as mergers, acquisitions, and valuations; corporate restructuring; ' +
+      'LBOs; MBOs; and merchant banking.',
+  },
+  {
+    courseCode: 'FIN585',
+    title: 'International Finance',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'This course prepares the students for a career in international finance by discussing ' +
+      'the financial environment in which a multinational firm and its managers must ' +
+      'function. It focuses on foreign exchange management and financial management in a ' +
+      'multinational firm. It points out to the students the basic principles of profit- ' +
+      'seeking and risk-avoidance practices in the volatile global financial markets.',
+  },
+  {
+    courseCode: 'HRM531',
+    title: 'Human Resource Management',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'This course provides students and practicing managers with a comprehensive overview of ' +
+      'essential personnel management concepts and techniques. The focus is on essential ' +
+      'topics such as job analysis, candidate screening, interviewing, testing, hiring, ' +
+      'evaluating, training, motivating, promoting, and compensating and their associated ' +
+      'legal constraints. Additional topics covered include global HR, diversity awareness ' +
+      'and training, and sexual harassment legal requirements. Practical applications such as ' +
+      'how to appraise performance and benefits and handle grievances are explored. ' +
+      'Additionally, developing independent work teams that foster creativity and innovation ' +
+      'will be discussed.',
+  },
+  {
+    courseCode: 'MGT310',
+    title: 'Principles of Management',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'MGT451',
+    title: 'Project Management',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'MGT460',
+    title: 'Production and Operations Management',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'This course balances the theory and practice of production and operations management, ' +
+      'covering quantitative, qualitative, and behavioral aspects. Students will learn how to ' +
+      'identify and apply strategies, business process design principles, and quantitative ' +
+      'techniques. This knowledge will then be applied to optimize business operations, ' +
+      'enhance efficiency, and improve competitiveness. Students will develop quantitative ' +
+      'models and use software tools such as Microsoft Excel Analysis Tool Pak and Solver to ' +
+      'create solutions for multivariate operational constraints. Typical control cases ' +
+      'include service and product design choices, sales forecasting, scheduling, metrics for ' +
+      'production/inventory control, statistical quality control, and logistical constraints. ' +
+      'MGT480 Entrepreneurship (3 credit hours; required) This course explores the full range ' +
+      'of entrepreneurial processes, including the evaluation, development, and creation of a ' +
+      'successful business. It will help potential entrepreneurs and professionals visualize ' +
+      'and experience entrepreneurial development. The course explores the entrepreneurial ' +
+      'approach to resources, such as developing an organizational structure, market ' +
+      'analysis, financing entrepreneurial ventures, and screening venture opportunities. ' +
+      'Individuals will experiment and evaluate what it takes to be an entrepreneur, ' +
+      'including developing a plan for a new business.',
+  },
+  {
+    courseCode: 'MGT480',
+    title: 'Entrepreneurship',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'MGT500',
+    title: 'Risk Management',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'This course is designed to teach the students risk management concepts, processes, and ' +
+      'strategy making and implementation in a corporate environment. Topics covered include ' +
+      'the nature and concept of risks, risk management structure and process flow, ' +
+      'information and gathering techniques, data analysis methodology and tools, and risk ' +
+      'management techniques. Case studies and a project are required.',
+  },
+  {
+    courseCode: 'MGT510',
+    title: 'Strategic Management and Leadership',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'MGT538',
+    title: 'International Business Management',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'In this course, students will begin by appraising and deconstructing the environment ' +
+      'of international business by examining the economic, financial, political, and ' +
+      'cultural aspects of global trade. They will then learn how to assess and critique ' +
+      'global organizational design and international business management techniques for ' +
+      'various situations. After examining business practices and opportunities in various ' +
+      'regions around the world, students will prepare a country screening analysis or ' +
+      'similar project as a way to apply their knowledge of strategic international business ' +
+      'management concepts to real-world situations.',
+  },
+  {
+    courseCode: 'MGT542',
+    title: 'Technology and Product Management',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Designed to give students practical experience in product development, this course ' +
+      'focuses on managing engineering and technology activities. Topics include technology ' +
+      'product design, planning, production, marketing, sales, and maintenance; technological ' +
+      'product life cycle from research and development through new product introduction; ' +
+      'marketing requirement documentation (MRD); product positioning; channel inventory ' +
+      'management; outbound communications; and the organizational role of the product ' +
+      'marketing manager. Case studies and project presentations are required.',
+  },
+  {
+    courseCode: 'MKT310',
+    title: 'Principles of Marketing',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'MKT483',
+    title: 'Monetizing Intellectual Property',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Intellectual property (IP) is a firm’s most valuable asset. Ideal for social media ' +
+      'content creators and going beyond traditional IP definition and usage, students in ' +
+      'this course will learn innovative models and interesting strategies for generating ' +
+      'capital and value from intangible assets. The rapidly growing U.S. market for leasing ' +
+      'intellectual property is already greater than $63 billion per year. Course topics ' +
+      'include Outright Sales, Third-Party Licensing, Royalty Securitizations, Bowie Bonds, ' +
+      'Collateralization, Donations, Copyrights, Trademarks, Trade Secrets and Patents, etc. ' +
+      'This course contains assignments with research and role-playing.',
+  },
+  {
+    courseCode: 'MKT491',
+    title: 'The Art of Negotiation',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'This course will enable students to acquire comprehensive knowledge and develop ' +
+      'advanced skills to navigate complex negotiation scenarios and influence various ' +
+      'stakeholders, including customers, vendors, managers, peers, and direct reports. ' +
+      'Throughout the course, students will analyze and apply theories and practical ' +
+      'strategies to achieve mutually beneficial outcomes, commonly known as win-win ' +
+      'solutions. The curriculum emphasizes the importance of a strategic mindset, ' +
+      'disciplined preparation, and the development of key interpersonal skills that are ' +
+      'crucial for achieving desired objectives in negotiations. Students will engage in ' +
+      'real-world and practical applications through case studies and simulations relevant to ' +
+      'Silicon Valley. They will analyze various negotiation contexts, including ' +
+      'entertainment and sports, and participate in projects focused on negotiating to ' +
+      'maximize profitability. By integrating real-world examples with theoretical concepts, ' +
+      'this course prepares students to apply negotiation skills effectively in diverse ' +
+      'business environments. Professional Development P450 Career Development (1 credit ' +
+      'hour; required) This course is designed for students to take in preparation for ' +
+      'becoming working professionals. Topics include effective communication strategies, ' +
+      'emotional intelligence, diversity and cultural awareness, professional behavior, and ' +
+      'interview skills. Note: SOC501 Emotional Intelligence Essentials may be used as a ' +
+      'substitute for P450. ************* Business – Graduate Programs Course Numbering and ' +
+      'Descriptions Master’s degree courses are numbered in the 500s. Each master’s degree ' +
+      'program allows for a limited number of credits for 400-level courses with a “G” ' +
+      'suffix. Course No. Description 450G–499G Cross-listed specialized skills courses taken ' +
+      'for graduate-level credits 500–599 Graduate-level courses For information on ' +
+      'prerequisites, corequisites, or subjects numbered below 450, refer to the section ' +
+      'Business — Undergraduate Programs Course Numbering and Descriptions above. Courses are ' +
+      'listed by subject: Accounting, Artificial Intelligence, Business Analytics, Business ' +
+      'Law, Business, Curriculum Practicum, Finance, Green Business Management, Management, ' +
+      'Marketing, Professional Development, and Social Science. Each course description is ' +
+      'followed by any prerequisite or corequisite information or recommendations. Each ' +
+      '1-credit-hour lab course requires at least 2 contact hours of lab work each week. Each ' +
+      '1- credit hour of a practicum course requires at least 45 contact hours of practical ' +
+      'experience related to the student’s program curriculum. Accounting',
+  },
+  {
+    courseCode: 'MKT541',
+    title: 'Strategic Marketing',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'This course will teach the students fundamental concepts and practices in marketing ' +
+      'research and marketing data analysis, as well as using data and financial analysis to ' +
+      'set strategic positioning strategies. Emphasis will be on practical marketing research ' +
+      'skills development and basic analysis mechanisms leading to strategic marketing. ' +
+      'Students will learn both primary sources (such as surveys) and secondary sources ' +
+      '(internet, publications, etc.) through research techniques. Students will also engage ' +
+      'in their own marketing research projects. Although statistical analysis will be ' +
+      'covered in the course, quantitative analysis skills will be the focus. The course also ' +
+      'covers an overview of quantitative and qualitative tools for strategic marketing, ' +
+      'market segmentation process, strategic positioning, and channel marketing issues. Case ' +
+      'studies and marketing requirements reports are required.',
+  },
+  {
+    courseCode: 'MKT551',
+    title: 'Sales Management',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'With a strong focus on selling as a career, this course covers a spectrum of selling ' +
+      'strategies, sales force management, strategic, relationship, and product selling ' +
+      'approaches, ownership of the customer relationship, and building customer personas. ' +
+      'Additional topics may include forecasting, pricing and negotiation strategies, ' +
+      'recruitment, territory assignment, quotas, channel management, etc. After completing ' +
+      'this course, the student can build and manage a sales team, formulate, and implement ' +
+      'sales programs, and evaluate and control the sales process.',
+  },
+  {
+    courseCode: 'MKT553',
+    title: 'Digital Marketing and Social Media',
+    creditHours: 3,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Using a robust combination of creativity, critical thinking, data analysis, and ' +
+      'project tracking skills, this course will enable students to master digital marketing ' +
+      'and social media influence. After completing this course, the student will be able to ' +
+      'explain in detail the ASCOR digital marketing framework (assessment phase, strategy ' +
+      'phase, channel and communication plan, digital marketing operations, refinement ' +
+      'phase), optimize a firm’s online value proposition by aligning its strengths with ' +
+      'ever-changing market economics; and create a multistage digital marketing campaign ' +
+      'from the initial activities through final deployment.',
+  },
+  {
+    courseCode: 'PSY210',
+    title: 'Introduction to Psychology',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'This psychology course reflects on theories and concepts of behavior and processes of ' +
+      'the mind. Students will be introduced to topics such as motivation, emotion, ' +
+      'personality, social behavior, perception, learning, and development. Different areas ' +
+      'of psychology will be examined, such as cognitive, forensic, social, and developmental ' +
+      'psychology. Additional topics may include environmental and biological factors ' +
+      'affecting behavior, adaptation to stress and adversity, common disorders, experimental ' +
+      'methods, and current research trends, among others. PSY450 Cyberpsychology: ' +
+      'Understanding Human Behavior in the Digital Age Explore how digital technologies shape ' +
+      'human behavior identity, relationships, mental health, and society. This ' +
+      'interdisciplinary course examines online behavior through psychological and ethical ' +
+      'lenses, covering topics like social media, cyberbullying, digital addiction, AI, VR, ' +
+      'UX, and algorithmic bias. Students engage in weekly reflections, discussions, and ' +
+      'hands-on projects, culminating in a final design promoting digital well-being or ' +
+      'equity. Open to students from all disciplines; no prerequisites.',
+  },
+  {
+    courseCode: 'PSY220',
+    title: 'Abnormal Psychology',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Psychology course offered in Fall 2026. Transcribed from the SFBU Fall 2026 ' +
+      'registration list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'PSY260',
+    title: 'Social Psychology',
+    creditHours: 3,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'Psychology course offered in Fall 2026. Transcribed from the SFBU Fall 2026 ' +
+      'registration list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'SEMINAR100',
+    title: 'Design Thinking: Your Passion Project',
+    creditHours: 1,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'General Education course offered in Fall 2026. Transcribed from the SFBU Fall 2026 ' +
+      'registration list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'SEMINAR200',
+    title: 'Passion in Progress: Build, Test, Launch',
+    creditHours: 1,
+    level: CourseLevel.UNDERGRADUATE,
+    description:
+      'General Education course offered in Fall 2026. Transcribed from the SFBU Fall 2026 ' +
+      'registration list; the 2025-2026 catalog carries no description for this course code.',
+  },
+  {
+    courseCode: 'SOC501',
+    title: 'Emotional Intelligence Essentials',
+    creditHours: 1,
+    level: CourseLevel.GRADUATE,
+    description:
+      'Business course offered in Fall 2026. Transcribed from the SFBU Fall 2026 registration ' +
+      'list; the 2025-2026 catalog carries no description for this course code.',
+  },
 ];
 
 // ──────────────────────────────────────────────────────────────
@@ -1769,11 +2386,19 @@ export const PROGRAMS: ProgramSeed[] = [
             description: null,
             sortOrder: 7,
           },
+          // The lab for CS483, grouped with its lecture as CS480/CS480L are.
+          {
+            courseCode: 'CS483L',
+            minCredits: null,
+            description: null,
+            sortOrder: 8,
+          },
         ],
       },
       {
         name: 'Free Electives',
-        description: 'Remaining credits to reach 120 total.',
+        description:
+          'Any discipline, to reach 120 total credits. Courses listed are those on the current schedule.',
         minCredits: 15,
         sortOrder: 5,
         requirements: [
@@ -1782,6 +2407,141 @@ export const PROGRAMS: ProgramSeed[] = [
             minCredits: 15,
             description: 'Any approved upper-division courses.',
             sortOrder: 1,
+          },
+          // The catalog allows electives from any discipline. These are the
+          // non-major courses actually on the schedule; the credit requirement
+          // above still governs — this list is not exhaustive.
+          {
+            courseCode: 'ACC110',
+            minCredits: null,
+            description: null,
+            sortOrder: 2,
+          },
+          {
+            courseCode: 'BAN463',
+            minCredits: null,
+            description: null,
+            sortOrder: 3,
+          },
+          {
+            courseCode: 'BAN472',
+            minCredits: null,
+            description: null,
+            sortOrder: 4,
+          },
+          {
+            courseCode: 'BLAW310',
+            minCredits: null,
+            description: null,
+            sortOrder: 5,
+          },
+          {
+            courseCode: 'BUS493',
+            minCredits: null,
+            description: null,
+            sortOrder: 6,
+          },
+          {
+            courseCode: 'ECON201',
+            minCredits: null,
+            description: null,
+            sortOrder: 7,
+          },
+          {
+            courseCode: 'EE461',
+            minCredits: null,
+            description: null,
+            sortOrder: 8,
+          },
+          {
+            courseCode: 'EE461L',
+            minCredits: null,
+            description: null,
+            sortOrder: 9,
+          },
+          {
+            courseCode: 'EE488',
+            minCredits: null,
+            description: null,
+            sortOrder: 10,
+          },
+          {
+            courseCode: 'FIN310',
+            minCredits: null,
+            description: null,
+            sortOrder: 11,
+          },
+          {
+            courseCode: 'MGT310',
+            minCredits: null,
+            description: null,
+            sortOrder: 12,
+          },
+          {
+            courseCode: 'MGT451',
+            minCredits: null,
+            description: null,
+            sortOrder: 13,
+          },
+          {
+            courseCode: 'MGT460',
+            minCredits: null,
+            description: null,
+            sortOrder: 14,
+          },
+          {
+            courseCode: 'MGT480',
+            minCredits: null,
+            description: null,
+            sortOrder: 15,
+          },
+          {
+            courseCode: 'MKT310',
+            minCredits: null,
+            description: null,
+            sortOrder: 16,
+          },
+          {
+            courseCode: 'MKT483',
+            minCredits: null,
+            description: null,
+            sortOrder: 17,
+          },
+          {
+            courseCode: 'MKT491',
+            minCredits: null,
+            description: null,
+            sortOrder: 18,
+          },
+          {
+            courseCode: 'PSY210',
+            minCredits: null,
+            description: null,
+            sortOrder: 19,
+          },
+          {
+            courseCode: 'PSY220',
+            minCredits: null,
+            description: null,
+            sortOrder: 20,
+          },
+          {
+            courseCode: 'PSY260',
+            minCredits: null,
+            description: null,
+            sortOrder: 21,
+          },
+          {
+            courseCode: 'SEMINAR100',
+            minCredits: null,
+            description: null,
+            sortOrder: 22,
+          },
+          {
+            courseCode: 'SEMINAR200',
+            minCredits: null,
+            description: null,
+            sortOrder: 23,
           },
         ],
       },
@@ -2039,7 +2799,8 @@ export const PROGRAMS: ProgramSeed[] = [
       },
       {
         name: 'Graduate Electives',
-        description: 'Approved graduate-level electives to total 36 credits.',
+        description:
+          'Any graduate-level course, including outside the department, to total 36 credits. Courses listed are those on the current schedule.',
         minCredits: 10,
         sortOrder: 8,
         requirements: [
@@ -2048,6 +2809,165 @@ export const PROGRAMS: ProgramSeed[] = [
             minCredits: 10,
             description: 'Approved 500-level CS courses.',
             sortOrder: 1,
+          },
+          // The catalog allows any graduate-level course, including those outside
+          // the department. These are the ones actually on the schedule; the
+          // credit requirement above still governs — this list is not exhaustive.
+          {
+            courseCode: 'AI501',
+            minCredits: null,
+            description: null,
+            sortOrder: 2,
+          },
+          {
+            courseCode: 'AI510',
+            minCredits: null,
+            description: null,
+            sortOrder: 3,
+          },
+          {
+            courseCode: 'AI511',
+            minCredits: null,
+            description: null,
+            sortOrder: 4,
+          },
+          {
+            courseCode: 'AI520',
+            minCredits: null,
+            description: null,
+            sortOrder: 5,
+          },
+          {
+            courseCode: 'BAN501',
+            minCredits: null,
+            description: null,
+            sortOrder: 6,
+          },
+          {
+            courseCode: 'BUS587',
+            minCredits: null,
+            description: null,
+            sortOrder: 7,
+          },
+          {
+            courseCode: 'BUS595',
+            minCredits: null,
+            description: null,
+            sortOrder: 8,
+          },
+          {
+            courseCode: 'CS547',
+            minCredits: null,
+            description: null,
+            sortOrder: 9,
+          },
+          {
+            courseCode: 'CS582',
+            minCredits: null,
+            description: null,
+            sortOrder: 10,
+          },
+          {
+            courseCode: 'CS583',
+            minCredits: null,
+            description: null,
+            sortOrder: 11,
+          },
+          {
+            courseCode: 'CS587',
+            minCredits: null,
+            description: null,
+            sortOrder: 12,
+          },
+          {
+            courseCode: 'DS500',
+            minCredits: null,
+            description: null,
+            sortOrder: 13,
+          },
+          {
+            courseCode: 'DS520',
+            minCredits: null,
+            description: null,
+            sortOrder: 14,
+          },
+          {
+            courseCode: 'FIN501',
+            minCredits: null,
+            description: null,
+            sortOrder: 15,
+          },
+          {
+            courseCode: 'FIN522',
+            minCredits: null,
+            description: null,
+            sortOrder: 16,
+          },
+          {
+            courseCode: 'FIN568',
+            minCredits: null,
+            description: null,
+            sortOrder: 17,
+          },
+          {
+            courseCode: 'FIN585',
+            minCredits: null,
+            description: null,
+            sortOrder: 18,
+          },
+          {
+            courseCode: 'HRM531',
+            minCredits: null,
+            description: null,
+            sortOrder: 19,
+          },
+          {
+            courseCode: 'MGT500',
+            minCredits: null,
+            description: null,
+            sortOrder: 20,
+          },
+          {
+            courseCode: 'MGT510',
+            minCredits: null,
+            description: null,
+            sortOrder: 21,
+          },
+          {
+            courseCode: 'MGT538',
+            minCredits: null,
+            description: null,
+            sortOrder: 22,
+          },
+          {
+            courseCode: 'MGT542',
+            minCredits: null,
+            description: null,
+            sortOrder: 23,
+          },
+          {
+            courseCode: 'MKT541',
+            minCredits: null,
+            description: null,
+            sortOrder: 24,
+          },
+          {
+            courseCode: 'MKT551',
+            minCredits: null,
+            description: null,
+            sortOrder: 25,
+          },
+          {
+            courseCode: 'MKT553',
+            minCredits: null,
+            description: null,
+            sortOrder: 26,
+          },
+          {
+            courseCode: 'SOC501',
+            minCredits: null,
+            description: null,
+            sortOrder: 27,
           },
         ],
       },
@@ -2208,7 +3128,8 @@ export const PROGRAMS: ProgramSeed[] = [
       },
       {
         name: 'Graduate Electives',
-        description: 'Approved graduate-level electives to total 36 credits.',
+        description:
+          'Any graduate-level course, including outside the department, to total 36 credits. Courses listed are those on the current schedule.',
         minCredits: 10,
         sortOrder: 5,
         requirements: [
@@ -2217,6 +3138,165 @@ export const PROGRAMS: ProgramSeed[] = [
             minCredits: 10,
             description: 'Approved 500-level EE/CE courses.',
             sortOrder: 1,
+          },
+          // The catalog allows any graduate-level course, including those outside
+          // the department. These are the ones actually on the schedule; the
+          // credit requirement above still governs — this list is not exhaustive.
+          {
+            courseCode: 'AI501',
+            minCredits: null,
+            description: null,
+            sortOrder: 2,
+          },
+          {
+            courseCode: 'AI510',
+            minCredits: null,
+            description: null,
+            sortOrder: 3,
+          },
+          {
+            courseCode: 'AI511',
+            minCredits: null,
+            description: null,
+            sortOrder: 4,
+          },
+          {
+            courseCode: 'AI520',
+            minCredits: null,
+            description: null,
+            sortOrder: 5,
+          },
+          {
+            courseCode: 'BAN501',
+            minCredits: null,
+            description: null,
+            sortOrder: 6,
+          },
+          {
+            courseCode: 'BUS587',
+            minCredits: null,
+            description: null,
+            sortOrder: 7,
+          },
+          {
+            courseCode: 'BUS595',
+            minCredits: null,
+            description: null,
+            sortOrder: 8,
+          },
+          {
+            courseCode: 'CS547',
+            minCredits: null,
+            description: null,
+            sortOrder: 9,
+          },
+          {
+            courseCode: 'CS582',
+            minCredits: null,
+            description: null,
+            sortOrder: 10,
+          },
+          {
+            courseCode: 'CS583',
+            minCredits: null,
+            description: null,
+            sortOrder: 11,
+          },
+          {
+            courseCode: 'CS587',
+            minCredits: null,
+            description: null,
+            sortOrder: 12,
+          },
+          {
+            courseCode: 'DS500',
+            minCredits: null,
+            description: null,
+            sortOrder: 13,
+          },
+          {
+            courseCode: 'DS520',
+            minCredits: null,
+            description: null,
+            sortOrder: 14,
+          },
+          {
+            courseCode: 'FIN501',
+            minCredits: null,
+            description: null,
+            sortOrder: 15,
+          },
+          {
+            courseCode: 'FIN522',
+            minCredits: null,
+            description: null,
+            sortOrder: 16,
+          },
+          {
+            courseCode: 'FIN568',
+            minCredits: null,
+            description: null,
+            sortOrder: 17,
+          },
+          {
+            courseCode: 'FIN585',
+            minCredits: null,
+            description: null,
+            sortOrder: 18,
+          },
+          {
+            courseCode: 'HRM531',
+            minCredits: null,
+            description: null,
+            sortOrder: 19,
+          },
+          {
+            courseCode: 'MGT500',
+            minCredits: null,
+            description: null,
+            sortOrder: 20,
+          },
+          {
+            courseCode: 'MGT510',
+            minCredits: null,
+            description: null,
+            sortOrder: 21,
+          },
+          {
+            courseCode: 'MGT538',
+            minCredits: null,
+            description: null,
+            sortOrder: 22,
+          },
+          {
+            courseCode: 'MGT542',
+            minCredits: null,
+            description: null,
+            sortOrder: 23,
+          },
+          {
+            courseCode: 'MKT541',
+            minCredits: null,
+            description: null,
+            sortOrder: 24,
+          },
+          {
+            courseCode: 'MKT551',
+            minCredits: null,
+            description: null,
+            sortOrder: 25,
+          },
+          {
+            courseCode: 'MKT553',
+            minCredits: null,
+            description: null,
+            sortOrder: 26,
+          },
+          {
+            courseCode: 'SOC501',
+            minCredits: null,
+            description: null,
+            sortOrder: 27,
           },
         ],
       },
@@ -2242,10 +3322,20 @@ export const CATALOG_IMPORT_STATUS = ImportStatus.COMPLETED;
 
 // ── Course Offerings ───────────────────────────────────────────
 
+export interface OfferedCourseSeed {
+  courseCode: string;
+  /** False when the course runs but the registrar has closed registration. */
+  openForRegistration: boolean;
+  /** Sections on the published schedule; omitted when the list does not say. */
+  sectionCount?: number;
+  /** Registrar's note, verbatim — "Cancelled due to low enrollment" and the like. */
+  statusNote?: string;
+}
+
 export interface CourseOfferingSeed {
   /** Must match an academic_terms.name created by the CourseOfferings migration. */
   termName: string;
-  courseCodes: string[];
+  courses: OfferedCourseSeed[];
 }
 
 /**
@@ -2278,15 +3368,201 @@ export interface CourseOfferingSeed {
 export const COURSE_OFFERINGS: CourseOfferingSeed[] = [
   {
     termName: 'Fall 2026',
-    courseCodes: [
-      'CS500', // Object-Oriented Design in Python
-      'CS500L', // Object-Oriented Design in Python Lab (corequisite of CS500)
-      'CS501', // Practical Application of Algorithms
-      'CS550', // Machine Learning and Business Intelligence
-      'CS570', // Big Data Processing & Analytics
-      'CS571', // Cloud Computing Infrastructure
-      'CS575', // Network Analysis & Testing
-      'CS595', // Computer Science Capstone Course
+    // The full published schedule, transcribed from the official SFBU Fall 2026
+    // registration list — 96 courses across every department, not just ECE.
+    //
+    // CS500 and FIN310 arrive contradicting themselves: both carry a cancellation
+    // note and Open For Registration: true. Cancelled wins here, because showing a
+    // cancelled course as registrable sends a student to enrol in something that
+    // will not run.
+    courses: [
+      { courseCode: 'ACC110', openForRegistration: true, sectionCount: 2 },
+      { courseCode: 'AI501', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'AI510', openForRegistration: true, sectionCount: 2 },
+      { courseCode: 'AI511', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'AI520', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'APP101', openForRegistration: true, sectionCount: 3 },
+      { courseCode: 'APP102', openForRegistration: true, sectionCount: 2 },
+      { courseCode: 'APP103', openForRegistration: false, sectionCount: 2 },
+      { courseCode: 'APP104', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'APP201', openForRegistration: true, sectionCount: 3 },
+      { courseCode: 'APP202', openForRegistration: true, sectionCount: 2 },
+      { courseCode: 'APP203', openForRegistration: false, sectionCount: 2 },
+      { courseCode: 'APP204', openForRegistration: false, sectionCount: 2 },
+      { courseCode: 'APP301', openForRegistration: false, sectionCount: 1 },
+      { courseCode: 'BAN463', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'BAN472', openForRegistration: false, sectionCount: 1 },
+      { courseCode: 'BAN501', openForRegistration: true, sectionCount: 1 },
+      {
+        courseCode: 'BLAW310',
+        openForRegistration: false,
+        sectionCount: 1,
+        statusNote: 'Cancelled. Will Return Next Semester.',
+      },
+      { courseCode: 'BUS450', openForRegistration: false, sectionCount: 1 },
+      { courseCode: 'BUS493', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'BUS587', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'BUS595', openForRegistration: true, sectionCount: 2 },
+      { courseCode: 'CE305', openForRegistration: false, sectionCount: 1 },
+      { courseCode: 'CE530', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'CS200', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'CS250', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'CS250L', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'CS350', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'CS350L', openForRegistration: true, sectionCount: 1 },
+      {
+        courseCode: 'CS360',
+        openForRegistration: true,
+        sectionCount: 1,
+        statusNote:
+          'From Shak: for CS 360 -- can you please increase the waiting by 2 as I need one student (Viplab) need to signup to grade this fall',
+      },
+      { courseCode: 'CS360L', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'CS455', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'CS457', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'CS457L', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'CS470', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'CS477', openForRegistration: false, sectionCount: 1 },
+      {
+        courseCode: 'CS478',
+        openForRegistration: false,
+        sectionCount: 1,
+        statusNote: 'Shak has approved to update waitlist capacity to 4',
+      },
+      { courseCode: 'CS481', openForRegistration: false, sectionCount: 1 },
+      { courseCode: 'CS483', openForRegistration: true, sectionCount: 2 },
+      { courseCode: 'CS483L', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'CS487', openForRegistration: false, sectionCount: 1 },
+      { courseCode: 'CS494', openForRegistration: true, sectionCount: 1 },
+      {
+        courseCode: 'CS500',
+        openForRegistration: false,
+        sectionCount: 2,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+      { courseCode: 'CS500L', openForRegistration: true, sectionCount: 2 },
+      { courseCode: 'CS501', openForRegistration: false, sectionCount: 1 },
+      { courseCode: 'CS521', openForRegistration: true, sectionCount: 1 },
+      {
+        courseCode: 'CS522',
+        openForRegistration: false,
+        sectionCount: 1,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+      { courseCode: 'CS547', openForRegistration: true, sectionCount: 2 },
+      { courseCode: 'CS550', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'CS570', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'CS571', openForRegistration: false, sectionCount: 1 },
+      { courseCode: 'CS575', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'CS582', openForRegistration: true, sectionCount: 1 },
+      {
+        courseCode: 'CS583',
+        openForRegistration: false,
+        sectionCount: 1,
+        statusNote: 'Cancelled due to sequencing issues',
+      },
+      { courseCode: 'CS587', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'CS595', openForRegistration: true, sectionCount: 2 },
+      { courseCode: 'DS500', openForRegistration: true, sectionCount: 1 },
+      {
+        courseCode: 'DS520',
+        openForRegistration: false,
+        sectionCount: 1,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+      { courseCode: 'ECON201', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'EE461', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'EE461L', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'EE488', openForRegistration: true, sectionCount: 1 },
+      {
+        courseCode: 'EE505',
+        openForRegistration: false,
+        sectionCount: 1,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+      {
+        courseCode: 'EE517',
+        openForRegistration: false,
+        sectionCount: 1,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+      {
+        courseCode: 'EE577',
+        openForRegistration: false,
+        sectionCount: 1,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+      { courseCode: 'EE595', openForRegistration: true, sectionCount: 1 },
+      {
+        courseCode: 'FIN310',
+        openForRegistration: false,
+        sectionCount: 2,
+        statusNote: 'Cancelled due to faculty availability',
+      },
+      { courseCode: 'FIN501', openForRegistration: true, sectionCount: 2 },
+      {
+        courseCode: 'FIN522',
+        openForRegistration: false,
+        sectionCount: 1,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+      {
+        courseCode: 'FIN568',
+        openForRegistration: false,
+        sectionCount: 1,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+      { courseCode: 'FIN585', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'HRM531', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'MATH201', openForRegistration: true, sectionCount: 2 },
+      { courseCode: 'MATH202', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'MATH203', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'MATH208', openForRegistration: false, sectionCount: 1 },
+      { courseCode: 'MGT310', openForRegistration: true, sectionCount: 2 },
+      { courseCode: 'MGT451', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'MGT460', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'MGT480', openForRegistration: true, sectionCount: 1 },
+      {
+        courseCode: 'MGT500',
+        openForRegistration: false,
+        sectionCount: 1,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+      { courseCode: 'MGT510', openForRegistration: true, sectionCount: 2 },
+      {
+        courseCode: 'MGT538',
+        openForRegistration: false,
+        sectionCount: 1,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+      { courseCode: 'MGT542', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'MKT310', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'MKT483', openForRegistration: false, sectionCount: 1 },
+      { courseCode: 'MKT491', openForRegistration: true, sectionCount: 1 },
+      {
+        courseCode: 'MKT541',
+        openForRegistration: false,
+        sectionCount: 1,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+      {
+        courseCode: 'MKT551',
+        openForRegistration: false,
+        sectionCount: 1,
+        statusNote: 'Cancelled due to low enrollment',
+      },
+      { courseCode: 'MKT553', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'PSY210', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'PSY220', openForRegistration: false, sectionCount: 1 },
+      { courseCode: 'PSY260', openForRegistration: true, sectionCount: 1 },
+      { courseCode: 'SEMINAR100', openForRegistration: false, sectionCount: 1 },
+      { courseCode: 'SEMINAR200', openForRegistration: false, sectionCount: 1 },
+      {
+        courseCode: 'SOC501',
+        openForRegistration: false,
+        sectionCount: 1,
+        statusNote: 'Cancelled due to low enrollment',
+      },
     ],
   },
 ];

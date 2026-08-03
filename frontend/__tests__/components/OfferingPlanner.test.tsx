@@ -1,10 +1,10 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { OfferingPlanner } from '../../components/planner/OfferingPlanner';
 import type { Course, TermSummary } from '../../lib/api';
 import type { ProgramOption } from '../../lib/programScope';
 
 jest.mock('../../lib/api', () => ({
-  api: { planner: { evaluate: jest.fn() } },
+  api: { planner: { evaluate: jest.fn() }, terms: { get: jest.fn() } },
 }));
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -32,7 +32,27 @@ const programs: ProgramOption[] = [
   { id: 'p-1', abbreviation: 'BSCS', name: 'Bachelor of Science', courseIds: ['c-1'] },
 ];
 
-const evaluationFor = (ids: string[]) => ({
+/** The term detail the API now serves: whole term, each course flagged inProgram. */
+const termDetail = (inProgram: string[] = []) => ({
+  id: 't-1',
+  name: 'Fall 2026',
+  sortOrder: 1,
+  courseCount: 2,
+  inProgramCount: inProgram.length,
+  courses: ['c-2', 'c-3'].map((id) => ({
+    id,
+    courseCode: courses.find((c) => c.id === id)!.courseCode,
+    title: courses.find((c) => c.id === id)!.title,
+    creditHours: 3,
+    level: 'graduate' as const,
+    openForRegistration: true,
+    sectionCount: null,
+    statusNote: null,
+    inProgram: inProgram.includes(id),
+  })),
+});
+
+const evaluationFor = (ids: string[], completed: string[] = []) => ({
   terms: [
     {
       term: 1,
@@ -42,15 +62,19 @@ const evaluationFor = (ids: string[]) => ({
       courses: ids.map((id) => ({
         courseId: id,
         courseCode: courses.find((c) => c.id === id)!.courseCode,
-        title: 'T',
+        title: courses.find((c) => c.id === id)!.title,
         creditHours: 3,
         level: 'graduate' as const,
         eligible: true,
         offered: true,
         registrable: true,
-        alreadyCompleted: false,
+        openForRegistration: true,
+        sectionCount: null,
+        statusNote: null,
+        alreadyCompleted: completed.includes(id),
         satisfiedPrerequisites: [],
         missingPrerequisites: [],
+        backgroundPrerequisites: [],
         corequisites: [],
         reason: 'Eligible',
       })),
@@ -65,6 +89,7 @@ const evaluationFor = (ids: string[]) => ({
 describe('OfferingPlanner — out-of-degree offerings', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    api.terms.get.mockResolvedValue(termDetail());
     api.planner.evaluate.mockImplementation(({ terms: t }: { terms: { courseIds: string[] }[] }) =>
       Promise.resolve(evaluationFor(t[0].courseIds)),
     );
@@ -125,5 +150,163 @@ describe('OfferingPlanner — out-of-degree offerings', () => {
 
     fireEvent.change(screen.getByLabelText('Degree'), { target: { value: 'p-1' } });
     expect(await screen.findByRole('button', { name: /Show all 2 anyway/ })).toBeInTheDocument();
+  });
+});
+
+describe('OfferingPlanner — completed courses in the offerings column', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.planner.evaluate.mockImplementation(
+      ({
+        completedCourseIds,
+        terms: t,
+      }: {
+        completedCourseIds: string[];
+        terms: { courseIds: string[] }[];
+      }) => Promise.resolve(evaluationFor(t[0].courseIds, completedCourseIds)),
+    );
+  });
+
+  const seed = (completedIds: string[]) =>
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        completedIds,
+        termId: 't-1',
+        selectedIds: [],
+        programId: 'p-1',
+        showAllOfferings: true,
+      }),
+    );
+
+  /** The offerings column only — course titles also appear under Suggested. */
+  const offeredColumn = async () => {
+    const heading = await screen.findByText(/^Offered in Fall 2026$/);
+    return heading.closest('div')!.parentElement as HTMLElement;
+  };
+
+  it('drops an already-completed course from the offerings column', async () => {
+    seed(['c-2']);
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+
+    const column = await offeredColumn();
+    // CS501 still on offer; CS500 is completed and no longer a candidate.
+    await waitFor(() => expect(within(column).getByText('Title CS501')).toBeInTheDocument());
+    expect(within(column).queryByText('Title CS500')).not.toBeInTheDocument();
+  });
+
+  it('says how many were hidden rather than silently shrinking the list', async () => {
+    seed(['c-2']);
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+    expect(await screen.findByText(/1 completed hidden/)).toBeInTheDocument();
+  });
+
+  it('reports the all-completed case instead of looking like it is still loading', async () => {
+    seed(['c-2', 'c-3']);
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+    expect(
+      await screen.findByText(/already completed everything offered in Fall 2026/),
+    ).toBeInTheDocument();
+  });
+});
+
+describe('OfferingPlanner — offerings come from the database', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.terms.get.mockResolvedValue(termDetail(['c-2']));
+    api.planner.evaluate.mockImplementation(({ terms: t }: { terms: { courseIds: string[] }[] }) =>
+      Promise.resolve(evaluationFor(t[0].courseIds)),
+    );
+  });
+
+  it('requests the term scoped to the selected degree', async () => {
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+    await waitFor(() => expect(api.terms.get).toHaveBeenCalledWith('t-1', { programId: 'p-1' }));
+  });
+
+  it("uses the API's inProgram flag for the scope notice", async () => {
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+    // 1 of the term's 2 offerings sits outside the degree.
+    expect(await screen.findByText(/1 of 2 offered courses are outside BSCS/)).toBeInTheDocument();
+  });
+
+  it('evaluates only the in-program offerings until the escape hatch is used', async () => {
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+    await waitFor(() =>
+      expect(api.planner.evaluate).toHaveBeenCalledWith(
+        expect.objectContaining({ terms: [{ termId: 't-1', courseIds: ['c-2'] }] }),
+      ),
+    );
+  });
+});
+
+describe('OfferingPlanner — the Suggested column is a shortlist', () => {
+  const many = Array.from({ length: 9 }, (_, i) => `m-${i}`);
+
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.terms.get.mockResolvedValue({
+      id: 't-1',
+      name: 'Fall 2026',
+      sortOrder: 1,
+      courseCount: many.length,
+      inProgramCount: many.length,
+      courses: many.map((id, i) => ({
+        id,
+        courseCode: `CS${600 + i}`,
+        title: `Course ${i}`,
+        creditHours: 3,
+        level: 'graduate' as const,
+        openForRegistration: true,
+        sectionCount: null,
+        statusNote: null,
+        inProgram: true,
+      })),
+    });
+    api.planner.evaluate.mockImplementation(({ terms: t }: { terms: { courseIds: string[] }[] }) =>
+      Promise.resolve({
+        terms: [
+          {
+            term: 1,
+            termId: 't-1',
+            termName: 'Fall 2026',
+            termCredits: 0,
+            courses: t[0].courseIds.map((id, i) => ({
+              courseId: id,
+              courseCode: `CS${600 + i}`,
+              title: `Course ${i}`,
+              creditHours: 3,
+              level: 'graduate' as const,
+              eligible: true,
+              offered: true,
+              openForRegistration: true,
+              sectionCount: null,
+              statusNote: null,
+              registrable: true,
+              alreadyCompleted: false,
+              satisfiedPrerequisites: [],
+              missingPrerequisites: [],
+              backgroundPrerequisites: [],
+              corequisites: [],
+              reason: 'Eligible',
+            })),
+          },
+        ],
+        suggestions: [],
+        totalPlannedCredits: 0,
+        allEligible: true,
+        allOffered: true,
+      }),
+    );
+  });
+
+  it('recommends at most five courses even when nine are registrable', async () => {
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+
+    const heading = await screen.findByText(/^Suggested for Fall 2026$/);
+    const column = heading.closest('div')!.parentElement as HTMLElement;
+    await waitFor(() =>
+      expect(within(column).getAllByRole('button', { name: /^Add CS/ })).toHaveLength(5),
+    );
   });
 });

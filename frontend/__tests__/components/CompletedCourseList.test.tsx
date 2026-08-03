@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { CompletedCourseList } from '../../components/planner/CompletedCourseList';
 import type { Course } from '../../lib/api';
@@ -14,12 +14,12 @@ const course = (
 ): Course => ({ id, courseCode, title, description: null, creditHours, level });
 
 const courses: Course[] = [
-  course('c-cs380', 'CS380', 'Analysis of Algorithms'),
-  course('c-cs200', 'CS200', 'Introduction to Computer Science'),
-  course('c-cs230l', 'CS230L', 'Object-Oriented Programming Lab', '1.0'),
+  course('c-cs380', 'CS380', 'Operating Systems'),
+  course('c-cs200', 'CS200', 'Discrete Logic'),
+  course('c-cs230l', 'CS230L', 'Linux & Shell Scripting Lab', '1.0'),
   course('c-ee310', 'EE310', 'Signals and Systems'),
-  course('c-ce305', 'CE305', 'Digital Logic Design'),
-  course('c-math200', 'MATH200', 'Discrete Mathematics'),
+  course('c-ce305', 'CE305', 'Computer Organization'),
+  course('c-math203', 'MATH203', 'Linear Algebra'),
 ];
 
 const renderList = (props: Partial<React.ComponentProps<typeof CompletedCourseList>> = {}) =>
@@ -27,46 +27,22 @@ const renderList = (props: Partial<React.ComponentProps<typeof CompletedCourseLi
     <CompletedCourseList courses={courses} completedIds={[]} onToggle={() => {}} {...props} />,
   );
 
-/** Expand a collapsed subject section by its header button. */
-const openSubject = (subject: string) =>
-  fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${subject}`) }));
+const codes = () =>
+  screen
+    .getAllByRole('checkbox')
+    .map((box) => box.closest('label')?.querySelector('span')?.textContent);
 
 describe('CompletedCourseList', () => {
-  it('groups courses by subject, largest-first by catalog convention', () => {
+  it('lists every course as one flat, code-ordered checklist', () => {
     renderList();
-    const headers = screen
-      .getAllByRole('button')
-      .map((b) => b.textContent ?? '')
-      .filter((t) => /Computer Science|Engineering|Mathematics/.test(t));
-    expect(headers[0]).toMatch(/^CS/);
-    expect(headers.some((h) => h.startsWith('CE'))).toBe(true);
-    expect(headers.some((h) => h.startsWith('EE'))).toBe(true);
-    expect(headers.some((h) => h.startsWith('MATH'))).toBe(true);
+    expect(codes()).toEqual(['CE305', 'CS200', 'CS230L', 'CS380', 'EE310', 'MATH203']);
   });
 
-  it('expands the first subject and collapses the rest so the panel stays scannable', () => {
+  it('shows every course without needing a section opened first', () => {
     renderList();
-    expect(screen.getByRole('button', { name: /^CS/ })).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByRole('button', { name: /^EE/ })).toHaveAttribute('aria-expanded', 'false');
-
-    expect(screen.getByLabelText(/CS200/)).toBeInTheDocument();
-    expect(screen.queryByLabelText(/EE310/)).not.toBeInTheDocument();
-  });
-
-  it('reveals a collapsed subject when its header is clicked', () => {
-    renderList();
-    expect(screen.queryByLabelText(/EE310/)).not.toBeInTheDocument();
-    openSubject('EE');
+    // Nothing is collapsed, so a course from any subject is immediately visible.
     expect(screen.getByLabelText(/EE310/)).toBeInTheDocument();
-  });
-
-  it('sorts courses within a subject by code', () => {
-    renderList();
-    const cs = screen.getByRole('button', { name: /^CS/ }).closest('section');
-    const codes = within(cs as HTMLElement)
-      .getAllByRole('checkbox')
-      .map((box) => box.closest('label')?.querySelector('span')?.textContent);
-    expect(codes).toEqual(['CS200', 'CS230L', 'CS380']);
+    expect(screen.getByLabelText(/MATH203/)).toBeInTheDocument();
   });
 
   it('marks a course on click and unmarks one already completed', () => {
@@ -91,22 +67,15 @@ describe('CompletedCourseList', () => {
     expect(screen.getByLabelText(/CS200/)).not.toBeChecked();
   });
 
-  it('shows a per-subject count of what is already marked', () => {
-    renderList({ completedIds: ['c-cs380', 'c-cs200'] });
-    expect(screen.getByRole('button', { name: /^CS/ })).toHaveTextContent('2 ✓');
-  });
-
-  it('filters by code and by title, opening every matching subject', () => {
+  it('filters by code and by title', () => {
     renderList();
     const filter = screen.getByLabelText('Filter courses by code or title');
 
-    // A match inside a collapsed subject must still surface.
     fireEvent.change(filter, { target: { value: 'EE310' } });
-    expect(screen.getByLabelText(/EE310/)).toBeInTheDocument();
-    expect(screen.queryByLabelText(/CS200/)).not.toBeInTheDocument();
+    expect(codes()).toEqual(['EE310']);
 
-    fireEvent.change(filter, { target: { value: 'digital logic' } });
-    expect(screen.getByLabelText(/CE305/)).toBeInTheDocument();
+    fireEvent.change(filter, { target: { value: 'computer organization' } });
+    expect(codes()).toEqual(['CE305']);
   });
 
   it('reports when nothing matches instead of rendering an empty panel', () => {
@@ -119,13 +88,12 @@ describe('CompletedCourseList', () => {
 
   it('normalises decimal credit strings so both planner columns agree', () => {
     renderList();
-    const cs = screen.getByRole('button', { name: /^CS/ }).closest('section');
-    expect(within(cs as HTMLElement).getAllByText('3 cr').length).toBeGreaterThan(0);
-    expect(within(cs as HTMLElement).getByText('1 cr')).toBeInTheDocument();
-    expect(within(cs as HTMLElement).queryByText('3.0 cr')).not.toBeInTheDocument();
+    expect(screen.getAllByText('3 cr').length).toBeGreaterThan(0);
+    expect(screen.getByText('1 cr')).toBeInTheDocument();
+    expect(screen.queryByText('3.0 cr')).not.toBeInTheDocument();
   });
 
-  it('has no accessibility violations, collapsed or filtered', async () => {
+  it('has no accessibility violations, listed or filtered', async () => {
     const { container } = renderList({ completedIds: ['c-cs380'] });
     expect(await axe(container)).toHaveNoViolations();
 

@@ -14,10 +14,13 @@ export class PlannerTermDto {
   @ApiProperty({
     type: [String],
     description:
-      'Course IDs planned for this term (order within a term is irrelevant)',
+      "Course IDs to evaluate for this term (order within a term is irrelevant). This is not only what the student has selected: the planner evaluates every course on offer so it can show what is blocked before the student commits, so the bound is a term's full published schedule rather than a plausible course load.",
   })
   @IsArray()
-  @ArrayMaxSize(30)
+  // Sized for a whole term schedule, not a student's course load. The original
+  // limit of 30 was the latter, and rejected every degree the moment Fall 2026
+  // was seeded in full — 96 offerings, of which BSCS alone matches 55.
+  @ArrayMaxSize(200)
   @IsUUID('4', { each: true })
   courseIds: string[];
 
@@ -52,6 +55,14 @@ export class EvaluatePlanDto {
   @ValidateNested({ each: true })
   @Type(() => PlannerTermDto)
   terms: PlannerTermDto[];
+
+  @ApiPropertyOptional({
+    description:
+      "Optional degree to evaluate within. Prerequisites outside this program's own course set are treated as background preparation — cleared before admission — and no longer block eligibility. Omit to evaluate against the whole catalog.",
+  })
+  @IsOptional()
+  @IsUUID('4')
+  programId?: string;
 }
 
 // ── Response shapes ─────────────────────────────────────────────
@@ -105,8 +116,29 @@ export class EvaluatedCourseDto {
   offered: boolean | null;
 
   @ApiProperty({
+    nullable: true,
     description:
-      'True when the student could actually register: eligible AND not known to be unoffered (offered !== false).',
+      'Whether the registrar has registration open for this offering. Distinct from `offered`: a cancelled or closed course still runs on the schedule but cannot be enrolled in. Null when offering data does not apply.',
+  })
+  openForRegistration: boolean | null;
+
+  @ApiProperty({
+    nullable: true,
+    description:
+      'Sections on the published schedule, or null when the schedule does not state one.',
+  })
+  sectionCount: number | null;
+
+  @ApiProperty({
+    nullable: true,
+    description:
+      "The registrar's note on this offering, verbatim — e.g. 'Cancelled due to low enrollment'. Null when there is none.",
+  })
+  statusNote: string | null;
+
+  @ApiProperty({
+    description:
+      'True when the student could actually register: eligible AND not known to be unoffered AND registration is not closed.',
   })
   registrable: boolean;
 
@@ -121,6 +153,13 @@ export class EvaluatedCourseDto {
 
   @ApiProperty({ type: [MissingPrerequisiteDto] })
   missingPrerequisites: MissingPrerequisiteDto[];
+
+  @ApiProperty({
+    type: [PlannerCourseRefDto],
+    description:
+      "Unmet prerequisites that belong to a different program than the one being evaluated. Reported for transparency but excluded from `eligible`: a graduate programme's admission requirements already cover this ground, so blocking an MSCS student on an undergraduate BSCS course would be wrong. Always empty when no programId is supplied.",
+  })
+  backgroundPrerequisites: PlannerCourseRefDto[];
 
   @ApiProperty({ type: [CorequisiteStatusDto] })
   corequisites: CorequisiteStatusDto[];

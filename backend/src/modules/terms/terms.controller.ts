@@ -1,5 +1,5 @@
-import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { TermsService } from './terms.service';
 
 @ApiTags('terms')
@@ -20,8 +20,20 @@ export class TermsController {
   @Get(':id')
   @ApiOperation({
     summary: 'Get one academic term with its offered courses',
+    description:
+      'Each course carries its registration status (openForRegistration, sectionCount, statusNote). With programId, every course also reports inProgram — the whole term is still returned so the caller can show how many offerings fall outside the degree and offer to reveal them.',
   })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.service.findOne(id);
+  @ApiQuery({
+    name: 'programId',
+    required: false,
+    description:
+      'Scope the offerings to a degree. Courses outside it are still returned, flagged inProgram: false.',
+  })
+  findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query('programId', new ParseUUIDPipe({ optional: true }))
+    programId?: string,
+  ) {
+    return this.service.findOne(id, programId);
   }
 }
