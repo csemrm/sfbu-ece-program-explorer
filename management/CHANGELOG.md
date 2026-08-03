@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.5.2](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.5.1...v1.5.2) (2026-08-03)
+
+
+### Bug Fixes
+
+* **catalog:** reconcile seed data with the 2025-2026 university catalog ([#9](https://github.com/csemrm/sfbu-ece-program-explorer/issues/9)) ([f246725](https://github.com/csemrm/sfbu-ece-program-explorer/commit/f2467252b3280dc5a7ca2e16421e07cb2ad76f5a))
+
 ## [1.5.1](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.5.0...v1.5.1) (2026-08-02)
 
 
