@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# [1.6.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.5.2...v1.6.0) (2026-08-03)
+
+
+### Features
+
+* **planner:** full Fall 2026 schedule, registration status and degree-scoped prerequisites ([#10](https://github.com/csemrm/sfbu-ece-program-explorer/issues/10)) ([eb78722](https://github.com/csemrm/sfbu-ece-program-explorer/commit/eb78722d9e7cae2e14c2ad33ed3c685d5be26af4))
+
 ## [1.5.2](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.5.1...v1.5.2) (2026-08-03)
 
 
