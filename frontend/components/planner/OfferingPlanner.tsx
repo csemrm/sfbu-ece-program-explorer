@@ -131,7 +131,11 @@ export function OfferingPlanner({
     const s = loadState();
     setCompletedIds(s.completedIds);
     setSelectedIds(s.selectedIds);
-    setTermId(s.termId ?? defaultTermId);
+    // A stored term that no longer exists falls back to the default rather than
+    // being restored blindly. Without this the selector showed a real term while
+    // the column beside it read "No academic terms have been set up yet" — the
+    // id had survived a term being deleted, or the database being replaced.
+    setTermId(s.termId && academicTerms.some((t) => t.id === s.termId) ? s.termId : defaultTermId);
     const known = (id: string | null) => !!id && programs.some((p) => p.id === id);
     setProgramId(
       known(initialProgramId)
@@ -142,7 +146,7 @@ export function OfferingPlanner({
     );
     setShowAllOfferings(s.showAllOfferings);
     setHydrated(true);
-  }, [defaultTermId, defaultProgramId, programs, initialProgramId]);
+  }, [defaultTermId, defaultProgramId, programs, academicTerms, initialProgramId]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -309,7 +313,10 @@ export function OfferingPlanner({
    * reveals the rest of the term.
    */
   const offeredGroups = useMemo(() => {
-    const buckets = new Map<string, { name: string; order: number; courses: typeof visibleOffered }>();
+    const buckets = new Map<
+      string,
+      { name: string; order: number; courses: typeof visibleOffered }
+    >();
     for (const course of visibleOffered) {
       const name = program?.groups[course.courseId] ?? OUTSIDE_DEGREE;
       const order = program?.groupOrder[course.courseId] ?? Number.MAX_SAFE_INTEGER;

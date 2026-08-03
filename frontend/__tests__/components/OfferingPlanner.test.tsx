@@ -830,14 +830,63 @@ describe('OfferingPlanner — offerings grouped into requirement cards', () => {
   it('counts the courses in each card', async () => {
     render(<OfferingPlanner courses={courses} academicTerms={terms} programs={progs} />);
     await waitFor(() => expect(cardTitles()).toContain('Foundation Courses'));
-    expect(
-      screen.getByRole('heading', { level: 3, name: /Foundation Courses/ }),
-    ).toHaveTextContent('1');
+    expect(screen.getByRole('heading', { level: 3, name: /Foundation Courses/ })).toHaveTextContent(
+      '1',
+    );
   });
 
   it('files a course the degree has no group for under one trailing card', async () => {
     render(<OfferingPlanner courses={courses} academicTerms={terms} programs={progs} />);
     // Last, so the degree's own groups are read first.
     await waitFor(() => expect(cardTitles().at(-1)).toBe('Not part of this degree'));
+  });
+});
+
+describe('OfferingPlanner — a stored term that no longer exists', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    api.terms.get.mockResolvedValue(termDetail(['c-2', 'c-3']));
+    api.planner.evaluate.mockImplementation(({ terms: t }: { terms: { courseIds: string[] }[] }) =>
+      Promise.resolve(evaluationFor(t[0].courseIds)),
+    );
+  });
+
+  it('falls back to the default term rather than showing none', async () => {
+    // A plan saved against a deleted term — or a replaced database — left the
+    // selector showing a real term while the column read "No academic terms
+    // have been set up yet".
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        completedIds: [],
+        termId: 'a-term-that-was-deleted',
+        selectedIds: [],
+        programId: 'p-1',
+        showAllOfferings: true,
+      }),
+    );
+
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+
+    expect(await screen.findByText(/^Offered in Fall 2026$/)).toBeInTheDocument();
+    expect(screen.queryByText(/No academic terms have been set up yet/)).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect((screen.getByLabelText('Next semester') as HTMLSelectElement).value).toBe('t-1'),
+    );
+  });
+
+  it('still restores a stored term that does exist', async () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        completedIds: [],
+        termId: 't-1',
+        selectedIds: [],
+        programId: 'p-1',
+        showAllOfferings: true,
+      }),
+    );
+    render(<OfferingPlanner courses={courses} academicTerms={terms} programs={programs} />);
+    expect(await screen.findByText(/^Offered in Fall 2026$/)).toBeInTheDocument();
   });
 });
