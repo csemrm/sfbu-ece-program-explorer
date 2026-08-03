@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# [1.9.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.8.0...v1.9.0) (2026-08-03)
+
+
+### Features
+
+* **roadmap,planner:** choose one specialization, group offerings into cards ([#14](https://github.com/csemrm/sfbu-ece-program-explorer/issues/14)) ([bec8fc5](https://github.com/csemrm/sfbu-ece-program-explorer/commit/bec8fc5315fa0f95a88ee2d7181ff039d52b1974))
+
 # [1.8.0](https://github.com/csemrm/sfbu-ece-program-explorer/compare/v1.7.1...v1.8.0) (2026-08-03)
 
 
